@@ -869,6 +869,45 @@ async function renderDashboard(){
     </div>`;
 }
 
+function updateSliderLabel(){
+  const slider=document.getElementById('qcount-slider');
+  const val=document.getElementById('qcount-val');
+  if(slider&&val)val.textContent=slider.value;
+}
+
+function updateCountDisplay(all,nw,wr){
+  const allEl=document.getElementById('cnt-all');
+  const newEl=document.getElementById('cnt-new');
+  const wrEl=document.getElementById('cnt-wrong');
+  if(allEl)allEl.textContent=`${all} questions`;
+  if(newEl)newEl.textContent=`${nw} unanswered`;
+  if(wrEl)wrEl.textContent=`${wr} wrong`;
+  const btns=document.querySelectorAll('.filter-btn');
+  if(btns[1])btns[1].disabled=nw===0;
+  if(btns[2])btns[2].disabled=wr===0;
+  const avail=qFilter==='all'?all:qFilter==='new'?nw:wr;
+  const slider=document.getElementById('qcount-slider');
+  const maxEl=document.getElementById('qcount-max');
+  const genBtn=document.getElementById('gen-btn');
+  const valEl=document.getElementById('qcount-val');
+  if(slider){
+    const max=Math.min(40,avail);
+    slider.max=max||1;
+    if(parseInt(slider.value)>max)slider.value=max;
+    if(valEl)valEl.textContent=slider.value;
+    if(maxEl)maxEl.textContent=`(${avail} available, max 40)`;
+    if(genBtn)genBtn.disabled=avail===0;
+  }
+}
+
+function setFilter(f){
+  qFilter=f;
+  document.querySelectorAll('.filter-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['all','new','wrong'][i]===f);
+  });
+  updateCountDisplay(qCounts.all,qCounts.new,qCounts.wrong);
+}
+
 function showCreateExam(){
   const prevSlider=document.getElementById('qcount-slider')?.value||'20';
   const body=document.getElementById('homeBody');
@@ -880,9 +919,9 @@ function showCreateExam(){
       </div>
       ${renderCreateExamHTML()}
     </div>`;
-  // restore slider value
   const slider=document.getElementById('qcount-slider');
-  if(slider){slider.value=prevSlider;updateSliderLabel();}
+  const val=document.getElementById('qcount-val');
+  if(slider){slider.value=prevSlider;if(val)val.textContent=prevSlider;}
   renderCatAccordion();
   if(selSubjects.size>0||randomMode)refreshCounts();
 }
@@ -971,7 +1010,7 @@ function renderCreateExamHTML(){
         <div class="gen-step-title">${hasDiscs?'Step 5':'Step 4'} — Number of questions</div>
         <div class="qcount-row">
           <span class="qcount-label">Questions:</span>
-          <input type="range" class="qcount-slider" id="qcount-slider" min="1" max="40" value="20" oninput="updateSliderLabel();document.getElementById('qcount-val').textContent=this.value;">
+          <input type="range" class="qcount-slider" id="qcount-slider" min="1" max="40" value="20" oninput="document.getElementById('qcount-val').textContent=this.value;">
           <span class="qcount-val" id="qcount-val">20</span>
           <span class="qcount-max" id="qcount-max"></span>
         </div>
