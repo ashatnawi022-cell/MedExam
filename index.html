@@ -456,7 +456,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="nav-right">
       <span class="nav-user" id="navUser" style="display:none;"></span>
       <span class="admin-badge" id="navAdminBadge" style="display:none;">ADMIN</span>
-      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="showPage('adminPage');loadSubjTable()">⚙ Admin</button>
+      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">⚙ Admin</button>
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
     </div>
   </nav>
@@ -754,19 +754,20 @@ async function initApp(){
   const{data:{user}}=await sb.auth.getUser();
   if(!user){showPage('authPage');return;}
   CU=user;
+  // always hide admin button first
+  document.getElementById('navAdminBadge').style.display='none';
+  document.getElementById('adminBtn').style.display='none';
   const{data:p,error:pErr}=await sb.from('profiles').select('*').eq('id',user.id).single();
   CP=p;
-  // if profile fetch fails entirely, don't block — show home and log error
   if(pErr){console.error('Profile fetch error:',pErr);showPage('homePage');renderDashboard();return;}
-  // admins always get through, pending users see the waiting screen
   const isAdmin=p?.is_admin===true;
   const isApproved=p?.status==='approved';
-  if(!isAdmin&&!isApproved){
-    showPage('pendingPage');
-    return;
-  }
+  if(!isAdmin&&!isApproved){showPage('pendingPage');return;}
   document.getElementById('navUser').textContent=p?.full_name||user.email;
-  if(isAdmin){document.getElementById('navAdminBadge').style.display='inline';document.getElementById('adminBtn').style.display='inline-flex';}
+  if(isAdmin){
+    document.getElementById('navAdminBadge').style.display='inline';
+    document.getElementById('adminBtn').style.display='inline-flex';
+  }
   showPage('homePage');renderDashboard();
 }
 
@@ -1062,15 +1063,14 @@ async function refreshCounts(){
   const catIds=[];
   selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
   if(!catIds.length){updateCountDisplay(0,0,0);return;}
-  // first fetch all matching questions without discipline filter
   const{data:qs}=await sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds);
   let pool=qs||[];
-  // only apply discipline filter if questions actually have disciplines assigned
+  // only filter by discipline if some are selected (not all, not none)
   if(!allDiscsSelected&&selDisciplines.size>0){
-    const anyHasDisc=pool.some(q=>q.discipline_id);
-    if(anyHasDisc)pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
-    // if no questions have disciplines yet, ignore the filter entirely
+    pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
   }
+  // if allDiscsSelected=false and selDisciplines is empty = deselect all = show 0
+  // but that's intentional — user chose nothing
   const allQIds=pool.map(q=>q.id);
   const{data:atts}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
   const answeredMap={};
@@ -1132,10 +1132,9 @@ async function generateSession(){
   // fetch matching questions
   const{data:qs}=await sb.from('questions').select('*').in('category_id',catIds);
   let pool=qs||[];
-  // only apply discipline filter if questions actually have disciplines assigned
+  // only filter by discipline if some specific ones are selected
   if(!allDiscsSelected&&selDisciplines.size>0){
-    const anyHasDisc=pool.some(q=>q.discipline_id);
-    if(anyHasDisc)pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
+    pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
   }
   // filter by answered status
   if(qFilter!=='all'){
