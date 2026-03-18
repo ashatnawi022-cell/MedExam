@@ -1861,9 +1861,11 @@ async function loadQTable(){
   const{data:qs}=await query;
   if(!qs?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No questions yet.</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>ID</th><th>Question</th><th>Topic</th><th>Subject</th><th>Correct</th><th>Actions</th></tr></thead><tbody>
-    ${qs.map((q,i)=>`<tr>
+    ${qs.map((q,i)=>{
+      const plainText=(q.question_text||'').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').trim();
+      return`<tr>
       <td><span style="background:var(--gray100);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace;">${q.custom_id||'—'}</span></td>
-      <td style="max-width:280px;">${q.question_text.slice(0,70)}…</td>
+      <td style="max-width:280px;">${plainText.slice(0,70)}${plainText.length>70?'…':''}</td>
       <td><span style="background:var(--gray100);padding:2px 8px;border-radius:6px;font-size:12px;">${q.categories?.name||'—'}</span></td>
       <td><span style="background:#eff6ff;padding:2px 8px;border-radius:6px;font-size:12px;color:var(--blue);">${q.disciplines?.name||'—'}</span></td>
       <td><b>${LTRS2[q.correct_answer]}</b></td>
@@ -1871,7 +1873,7 @@ async function loadQTable(){
         <button class="btn btn-sm btn-secondary" onclick="openQModal('${q.id}')">Edit</button>
         <button class="btn btn-sm btn-danger" onclick="delQ('${q.id}')">Delete</button>
       </td>
-    </tr>`).join('')}</tbody></table>`;
+    </tr>`;}).join('')}</tbody></table>`;
 }
 async function loadQModalCats(){
   const sid=document.getElementById('qm-subj').value;
