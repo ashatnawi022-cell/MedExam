@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MedExam — Medical Question Bank</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 0 L30 5 L30 20 Q30 30 16 32 Q2 30 2 20 L2 5 Z' fill='%230f2744'/><rect x='8' y='14' width='14' height='4' rx='2' fill='%234fc3f7'/><rect x='13' y='9' width='4' height='14' rx='2' fill='%234fc3f7'/></svg>">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
@@ -49,7 +50,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 /* AUTH */
 .auth-wrap{min-height:100vh;display:flex;}
 .auth-left{width:400px;flex-shrink:0;background:var(--navy);padding:48px;display:flex;flex-direction:column;justify-content:space-between;}
-.auth-logo{color:white;font-family:'DM Serif Display',serif;font-size:28px;}
+.auth-logo{display:flex;align-items:center;}
 .auth-logo span{color:var(--cyan);}
 .auth-tagline{color:rgba(255,255,255,0.55);font-size:14px;margin-top:6px;}
 .auth-features{margin-top:36px;display:flex;flex-direction:column;gap:14px;}
@@ -69,7 +70,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
 /* NAV */
 .app-nav{background:var(--navy);padding:0 14px;display:flex;align-items:center;height:58px;gap:5px;position:sticky;top:0;z-index:100;min-width:0;overflow:hidden;}
-.nav-brand{color:white;font-family:'DM Serif Display',serif;font-size:20px;flex-shrink:0;margin-right:2px;}
+.nav-brand{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-right:4px;}
 .nav-brand span{color:var(--cyan);}
 .nav-links{display:flex;gap:2px;flex:1;min-width:0;overflow:hidden;}
 .nav-link{color:rgba(255,255,255,0.6);font-size:12px;font-weight:500;padding:5px 9px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
@@ -394,7 +395,14 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   <div class="auth-wrap">
     <div class="auth-left">
       <div>
-        <div class="auth-logo">Med<span>Exam</span></div>
+        <div class="auth-logo"><svg height="44" viewBox="0 0 220 44" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16 0 L32 5.5 L32 24 Q32 38 16 44 Q0 38 0 24 L0 5.5 Z" fill="#1a3a5c"/>
+  <path d="M16 0 L32 5.5 L32 24 Q32 38 16 44 Q0 38 0 24 L0 5.5 Z" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
+  <rect x="8" y="17.5" width="16" height="5" rx="2.5" fill="#4fc3f7"/>
+  <rect x="13.5" y="12" width="5" height="16" rx="2.5" fill="#4fc3f7"/>
+  <text x="40" y="31" font-family="DM Serif Display,Georgia,serif" font-size="28" fill="white" letter-spacing="-0.5">Med</text>
+  <text x="98" y="31" font-family="DM Serif Display,Georgia,serif" font-size="28" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
+</svg></div>
         <div class="auth-tagline">Medical Question Bank</div>
         <div class="auth-features">
           <div class="auth-feat"><div class="auth-feat-icon">🏥</div><div>Clinical questions by medical experts for University of Jordan students</div></div>
@@ -466,7 +474,14 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <!-- HOME PAGE -->
 <div id="homePage" class="page">
   <nav class="app-nav">
-    <div class="nav-brand">Med<span>Exam</span></div>
+    <div class="nav-brand"><svg height="32" viewBox="0 0 180 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="#1a3a5c"/>
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="none" stroke="#4fc3f7" stroke-width="1.2"/>
+  <rect x="6.5" y="13" width="11" height="4" rx="2" fill="#4fc3f7"/>
+  <rect x="10" y="9.5" width="4" height="11" rx="2" fill="#4fc3f7"/>
+  <text x="30" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="white" letter-spacing="-0.5">Med</text>
+  <text x="72" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
+</svg></div>
     <div class="nav-links">
       <button class="nav-link active" id="nav-home" onclick="goHome()">🏠 Home</button>
     </div>
@@ -498,7 +513,14 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <!-- ADMIN PAGE -->
 <div id="adminPage" class="page" style="display:none;">
   <nav class="app-nav">
-    <div class="nav-brand">Med<span>Exam</span> <span style="font-size:12px;color:var(--cyan);font-family:'DM Sans',sans-serif;font-weight:600;">Admin</span></div>
+    <div class="nav-brand"><svg height="32" viewBox="0 0 180 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="#1a3a5c"/>
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="none" stroke="#4fc3f7" stroke-width="1.2"/>
+  <rect x="6.5" y="13" width="11" height="4" rx="2" fill="#4fc3f7"/>
+  <rect x="10" y="9.5" width="4" height="11" rx="2" fill="#4fc3f7"/>
+  <text x="30" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="white" letter-spacing="-0.5">Med</text>
+  <text x="72" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
+</svg><span style="font-size:11px;color:var(--cyan);font-family:'DM Sans',sans-serif;font-weight:600;margin-left:4px;">Admin</span></div>
     <div class="nav-right">
       <button class="btn btn-sm btn-secondary" onclick="showPage('homePage');renderDashboard()">← Back to App</button>
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
