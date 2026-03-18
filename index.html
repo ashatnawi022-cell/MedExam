@@ -3201,6 +3201,18 @@ async function parseAndFill(){
     while(j<nextOptIdx){
       var ln=lines[j];
       if(pctRegex.test(ln)||!ln){j++;continue;}
+      // Stop if line looks like explanation content:
+      // - long sentence (>80 chars) = explanation paragraph
+      // - starts with "Correct:" or "Incorrect"
+      // - starts with "Educational objective"
+      // - starts with "(Choice"
+      // - contains percentage like "63%" or "44%" standalone
+      if(ln.length>80)break;
+      if(/^[Cc]orrect[:\s]/i.test(ln))break;
+      if(/^[Ii]ncorrect/i.test(ln))break;
+      if(/^[Ee]ducational\s+objective/i.test(ln))break;
+      if(/^\(Choice/i.test(ln))break;
+      if(/^\d+%\s*(Correct|Pathology|Physiology|Pharmacology|Anatomy|Biochemistry|Microbiology|Immunology|Histology|Embryology|Genetics|Biostatistics|Behavioral)/i.test(ln))break;
       if(!optText)optText=ln;
       else optText+=' '+ln;
       j++;
