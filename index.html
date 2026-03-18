@@ -892,6 +892,20 @@ function renderCreateExamHTML(){
       <h2>🎯 Generate Practice Session</h2>
       <div class="sub">Filter by subject and system, then set how many questions you want.</div>
 
+      <!-- Random Mode Toggle -->
+      <div style="display:flex;align-items:center;gap:12px;background:${randomMode?'#eff6ff':'var(--gray50)'};border:1.5px solid ${randomMode?'var(--blue)':'var(--gray200)'};border-radius:10px;padding:12px 16px;margin-bottom:20px;cursor:pointer;" onclick="toggleRandomMode()">
+        <div style="font-size:24px;">🎲</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:${randomMode?'var(--blue)':'var(--gray700)'};">Random Mode</div>
+          <div style="font-size:12px;color:var(--gray400);margin-top:2px;">Pull random questions from the entire question bank, ignoring systems and subjects</div>
+        </div>
+        <div style="width:40px;height:22px;background:${randomMode?'var(--blue)':'var(--gray300)'};border-radius:11px;position:relative;transition:background 0.2s;flex-shrink:0;">
+          <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;${randomMode?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+        </div>
+      </div>
+
+      <!-- Steps — hidden in random mode -->
+      <div id="filter-steps-wrap" style="display:${randomMode?'none':'block'};">
       ${hasDiscs?`
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div class="gen-step-title" style="margin:0;">Step 1 — Select subjects</div>
@@ -932,8 +946,9 @@ function renderCreateExamHTML(){
         <div class="gen-step-title">${hasDiscs?'Step 3':'Step 2'} — Choose topics</div>
         <div class="subj-categories" id="cat-accordion-body"></div>
       </div>
+      </div><!-- end filter-steps-wrap -->
 
-      <div id="filter-step" style="display:${anythingSelected?'block':'none'};">
+      <div id="filter-step" style="display:${anythingSelected||randomMode?'block':'none'};">
         <div class="gen-step-title">${hasDiscs?'Step 4':'Step 3'} — Question filter</div>
         <div class="filter-row">
           <button class="filter-btn${qFilter==='all'?' active':''}" onclick="setFilter('all')">
@@ -948,7 +963,7 @@ function renderCreateExamHTML(){
         </div>
       </div>
 
-      <div id="count-step" style="display:${anythingSelected?'block':'none'};">
+      <div id="count-step" style="display:${anythingSelected||randomMode?'block':'none'};">
         <div class="gen-step-title">${hasDiscs?'Step 5':'Step 4'} — Number of questions</div>
         <div class="qcount-row">
           <span class="qcount-label">Questions:</span>
@@ -973,6 +988,12 @@ function renderCreateExamHTML(){
     </div>`;
 }
 
+function toggleRandomMode(){
+  randomMode=!randomMode;
+  showCreateExam();
+  if(randomMode)refreshCounts();
+}
+
 function toggleSubjectCE(id){
   if(selSubjects.has(id))selSubjects.delete(id);
   else{selSubjects.add(id);if(!selCategories[id])selCategories[id]=new Set((subjectCategories[id]||[]).map(c=>c.id));}
@@ -993,6 +1014,7 @@ function deselectAllSystems(){
 }
 
 let allDiscsSelected=true; // true = all on, false = use selDisciplines (empty = none)
+let randomMode=false; // true = ignore all filters, pull from all questions
 
 function toggleDisc(id){
   if(allDiscsSelected){
@@ -1060,18 +1082,24 @@ function toggleAllCats(sid,allOn){
 }
 
 async function refreshCounts(){
-  if(selSubjects.size===0)return;
-  const catIds=[];
-  selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
-  if(!catIds.length){updateCountDisplay(0,0,0);return;}
-  const{data:qs}=await sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds);
-  let pool=qs||[];
-  // only filter by discipline if some are selected (not all, not none)
+  if(selSubjects.size===0&&!randomMode)return;
+  let pool=[];
+  if(randomMode){
+    const{data:qs}=await sb.from('questions').select('id,category_id,discipline_id');
+    pool=qs||[];
+  } else {
+    const catIds=[];
+    selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
+    const[{data:catQs},{data:uncatQs}]=await Promise.all([
+      catIds.length?sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds):Promise.resolve({data:[]}),
+      sb.from('questions').select('id,category_id,discipline_id').is('category_id',null)
+    ]);
+    pool=[...(catQs||[]),...(uncatQs||[])];
+    const seen=new Set();pool=pool.filter(q=>{if(seen.has(q.id))return false;seen.add(q.id);return true;});
+  }
   if(!allDiscsSelected&&selDisciplines.size>0){
     pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
   }
-  // if allDiscsSelected=false and selDisciplines is empty = deselect all = show 0
-  // but that's intentional — user chose nothing
   const allQIds=pool.map(q=>q.id);
   const{data:atts}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
   const answeredMap={};
@@ -1085,59 +1113,25 @@ async function refreshCounts(){
   updateCountDisplay(allQIds.length,newCount,wrongCount);
 }
 
-function updateCountDisplay(all,nw,wr){
-  const allEl=document.getElementById('cnt-all');
-  const newEl=document.getElementById('cnt-new');
-  const wrEl=document.getElementById('cnt-wrong');
-  if(allEl)allEl.textContent=`${all} questions`;
-  if(newEl)newEl.textContent=`${nw} unanswered`;
-  if(wrEl)wrEl.textContent=`${wr} wrong`;
-  const newBtn=document.querySelector('.filter-btn:nth-child(2)');
-  const wrBtn=document.querySelector('.filter-btn:nth-child(3)');
-  if(newBtn)newBtn.disabled=nw===0;
-  if(wrBtn)wrBtn.disabled=wr===0;
-  // update slider max
-  const avail=qFilter==='all'?all:qFilter==='new'?nw:wr;
-  const slider=document.getElementById('qcount-slider');
-  const maxEl=document.getElementById('qcount-max');
-  const genBtn=document.getElementById('gen-btn');
-  if(slider){
-    const max=Math.min(40,avail);
-    slider.max=max||1;
-    if(parseInt(slider.value)>max)slider.value=max;
-    if(maxEl)maxEl.textContent=`(${avail} available, max 40)`;
-    if(genBtn)genBtn.disabled=avail===0;
-    updateSliderLabel();
-  }
-}
-
-function setFilter(f){
-  qFilter=f;
-  document.querySelectorAll('.filter-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['all','new','wrong'][i]===f);
-  });
-  updateCountDisplay(qCounts.all,qCounts.new,qCounts.wrong);
-}
-
-function updateSliderLabel(){
-  const slider=document.getElementById('qcount-slider');
-  const val=document.getElementById('qcount-val');
-  if(slider&&val)val.textContent=slider.value;
-}
-
 async function generateSession(){
   const qcount=parseInt(document.getElementById('qcount-slider').value);
-  const catIds=[];
-  selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
-  if(!catIds.length){toast('Please select at least one system and topic');return;}
-  // fetch matching questions
-  const{data:qs}=await sb.from('questions').select('*').in('category_id',catIds);
-  let pool=qs||[];
-  // only filter by discipline if some specific ones are selected
+  let pool=[];
+  if(randomMode){
+    const{data:qs}=await sb.from('questions').select('*');
+    pool=qs||[];
+  } else {
+    const catIds=[];
+    selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
+    const[{data:catQs},{data:uncatQs}]=await Promise.all([
+      catIds.length?sb.from('questions').select('*').in('category_id',catIds):Promise.resolve({data:[]}),
+      sb.from('questions').select('*').is('category_id',null)
+    ]);
+    pool=[...(catQs||[]),...(uncatQs||[])];
+    const seen=new Set();pool=pool.filter(q=>{if(seen.has(q.id))return false;seen.add(q.id);return true;});
+  }
   if(!allDiscsSelected&&selDisciplines.size>0){
     pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
   }
-  // filter by answered status
   if(qFilter!=='all'){
     const{data:atts}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
     const answeredMap={};
@@ -1150,11 +1144,8 @@ async function generateSession(){
   }
   if(!pool.length){toast('No questions match your selection. Try a different filter.');return;}
   pool=pool.sort(()=>Math.random()-0.5).slice(0,qcount);
-  // build descriptive title
-  const systemNames=[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ');
-  const discNames=selDisciplines.size>0?[...selDisciplines].map(did=>allDisciplines.find(d=>d.id===did)?.name||'').join(', '):'All Subjects';
-  const filterLabel=qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':'Wrong Qs';
-  const title=`${systemNames} · ${discNames} · ${filterLabel}`;
+  const title=randomMode?'Random Session':
+    `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')} · ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':'Wrong Qs'}`;
   await launchSession(pool,title);
 }
 
