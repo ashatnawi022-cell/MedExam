@@ -238,7 +238,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt.excl .opt-txt{text-decoration:line-through;color:var(--gray300);}
 .opt.excl .L{color:var(--gray300)!important;}
 .opt.excl{border-color:var(--gray100);background:var(--gray50);}
-.excl-btn{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:none;font-size:11px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;}
+.excl-btn{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:none;background:none;font-size:11px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;}
 .opt:hover:not([disabled]) .excl-btn{display:flex;background:var(--red-light);color:var(--red);}
 .opt.excl .excl-btn{display:flex!important;background:var(--green-light);color:var(--green);}
 .opt[disabled] .excl-btn{display:none!important;}
@@ -1071,7 +1071,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt.excl .opt-txt{text-decoration:line-through;color:var(--gray300);}
 .opt.excl .L{color:var(--gray300)!important;}
 .opt.excl{border-color:var(--gray100);background:var(--gray50);}
-.excl-btn{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:none;font-size:11px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;}
+.excl-btn{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:none;background:none;font-size:11px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;}
 .opt:hover:not([disabled]) .excl-btn{display:flex;background:var(--red-light);color:var(--red);}
 .opt.excl .excl-btn{display:flex!important;background:var(--green-light);color:var(--green);}
 .opt[disabled] .excl-btn{display:none!important;}
@@ -2497,9 +2497,10 @@ async function eRenderQ(){
     else{if(excl.has(i))cls+=' excl';if(myI===i)cls+=' sel-opt';}
     const imgs=q.options_images||[];
     const imgHtml=imgs[i]?`<img src="${imgs[i]}" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;display:block;">`:'';
-    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})" style="${imgs[i]?'flex-direction:column;align-items:flex-start;height:auto;padding:10px 14px;':''}">
-      <div style="display:flex;align-items:center;width:100%;"><span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
-      ${!isAns?`<button class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</button>`:''}</div>
+    const hasImg=!!imgs[i];
+    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})" style="${hasImg?'flex-direction:column;align-items:flex-start;height:auto;':''}">
+      <span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
+      ${!isAns?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
       ${imgHtml}
     </button>`;
   }).join('');
