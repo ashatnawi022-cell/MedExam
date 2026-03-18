@@ -870,6 +870,7 @@ async function renderDashboard(){
 }
 
 function showCreateExam(){
+  const prevSlider=document.getElementById('qcount-slider')?.value||'20';
   const body=document.getElementById('homeBody');
   body.innerHTML=`
     <div class="page-body" style="max-width:1000px;margin:0 auto;padding:28px 24px 80px;">
@@ -879,8 +880,11 @@ function showCreateExam(){
       </div>
       ${renderCreateExamHTML()}
     </div>`;
+  // restore slider value
+  const slider=document.getElementById('qcount-slider');
+  if(slider){slider.value=prevSlider;updateSliderLabel();}
   renderCatAccordion();
-  if(selSubjects.size>0)refreshCounts();
+  if(selSubjects.size>0||randomMode)refreshCounts();
 }
 
 function renderCreateExamHTML(){
@@ -967,7 +971,7 @@ function renderCreateExamHTML(){
         <div class="gen-step-title">${hasDiscs?'Step 5':'Step 4'} — Number of questions</div>
         <div class="qcount-row">
           <span class="qcount-label">Questions:</span>
-          <input type="range" class="qcount-slider" id="qcount-slider" min="1" max="40" value="20" oninput="updateSliderLabel()">
+          <input type="range" class="qcount-slider" id="qcount-slider" min="1" max="40" value="20" oninput="updateSliderLabel();document.getElementById('qcount-val').textContent=this.value;">
           <span class="qcount-val" id="qcount-val">20</span>
           <span class="qcount-max" id="qcount-max"></span>
         </div>
@@ -998,6 +1002,7 @@ function toggleSubjectCE(id){
   if(selSubjects.has(id))selSubjects.delete(id);
   else{selSubjects.add(id);if(!selCategories[id])selCategories[id]=new Set((subjectCategories[id]||[]).map(c=>c.id));}
   showCreateExam();
+  refreshCounts();
 }
 
 function selectAllSystems(){
@@ -1006,11 +1011,13 @@ function selectAllSystems(){
     if(!selCategories[s.id])selCategories[s.id]=new Set((subjectCategories[s.id]||[]).map(c=>c.id));
   });
   showCreateExam();
+  refreshCounts();
 }
 
 function deselectAllSystems(){
   selSubjects=new Set();
   showCreateExam();
+  updateCountDisplay(0,0,0);
 }
 
 let allDiscsSelected=true; // true = all on, false = use selDisciplines (empty = none)
