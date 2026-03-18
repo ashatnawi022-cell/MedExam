@@ -709,6 +709,26 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   </div>
 </div>
 
+<!-- Reset Password Modal -->
+<div class="modal-bg" id="reset-pass-modal" style="display:none;">
+  <div class="modal" style="text-align:left;max-width:380px;">
+    <h2>🔑 Reset Password</h2>
+    <p style="font-size:13px;color:var(--gray500);margin-bottom:16px;">Set a new password for <b id="reset-pass-name"></b>. Share it with them securely.</p>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <input type="text" class="form-input" id="reset-pass-input" placeholder="Enter new password (min 6 chars)">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-secondary btn-sm" onclick="generateTempPass()">🎲 Generate random</button>
+    </div>
+    <div class="auth-err" id="reset-pass-err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="hideAModal('reset-pass-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="doResetPass()">Set Password</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1938,6 +1958,7 @@ async function loadUsersTable(){
              <button class="btn btn-sm btn-danger" onclick="rejectUser('${x.id}','${x.email||''}')">✕ Reject</button>`
           :`<button class="btn btn-sm btn-danger" onclick="revokeUser('${x.id}')">Revoke</button>`}
         <button class="btn btn-sm btn-secondary" onclick="toggleAdmin('${x.id}',${x.is_admin})">${x.is_admin?'Remove Admin':'Make Admin'}</button>
+        <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">🔑 Reset Pass</button>
       </td>
     </tr>`;
   };
@@ -1971,6 +1992,30 @@ async function rejectUser(id,email){
 }
 async function toggleAdmin(id,is){await sb.from('profiles').update({is_admin:!is}).eq('id',id);toast(is?'Admin removed':'Admin granted');loadUsersTable();}
 
+// ── RESET PASSWORD ──
+let resetPassUserId=null;
+function openResetPassModal(userId,name){
+  resetPassUserId=userId;
+  document.getElementById('reset-pass-name').textContent=name;
+  document.getElementById('reset-pass-input').value='';
+  document.getElementById('reset-pass-err').classList.remove('show');
+  showAModal('reset-pass-modal');
+}
+function generateTempPass(){
+  const chars='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let pass='';for(let i=0;i<10;i++)pass+=chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('reset-pass-input').value=pass;
+}
+async function doResetPass(){
+  const pass=document.getElementById('reset-pass-input').value.trim();
+  const errEl=document.getElementById('reset-pass-err');
+  errEl.classList.remove('show');
+  if(!pass||pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.classList.add('show');return;}
+  const{error}=await sb.rpc('admin_reset_user_password',{target_user_id:resetPassUserId,new_password:pass});
+  if(error){errEl.textContent='Error: '+error.message;errEl.classList.add('show');return;}
+  hideAModal('reset-pass-modal');
+  toast('Password reset! ✓ Share the new password with the user.',4000);
+}
 // ADMIN MODALS
 function showAModal(id){document.getElementById(id).style.display='flex';}
 function hideAModal(id){document.getElementById(id).style.display='none';}
