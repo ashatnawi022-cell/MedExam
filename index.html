@@ -218,7 +218,11 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .qnum{font-size:11px;color:var(--gray400);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;}
 .q-t-chip{background:var(--gray100);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--gray500);display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;}
 .q-t-chip span{font-weight:700;font-family:monospace;color:var(--navy2);}
-.qtext{font-size:15px;line-height:1.75;color:var(--gray800);margin-bottom:16px;user-select:text;}
+.qtext table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;}
+.qtext table td,.qtext table th{border:1px solid var(--gray300);padding:7px 11px;}
+.qtext table th{background:var(--gray100);font-weight:700;}
+.qtext img{max-width:100%;height:auto;border-radius:8px;margin:8px 0;display:block;}
+.qtext ul,.qtext ol{padding-left:22px;margin:6px 0;}
 .opts{display:flex;flex-direction:column;gap:7px;}
 .opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;}
 .opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
@@ -652,7 +656,30 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <div class="form-group"><label class="form-label">Subject <span style="color:var(--gray400);font-weight:400;">(e.g. Pathology, Physiology)</span></label><select class="form-input form-select" id="qm-disc"><option value="">— None —</option></select></div>
       <div class="form-group"><label class="form-label">Question ID <span style="color:var(--gray400);font-weight:400;">(optional, e.g. CARD-001)</span></label><input type="text" class="form-input" id="qm-cid" placeholder="e.g. CARD-001"></div>
     </div>
-    <div class="form-group"><label class="form-label">Question text</label><textarea class="form-input" id="qm-text" rows="4" placeholder="A 45-year-old male presents with..."></textarea></div>
+    <div class="form-group">
+      <label class="form-label">Question text</label>
+      <div class="rte-wrap">
+        <div class="rte-toolbar">
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','bold')"><b>B</b></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','italic')"><i>I</i></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','underline')"><u>U</u></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','insertUnorderedList')">• List</button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','insertOrderedList')">1. List</button>
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#fef08a')" style="background:#fef08a" title="Yellow">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#bbf7d0')" style="background:#bbf7d0" title="Green">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#bae6fd')" style="background:#bae6fd" title="Blue">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#fecaca')" style="background:#fecaca" title="Red">A</button>
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-btn" onclick="rteInsertTable('rte-qtext')">⊞ Table</button>
+          <button type="button" class="rte-btn" onclick="document.getElementById('rte-qtext-img').click()">🖼 Image</button>
+          <input type="file" id="rte-qtext-img" accept="image/*" style="display:none" onchange="rteUploadImg(this,'rte-qtext')">
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-btn rte-danger-btn" onclick="document.getElementById('rte-qtext').innerHTML=''">✕ Clear</button>
+        </div>
+        <div class="rte-editor" id="rte-qtext" contenteditable="true" spellcheck="true" style="min-height:120px;" data-placeholder="A 45-year-old male presents with..."></div>
+      </div>
+    </div>
     <div class="form-group">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <label class="form-label" style="margin:0;">Answer choices</label>
@@ -1638,7 +1665,7 @@ async function eRenderQ(){
     <div class="qcard">
       <div class="qnum">Q${cur+1} of ${Q.length}</div>
       <div class="q-t-chip">⏱ <span id="qtinline">${qTV}</span></div>
-      <div class="qtext hlable">${q.question_text}</div>
+      <div class="qtext hlable" id="qtext-content"></div>
       <div class="opts">${optsHtml}</div>
       ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>Submit Answer</button>`:''}
       ${expHtml}
@@ -1647,6 +1674,9 @@ async function eRenderQ(){
     m.style.backgroundColor=eHLMode?(m.dataset.c||HLCOLS[0]):'transparent';
     m.addEventListener('click',function(ev){if(!eHLMode)return;ev.stopPropagation();const p=this.parentNode;while(this.firstChild)p.insertBefore(this.firstChild,this);p.removeChild(this);p.normalize();});
   });
+  // render question text as HTML (supports tables and images)
+  const qtEl=document.getElementById('qtext-content');
+  if(qtEl)qtEl.innerHTML=q.question_text||'';
 }
 
 function eGoNext(){eRun=true;document.getElementById('exam-t').className='t-val';eNav(ES.cur+1);}
@@ -1909,7 +1939,7 @@ async function openQModal(id=null){
       document.getElementById('qm-cat').value=q.category_id||'';
       document.getElementById('qm-disc').value=q.discipline_id||'';
       document.getElementById('qm-cid').value=q.custom_id||'';
-      document.getElementById('qm-text').value=q.question_text;
+      rteSetHTML('rte-qtext',q.question_text||'');
       rteSetHTML('rte-exp',q.explanation||'');
       rteSetHTML('rte-th',q.take_home_message||'');
       const opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d].filter(Boolean);
@@ -1926,12 +1956,12 @@ async function saveQ(){
   const subj_id=document.getElementById('qm-subj').value;
   const disc_id=document.getElementById('qm-disc').value||null;
   const custom_id=document.getElementById('qm-cid').value.trim();
-  const text=document.getElementById('qm-text').value.trim();
+  const text=rteGetHTML('rte-qtext');
   const opts=Array.from(document.querySelectorAll('.dyn-opt')).map(i=>i.value.trim());
   const oa=Array.from(document.querySelectorAll('.dyn-oa')).map(i=>i.value.trim());
   if(!cat_id){toast('Please select a category');return;}
   if(!subj_id){toast('Please select a subject');return;}
-  if(!text){toast('Please enter question text');return;}
+  if(!text||text==='<br>'||text==='<div><br></div>'){toast('Please enter question text');return;}
   if(opts.some(o=>!o)){toast('Fill all answer choices');return;}
   if(selCorr===null){toast('Select the correct answer');return;}
   const payload={
@@ -2200,6 +2230,7 @@ function rteSetHTML(edId,html){
 function rteClearAll(){
   rteSetHTML('rte-exp','');
   rteSetHTML('rte-th','');
+  rteSetHTML('rte-qtext','');
 }
 
 </script>
