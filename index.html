@@ -1090,34 +1090,44 @@ function toggleAllCats(sid,allOn){
 
 async function refreshCounts(){
   if(selSubjects.size===0&&!randomMode)return;
-  let pool=[];
-  if(randomMode){
-    const{data:qs}=await sb.from('questions').select('id,category_id,discipline_id');
-    pool=qs||[];
-  } else {
-    const catIds=[];
-    selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
-    const[{data:catQs},{data:uncatQs}]=await Promise.all([
-      catIds.length?sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds):Promise.resolve({data:[]}),
-      sb.from('questions').select('id,category_id,discipline_id').is('category_id',null)
-    ]);
-    pool=[...(catQs||[]),...(uncatQs||[])];
-    const seen=new Set();pool=pool.filter(q=>{if(seen.has(q.id))return false;seen.add(q.id);return true;});
+  try{
+    let pool=[];
+    if(randomMode){
+      const{data:qs,error:e}=await sb.from('questions').select('id,category_id,discipline_id');
+      if(e){console.error('refreshCounts random error:',e);updateCountDisplay(0,0,0);return;}
+      pool=qs||[];
+    } else {
+      const catIds=[];
+      selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
+      const[{data:catQs,error:e1},{data:uncatQs,error:e2}]=await Promise.all([
+        catIds.length?sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds):Promise.resolve({data:[],error:null}),
+        sb.from('questions').select('id,category_id,discipline_id').is('category_id',null)
+      ]);
+      if(e1)console.error('catQs error:',e1);
+      if(e2)console.error('uncatQs error:',e2);
+      pool=[...(catQs||[]),...(uncatQs||[])];
+      const seen=new Set();pool=pool.filter(q=>{if(seen.has(q.id))return false;seen.add(q.id);return true;});
+    }
+    if(!allDiscsSelected&&selDisciplines.size>0){
+      pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
+    }
+    const allQIds=pool.map(q=>q.id);
+    const{data:atts,error:e3}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
+    if(e3)console.error('attempts error:',e3);
+    const answeredMap={};
+    (atts||[]).forEach(att=>{
+      const qIds=att.question_ids||[];const ans=att.answers||[];
+      qIds.forEach((qid,i)=>{if(ans[i]!==null&&ans[i]!==undefined)answeredMap[qid]=ans[i];});
+    });
+    const newCount=allQIds.filter(id=>answeredMap[id]===undefined).length;
+    const wrongCount=allQIds.filter(id=>answeredMap[id]===false).length;
+    qCounts={all:allQIds.length,new:newCount,wrong:wrongCount};
+    updateCountDisplay(allQIds.length,newCount,wrongCount);
+    console.log('refreshCounts done:',allQIds.length,'questions');
+  }catch(err){
+    console.error('refreshCounts exception:',err);
+    updateCountDisplay(0,0,0);
   }
-  if(!allDiscsSelected&&selDisciplines.size>0){
-    pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
-  }
-  const allQIds=pool.map(q=>q.id);
-  const{data:atts}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
-  const answeredMap={};
-  (atts||[]).forEach(att=>{
-    const qIds=att.question_ids||[];const ans=att.answers||[];
-    qIds.forEach((qid,i)=>{if(ans[i]!==null&&ans[i]!==undefined)answeredMap[qid]=ans[i];});
-  });
-  const newCount=allQIds.filter(id=>answeredMap[id]===undefined).length;
-  const wrongCount=allQIds.filter(id=>answeredMap[id]===false).length;
-  qCounts={all:allQIds.length,new:newCount,wrong:wrongCount};
-  updateCountDisplay(allQIds.length,newCount,wrongCount);
 }
 
 async function generateSession(){
