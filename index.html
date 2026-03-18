@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedExam — Medical Question Bank</title>
+<title>MedExam ? Medical Question Bank</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 0 L30 5 L30 20 Q30 30 16 32 Q2 30 2 20 L2 5 Z' fill='%230f2744'/><rect x='8' y='14' width='14' height='4' rx='2' fill='%234fc3f7'/><rect x='13' y='9' width='4' height='14' rx='2' fill='%234fc3f7'/></svg>">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -307,7 +307,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .qmodal h2{margin-bottom:18px;}
 
 /* MISC */
-/* ── DASHBOARD ── */
+/* ?? DASHBOARD ?? */
 .dash-wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px;}
 .dash-greeting{margin-bottom:32px;}
 .dash-greeting h1{font-size:26px;font-weight:800;color:var(--gray800);}
@@ -332,12 +332,12 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .dash-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
 .dash-stat{background:rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:12px;color:rgba(255,255,255,0.9);font-weight:600;}
 .dash-stat-dark{background:var(--gray100);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--gray600);font-weight:600;}
-/* ── CREATE EXAM PAGE ── */
+/* ?? CREATE EXAM PAGE ?? */
 .back-header{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--gray200);}
 .back-header button{background:none;border:none;cursor:pointer;color:var(--gray500);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;padding:0;}
 .back-header button:hover{color:var(--gray800);}
 .back-header h2{font-size:18px;font-weight:800;color:var(--gray800);}
-/* ── SETTINGS ── */
+/* ?? SETTINGS ?? */
 .settings-section{background:white;border-radius:var(--radius);border:0.5px solid var(--gray200);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);}
 .settings-section h3{font-size:15px;font-weight:700;color:var(--gray800);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--gray100);}
 .settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray100);}
@@ -370,7 +370,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .ans-stat-count{color:var(--gray400);min-width:60px;}
 .ans-stats-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray400);margin-bottom:4px;}
 
-/* ── RICH TEXT EDITOR ── */
+/* ?? RICH TEXT EDITOR ?? */
 .rte-wrap{border:1.5px solid var(--gray200);border-radius:8px;overflow:hidden;background:white;}
 .rte-wrap:focus-within{border-color:var(--blue);}
 .rte-toolbar{display:flex;align-items:center;gap:2px;padding:6px 8px;background:var(--gray50);border-bottom:1px solid var(--gray200);flex-wrap:wrap;}
@@ -409,13 +409,13 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 </svg></div>
         <div class="auth-tagline">Medical Question Bank</div>
         <div class="auth-features">
-          <div class="auth-feat"><div class="auth-feat-icon">🏥</div><div>Clinical questions by medical experts for University of Jordan students</div></div>
-          <div class="auth-feat"><div class="auth-feat-icon">🎯</div><div>Filter by subject, category, and question type</div></div>
-          <div class="auth-feat"><div class="auth-feat-icon">📊</div><div>Track performance and focus on your weak areas</div></div>
-          <div class="auth-feat"><div class="auth-feat-icon">🔖</div><div>Suspend and continue exams anytime</div></div>
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Clinical questions by medical experts for University of Jordan students</div></div>
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Filter by subject, category, and question type</div></div>
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Track performance and focus on your weak areas</div></div>
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Suspend and continue exams anytime</div></div>
         </div>
       </div>
-      <div class="auth-left-foot">© 2025 MedExam · University of Jordan</div>
+      <div class="auth-left-foot">? 2025 MedExam ? University of Jordan</div>
     </div>
     <div class="auth-right">
       <div class="auth-box" id="loginBox">
@@ -428,7 +428,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
             <label class="form-label" style="margin:0;">Password</label>
             <a onclick="showForgot()" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;">Forgot password?</a>
           </div>
-          <input type="password" class="form-input" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+          <input type="password" class="form-input" id="loginPass" placeholder="????????" onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()">Sign In</button>
         <div class="auth-switch">No account? <a onclick="showReg()">Create one</a></div>
@@ -442,7 +442,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
         <div class="auth-ok" id="forgotOk"></div>
         <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="forgotEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doForgot()"></div>
         <button class="btn btn-primary btn-block btn-lg" onclick="doForgot()">Send Reset Link</button>
-        <div class="auth-switch"><a onclick="showLogin()" style="cursor:pointer;">← Back to Sign In</a></div>
+        <div class="auth-switch"><a onclick="showLogin()" style="cursor:pointer;">? Back to Sign In</a></div>
       </div>
       <div class="auth-box" id="regBox" style="display:none;">
         <h2>Create account</h2>
@@ -487,12 +487,12 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   <text x="72" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
 </svg></div>
     <div class="nav-links">
-      <button class="nav-link active" id="nav-home" onclick="goHome()">🏠 Home</button>
+      <button class="nav-link active" id="nav-home" onclick="goHome()">? Home</button>
     </div>
     <div class="nav-right">
       <span class="nav-user" id="navUser" style="display:none;"></span>
       <span class="admin-badge" id="navAdminBadge" style="display:none;">ADMIN</span>
-      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">⚙ Admin</button>
+      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">? Admin</button>
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
     </div>
   </nav>
@@ -503,11 +503,11 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <div id="pendingPage" class="page">
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--gray50);">
     <div style="text-align:center;max-width:420px;padding:40px 24px;">
-      <div style="font-size:56px;margin-bottom:16px;">⏳</div>
+      <div style="font-size:56px;margin-bottom:16px;">?</div>
       <h2 style="font-size:22px;font-weight:800;color:var(--gray800);margin-bottom:10px;">Account Pending Approval</h2>
       <p style="font-size:14px;color:var(--gray500);line-height:1.7;margin-bottom:24px;">Your account has been created and is waiting for admin approval. You'll be able to access the platform once approved. Please check back later.</p>
       <div style="background:var(--amber-light);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--amber);font-weight:600;margin-bottom:24px;">
-        📧 Contact your administrator if you've already completed payment and are waiting for access.
+        ? Contact your administrator if you've already completed payment and are waiting for access.
       </div>
       <button class="btn btn-secondary" onclick="doLogout()">Sign out</button>
     </div>
@@ -526,53 +526,53 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   <text x="72" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
 </svg><span style="font-size:11px;color:var(--cyan);font-family:'DM Sans',sans-serif;font-weight:600;margin-left:4px;">Admin</span></div>
     <div class="nav-right">
-      <button class="btn btn-sm btn-secondary" onclick="showPage('homePage');renderDashboard()">← Back to App</button>
+      <button class="btn btn-sm btn-secondary" onclick="showPage('homePage');renderDashboard()">? Back to App</button>
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
     </div>
   </nav>
   <div class="admin-layout">
     <div class="admin-sb">
       <div class="admin-sb-title">Content</div>
-      <button class="admin-nav active" onclick="aNav('subjects',event)">🫀 Systems</button>
-      <button class="admin-nav" onclick="aNav('categories',event)">🏷 Topics</button>
-      <button class="admin-nav" onclick="aNav('disciplines',event)">📚 Subjects</button>
-      <button class="admin-nav" onclick="aNav('questions',event)">❓ Questions</button>
+      <button class="admin-nav active" onclick="aNav('subjects',event)">? Systems</button>
+      <button class="admin-nav" onclick="aNav('categories',event)">? Topics</button>
+      <button class="admin-nav" onclick="aNav('disciplines',event)">? Subjects</button>
+      <button class="admin-nav" onclick="aNav('questions',event)">? Questions</button>
       <div class="admin-sb-title" style="margin-top:16px;">Data</div>
-      <button class="admin-nav" onclick="aNav('users',event)">👥 Users</button>
+      <button class="admin-nav" onclick="aNav('users',event)">? Users</button>
     </div>
     <div class="admin-content">
       <div class="admin-sec active" id="asec-subjects">
-        <div class="admin-toolbar"><h2>🫀 Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add System</button></div>
-        <div id="subj-wrap"><div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add one!</p></div></div>
+        <div class="admin-toolbar"><h2>? Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add System</button></div>
+        <div id="subj-wrap"><div class="empty-state"><div class="esi">?</div><p>No subjects yet. Add one!</p></div></div>
       </div>
       <div class="admin-sec" id="asec-categories">
         <div class="admin-toolbar">
-          <h2>🏷 Topics</h2>
+          <h2>? Topics</h2>
           <div style="display:flex;gap:8px;align-items:center;">
             <select class="form-input form-select" id="catSubjFilter" onchange="loadCatsTable()" style="width:200px;font-size:13px;padding:7px 12px;"></select>
             <button class="btn btn-primary btn-sm" onclick="openCatModal()">+ Add Category</button>
           </div>
         </div>
-        <div id="cats-wrap"><div class="empty-state"><div class="esi">👆</div><p>Select a subject</p></div></div>
+        <div id="cats-wrap"><div class="empty-state"><div class="esi">?</div><p>Select a subject</p></div></div>
       </div>
       <div class="admin-sec" id="asec-disciplines">
-        <div class="admin-toolbar"><h2>📚 Subjects</h2><button class="btn btn-primary btn-sm" onclick="openDiscModal()">+ Add Subject</button></div>
-        <p style="font-size:13px;color:var(--gray500);margin-bottom:14px;">Subjects are cross-system categories like Anatomy, Physiology, Pathology — just like UWorld. Assign them to questions.</p>
+        <div class="admin-toolbar"><h2>? Subjects</h2><button class="btn btn-primary btn-sm" onclick="openDiscModal()">+ Add Subject</button></div>
+        <p style="font-size:13px;color:var(--gray500);margin-bottom:14px;">Subjects are cross-system categories like Anatomy, Physiology, Pathology ? just like UWorld. Assign them to questions.</p>
         <div id="disc-wrap"><div class="spinner-wrap"><div class="spinner"></div></div></div>
       </div>
       <div class="admin-sec" id="asec-questions">
         <div class="admin-toolbar">
-          <h2>❓ Questions</h2>
+          <h2>? Questions</h2>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <select class="form-input form-select" id="qSubjFilter" onchange="loadQCatFilter()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
             <select class="form-input form-select" id="qCatFilter" onchange="loadQTable()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
             <button class="btn btn-primary btn-sm" onclick="openQModal()">+ Add Question</button>
           </div>
         </div>
-        <div id="q-wrap"><div class="empty-state"><div class="esi">👆</div><p>Select a system and topic</p></div></div>
+        <div id="q-wrap"><div class="empty-state"><div class="esi">?</div><p>Select a system and topic</p></div></div>
       </div>
       <div class="admin-sec" id="asec-users">
-        <div class="admin-toolbar"><h2>👥 Users</h2></div>
+        <div class="admin-toolbar"><h2>? Users</h2></div>
         <div id="users-wrap"><div class="spinner-wrap"><div class="spinner"></div></div></div>
       </div>
     </div>
@@ -592,11 +592,11 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     </div>
   </div>
   <div class="nav-strip">
-    <div class="nav-left"><button class="sb-tog" onclick="toggleESB()">☰ List</button><div class="pw"><div class="pf" id="eprog"></div></div></div>
+    <div class="nav-left"><button class="sb-tog" onclick="toggleESB()">? List</button><div class="pw"><div class="pf" id="eprog"></div></div></div>
     <div class="nav-center">
-      <button class="nav-ebtn" id="prev-btn" onclick="eNav(ES.cur-1)" disabled>← Prev</button>
+      <button class="nav-ebtn" id="prev-btn" onclick="eNav(ES.cur-1)" disabled>? Prev</button>
       <span class="nav-lbl" id="enav-lbl">Q 1 / ?</span>
-      <button class="nav-ebtn" id="next-btn" onclick="eNav(ES.cur+1)">Next →</button>
+      <button class="nav-ebtn" id="next-btn" onclick="eNav(ES.cur+1)">Next ?</button>
     </div>
     <div class="nav-right"></div>
   </div>
@@ -605,9 +605,9 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="exam-main" id="exam-main"></div>
   </div>
   <div class="bottom-bar" id="exam-bb">
-    <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">🏠 Home</button>
-    <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">⏸ Suspend</button>
-    <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">■ End Exam</button>
+    <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">? Home</button>
+    <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">? Suspend</button>
+    <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">? End Exam</button>
   </div>
 </div>
 
@@ -622,7 +622,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="sm-name" placeholder="e.g. Cardiology"></div>
     <div class="form-group"><label class="form-label">Description</label><input type="text" class="form-input" id="sm-desc" placeholder="Brief description"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="form-group"><label class="form-label">Icon (emoji)</label><input type="text" class="form-input" id="sm-icon" placeholder="❤️" style="width:80px;"></div>
+      <div class="form-group"><label class="form-label">Icon (emoji)</label><input type="text" class="form-input" id="sm-icon" placeholder="??" style="width:80px;"></div>
     </div>
     <div class="modal-btns"><button class="btn btn-secondary" onclick="hideAModal('subj-modal')">Cancel</button><button class="btn btn-primary" onclick="saveSubj()">Save</button></div>
   </div>
@@ -651,14 +651,14 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <h2 id="q-modal-title" style="margin:0;">Add Question</h2>
       <button type="button" class="btn btn-sm" onclick="toggleParsePanel()" id="parse-toggle-btn"
         style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;gap:5px;">
-        📋 Paste Full Question
+        ? Paste Full Question
       </button>
     </div>
 
     <!-- Parse Panel (hidden by default) -->
     <div id="parse-panel" style="display:none;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:16px;margin-bottom:18px;">
-      <div style="font-size:13px;font-weight:700;color:var(--navy2);margin-bottom:6px;">📋 Paste the entire question block</div>
-      <div style="font-size:12px;color:var(--gray500);margin-bottom:10px;">Copy everything from UWorld or any source — question, choices with percentages, correct answer, explanation, choice analyses, and educational objective. The parser fills <b>all fields</b> automatically.</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy2);margin-bottom:6px;">? Paste the entire question block</div>
+      <div style="font-size:12px;color:var(--gray500);margin-bottom:10px;">Copy everything from UWorld or any source ? question, choices with percentages, correct answer, explanation, choice analyses, and educational objective. The parser fills <b>all fields</b> automatically.</div>
       <textarea id="parse-input" class="form-input" rows="10" placeholder="Paste the full question here...
 
 Example:
@@ -671,13 +671,13 @@ C. Mitral stenosis
 The correct answer is A.
 Explanation: Aortic regurgitation causes...
 
-A. Correct — bounding pulses indicate...
-B. Incorrect — stenosis causes...
+A. Correct ? bounding pulses indicate...
+B. Incorrect ? stenosis causes...
 
 Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."></textarea>
       <div id="parse-error" style="display:none;background:var(--red-light);color:var(--red);border-radius:7px;padding:8px 12px;font-size:12px;margin-top:8px;"></div>
       <div style="display:flex;gap:8px;margin-top:10px;">
-        <button type="button" class="btn btn-primary" onclick="parseAndFill()">✨ Parse &amp; Fill Fields</button>
+        <button type="button" class="btn btn-primary" onclick="parseAndFill()">? Parse &amp; Fill Fields</button>
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('parse-input').value=''">Clear</button>
       </div>
     </div>
@@ -686,7 +686,7 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
       <div class="form-group"><label class="form-label">Topic</label><select class="form-input form-select" id="qm-cat"></select></div>
     </div>
     <div class="qform-grid">
-      <div class="form-group"><label class="form-label">Subject <span style="color:var(--gray400);font-weight:400;">(e.g. Pathology, Physiology)</span></label><select class="form-input form-select" id="qm-disc"><option value="">— None —</option></select></div>
+      <div class="form-group"><label class="form-label">Subject <span style="color:var(--gray400);font-weight:400;">(e.g. Pathology, Physiology)</span></label><select class="form-input form-select" id="qm-disc"><option value="">? None ?</option></select></div>
       <div class="form-group"><label class="form-label">Question ID <span style="color:var(--gray400);font-weight:400;">(optional, e.g. CARD-001)</span></label><input type="text" class="form-input" id="qm-cid" placeholder="e.g. CARD-001"></div>
     </div>
     <div class="form-group">
@@ -696,7 +696,7 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
           <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','bold')"><b>B</b></button>
           <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','italic')"><i>I</i></button>
           <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','underline')"><u>U</u></button>
-          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','insertUnorderedList')">• List</button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','insertUnorderedList')">? List</button>
           <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','insertOrderedList')">1. List</button>
           <div class="rte-sep"></div>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#fef08a')" style="background:#fef08a" title="Yellow">A</button>
@@ -704,11 +704,11 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#bae6fd')" style="background:#bae6fd" title="Blue">A</button>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#fecaca')" style="background:#fecaca" title="Red">A</button>
           <div class="rte-sep"></div>
-          <button type="button" class="rte-btn" onclick="rteInsertTable('rte-qtext')">⊞ Table</button>
-          <button type="button" class="rte-btn" onclick="document.getElementById('rte-qtext-img').click()">🖼 Image</button>
+          <button type="button" class="rte-btn" onclick="rteInsertTable('rte-qtext')">? Table</button>
+          <button type="button" class="rte-btn" onclick="document.getElementById('rte-qtext-img').click()">? Image</button>
           <input type="file" id="rte-qtext-img" accept="image/*" style="display:none" onchange="rteUploadImg(this,'rte-qtext')">
           <div class="rte-sep"></div>
-          <button type="button" class="rte-btn rte-danger-btn" onclick="document.getElementById('rte-qtext').innerHTML=''">✕ Clear</button>
+          <button type="button" class="rte-btn rte-danger-btn" onclick="document.getElementById('rte-qtext').innerHTML=''">? Clear</button>
         </div>
         <div class="rte-editor" id="rte-qtext" contenteditable="true" spellcheck="true" style="min-height:120px;" data-placeholder="A 45-year-old male presents with..."></div>
       </div>
@@ -726,7 +726,7 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
         <label class="form-label" style="margin:0;">Full explanation</label>
         <button type="button" class="btn btn-sm" onclick="toggleExpParsePanel()"
           id="exp-parse-toggle-btn" style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;font-size:11px;">
-          📋 Paste &amp; Parse Explanation
+          ? Paste &amp; Parse Explanation
         </button>
       </div>
       <!-- Explanation Parse Panel -->
@@ -737,14 +737,14 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
 Example:
 This patient has aortic regurgitation because...
 
-(Choice A) Correct — bounding pulses and head bobbing...
-(Choice B) Incorrect — aortic stenosis causes...
+(Choice A) Correct ? bounding pulses and head bobbing...
+(Choice B) Incorrect ? aortic stenosis causes...
 (Choices C and D) Both incorrect because...
 
 Educational objective: Aortic regurgitation presents with..."></textarea>
         <div id="exp-parse-error" style="display:none;border-radius:7px;padding:8px 12px;font-size:12px;margin-top:8px;"></div>
         <div style="display:flex;gap:8px;margin-top:10px;">
-          <button type="button" class="btn btn-primary" onclick="parseAndFillExp()">✨ Parse &amp; Fill</button>
+          <button type="button" class="btn btn-primary" onclick="parseAndFillExp()">? Parse &amp; Fill</button>
           <button type="button" class="btn btn-secondary" onclick="document.getElementById('exp-parse-input').value=''">Clear</button>
         </div>
       </div>
@@ -753,7 +753,7 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
           <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','bold')"><b>B</b></button>
           <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','italic')"><i>I</i></button>
           <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','underline')"><u>U</u></button>
-          <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','insertUnorderedList')">• List</button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','insertUnorderedList')">? List</button>
           <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','insertOrderedList')">1. List</button>
           <div class="rte-sep"></div>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-exp','#fef08a')" style="background:#fef08a" title="Yellow">A</button>
@@ -761,11 +761,11 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-exp','#bae6fd')" style="background:#bae6fd" title="Blue">A</button>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-exp','#fecaca')" style="background:#fecaca" title="Red">A</button>
           <div class="rte-sep"></div>
-          <button type="button" class="rte-btn" onclick="rteInsertTable('rte-exp')">⊞ Table</button>
-          <button type="button" class="rte-btn" onclick="document.getElementById('rte-exp-img').click()">🖼 Image</button>
+          <button type="button" class="rte-btn" onclick="rteInsertTable('rte-exp')">? Table</button>
+          <button type="button" class="rte-btn" onclick="document.getElementById('rte-exp-img').click()">? Image</button>
           <input type="file" id="rte-exp-img" accept="image/*" style="display:none" onchange="rteUploadImg(this,'rte-exp')">
           <div class="rte-sep"></div>
-          <button type="button" class="rte-btn rte-danger-btn" onclick="document.getElementById('rte-exp').innerHTML=''">✕ Clear</button>
+          <button type="button" class="rte-btn rte-danger-btn" onclick="document.getElementById('rte-exp').innerHTML=''">? Clear</button>
         </div>
         <div class="rte-editor" id="rte-exp" contenteditable="true" spellcheck="true"></div>
       </div>
@@ -782,7 +782,7 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-th','#fef08a')" style="background:#fef08a" title="Yellow">A</button>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-th','#bbf7d0')" style="background:#bbf7d0" title="Green">A</button>
           <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-th','#bae6fd')" style="background:#bae6fd" title="Blue">A</button>
-          <button type="button" class="rte-btn" onclick="document.getElementById('rte-th-img').click()">🖼 Image</button>
+          <button type="button" class="rte-btn" onclick="document.getElementById('rte-th-img').click()">? Image</button>
           <input type="file" id="rte-th-img" accept="image/*" style="display:none" onchange="rteUploadImg(this,'rte-th')">
         </div>
         <div class="rte-editor" id="rte-th" contenteditable="true" spellcheck="true"></div>
@@ -796,13 +796,13 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
 <!-- Table Builder Modal -->
 <div class="modal-bg" id="tbl-modal" style="display:none;">
   <div class="modal" style="max-width:320px;text-align:left;">
-    <h2 style="font-size:15px;font-weight:700;margin-bottom:14px;">⊞ Insert Table</h2>
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:14px;">? Insert Table</h2>
     <div style="font-size:12px;color:var(--gray500);margin-bottom:8px;" id="tbl-size-lbl">Hover to select size</div>
     <div class="tbl-grid" id="tbl-grid"></div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
       <label style="font-size:12px;font-weight:600;color:var(--gray600);">Or enter manually:</label>
       <input type="number" id="tbl-rows" min="1" max="20" value="3" style="width:54px;padding:5px 8px;border:1.5px solid var(--gray200);border-radius:6px;font-size:13px;">
-      <span style="font-size:12px;color:var(--gray400);">×</span>
+      <span style="font-size:12px;color:var(--gray400);">?</span>
       <input type="number" id="tbl-cols" min="1" max="10" value="3" style="width:54px;padding:5px 8px;border:1.5px solid var(--gray200);border-radius:6px;font-size:13px;">
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
@@ -819,14 +819,847 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
 <!-- Reset Password Modal -->
 <div class="modal-bg" id="reset-pass-modal" style="display:none;">
   <div class="modal" style="text-align:left;max-width:380px;">
-    <h2>🔑 Reset Password</h2>
+    <h2>? Reset Password</h2>
     <p style="font-size:13px;color:var(--gray500);margin-bottom:16px;">Set a new password for <b id="reset-pass-name"></b>. Share it with them securely.</p>
     <div class="form-group">
       <label class="form-label">New Password</label>
       <input type="text" class="form-input" id="reset-pass-input" placeholder="Enter new password (min 6 chars)">
     </div>
     <div style="display:flex;gap:8px;margin-bottom:16px;">
-      <button class="btn btn-secondary btn-sm" onclick="generateTempPass()">🎲 Generate random</button>
+      <button class="btn btn-secondary btn-sm" onclick="generateTempPass()">? Generate random</button>
+    </div>
+    <div class="auth-err" id="reset-pass-err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="hideAModal('reset-pass-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="doResetPass()">Set Password</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2744;--navy2:#1a3a5c;--navy3:#16314f;
+  --blue:#2563eb;--blue-light:#3b82f6;--cyan:#4fc3f7;
+  --green:#16a34a;--green-light:#dcfce7;
+  --red:#dc2626;--red-light:#fee2e2;
+  --amber:#d97706;--amber-light:#fef3c7;
+  --gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray300:#cbd5e1;
+  --gray400:#94a3b8;--gray500:#64748b;--gray600:#475569;--gray700:#334155;--gray800:#1e293b;
+  --radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,0.1),0 4px 6px rgba(0,0,0,0.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--gray50);color:var(--gray800);min-height:100vh;}
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+#examPage.active{display:flex;flex-direction:column;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
+.btn-primary{background:var(--navy2);color:white;}.btn-primary:hover{background:var(--navy);}
+.btn-secondary{background:white;color:var(--navy2);border:1.5px solid var(--gray200);}.btn-secondary:hover{background:var(--gray50);}
+.btn-danger{background:var(--red);color:white;}.btn-danger:hover{background:#b91c1c;}
+.btn-success{background:var(--green);color:white;}.btn-success:hover{background:#15803d;}
+.btn-amber{background:var(--amber);color:white;}.btn-amber:hover{background:#b45309;}
+.btn-lg{padding:13px 28px;font-size:15px;}
+.btn-sm{padding:6px 14px;font-size:12px;}
+.btn-block{width:100%;}
+.btn:disabled{opacity:0.45;cursor:default;}
+
+/* FORMS */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--gray600);margin-bottom:6px;}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid var(--gray200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--gray800);background:white;outline:none;transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--blue);}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+textarea.form-input{resize:vertical;min-height:80px;}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;}
+.auth-left{width:400px;flex-shrink:0;background:var(--navy);padding:48px;display:flex;flex-direction:column;justify-content:space-between;}
+.auth-logo{display:flex;align-items:center;}
+.auth-logo span{color:var(--cyan);}
+.auth-tagline{color:rgba(255,255,255,0.55);font-size:14px;margin-top:6px;}
+.auth-features{margin-top:36px;display:flex;flex-direction:column;gap:14px;}
+.auth-feat{display:flex;gap:12px;color:rgba(255,255,255,0.82);font-size:14px;line-height:1.5;}
+.auth-feat-icon{font-size:18px;flex-shrink:0;}
+.auth-left-foot{color:rgba(255,255,255,0.35);font-size:12px;}
+.auth-right{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;}
+.auth-box{width:100%;max-width:420px;}
+.auth-box h2{font-size:24px;font-weight:700;margin-bottom:4px;}
+.auth-sub{font-size:14px;color:var(--gray500);margin-bottom:24px;}
+.auth-err{background:var(--red-light);color:var(--red);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none;}
+.auth-err.show{display:block;}
+.auth-ok{background:var(--green-light);color:var(--green);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none;}
+.auth-ok.show{display:block;}
+.auth-switch{text-align:center;margin-top:18px;font-size:13px;color:var(--gray500);}
+.auth-switch a{color:var(--blue);font-weight:600;cursor:pointer;}
+
+/* NAV */
+.app-nav{background:var(--navy);padding:0 14px;display:flex;align-items:center;height:58px;gap:5px;position:sticky;top:0;z-index:100;min-width:0;overflow:hidden;}
+.nav-brand{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-right:4px;}
+.nav-brand span{color:var(--cyan);}
+.nav-links{display:flex;gap:2px;flex:1;min-width:0;overflow:hidden;}
+.nav-link{color:rgba(255,255,255,0.6);font-size:12px;font-weight:500;padding:5px 9px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
+.nav-link:hover{color:white;background:rgba(255,255,255,0.1);}
+.nav-link.active{color:white;background:rgba(255,255,255,0.15);}
+.nav-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto;}
+.nav-user{display:none;}
+.admin-badge{background:var(--amber);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;}
+
+/* HOME */
+.page-body{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
+.page-hdr{margin-bottom:28px;}
+.page-hdr h1{font-size:22px;font-weight:700;}
+.page-hdr p{font-size:14px;color:var(--gray500);margin-top:4px;}
+
+/* GENERATE EXAM CARD */
+.gen-card{background:white;border-radius:var(--radius);border:0.5px solid var(--gray200);padding:28px;margin-bottom:28px;box-shadow:var(--shadow);}
+.gen-card h2{font-size:17px;font-weight:700;color:var(--navy2);margin-bottom:4px;}
+.gen-card .sub{font-size:13px;color:var(--gray500);margin-bottom:22px;}
+.gen-step-title{font-size:11px;font-weight:700;color:var(--gray400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+
+/* Subject select cards */
+.subjects-select-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.subj-chip{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:13px;font-weight:600;background:white;transition:all 0.12s;user-select:none;}
+.subj-chip:hover{border-color:var(--blue-light);background:#eff6ff;}
+.subj-chip.selected{border-color:var(--navy2);background:#eff6ff;color:var(--navy2);}
+.subj-chip .chip-icon{font-size:16px;}
+.subj-chip .chip-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--gray300);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.subj-chip.selected .chip-check{background:var(--navy2);border-color:var(--navy2);color:white;}
+
+/* Category accordion */
+.subj-categories{margin-bottom:16px;}
+.subj-cat-block{background:var(--gray50);border-radius:10px;border:0.5px solid var(--gray200);margin-bottom:8px;overflow:hidden;}
+.subj-cat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;user-select:none;}
+.subj-cat-header-left{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;}
+.subj-cat-chevron{font-size:12px;transition:transform 0.2s;color:var(--gray400);}
+.subj-cat-chevron.open{transform:rotate(180deg);}
+.subj-cat-body{padding:10px 14px 14px;display:none;}
+.subj-cat-body.open{display:block;}
+.cat-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.cat-toggle-all{font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;}
+.cat-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.cat-chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:1.5px solid var(--gray200);cursor:pointer;font-size:12px;font-weight:600;background:white;transition:all 0.1s;}
+.cat-chip.on{background:var(--green-light);border-color:#86efac;color:#15803d;}
+.cat-chip.off{background:var(--gray100);border-color:var(--gray200);color:var(--gray400);text-decoration:line-through;}
+
+/* Filter + Count row */
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{flex:1;min-width:120px;padding:10px 14px;border-radius:8px;border:1.5px solid var(--gray200);background:white;cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;text-align:center;transition:all 0.12s;}
+.filter-btn:hover{border-color:var(--blue-light);}
+.filter-btn.active{border-color:var(--navy2);background:#eff6ff;color:var(--navy2);}
+.filter-btn .fb-label{font-size:13px;font-weight:700;}
+.filter-btn .fb-count{font-size:11px;color:var(--gray400);margin-top:2px;}
+.filter-btn.active .fb-count{color:var(--blue);}
+.filter-btn:disabled{opacity:0.4;cursor:default;}
+
+/* Q Count slider */
+.qcount-row{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.qcount-label{font-size:13px;font-weight:600;color:var(--gray600);white-space:nowrap;}
+.qcount-slider{flex:1;}
+.qcount-val{font-size:15px;font-weight:700;color:var(--navy2);min-width:30px;text-align:center;}
+.qcount-max{font-size:12px;color:var(--gray400);}
+
+/* Attempts list */
+.attempts-list{display:flex;flex-direction:column;gap:9px;}
+.att-row{background:white;border-radius:var(--radius);border:0.5px solid var(--gray200);padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);}
+.att-info{flex:1;min-width:0;}
+.att-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.att-meta{font-size:12px;color:var(--gray400);}
+.att-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0;}
+.badge-done{background:var(--green-light);color:var(--green);}
+.badge-sus{background:var(--amber-light);color:var(--amber);}
+.badge-prog{background:#eff6ff;color:var(--blue);}
+
+/* ADMIN */
+.admin-layout{display:flex;min-height:calc(100vh - 58px);}
+.admin-sb{width:210px;background:white;border-right:1px solid var(--gray200);padding:14px;flex-shrink:0;}
+.admin-sb-title{font-size:10px;font-weight:700;color:var(--gray400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;padding:0 8px;}
+.admin-nav{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--gray600);border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;}
+.admin-nav:hover{background:var(--gray100);color:var(--gray800);}
+.admin-nav.active{background:#eff6ff;color:var(--blue);font-weight:600;}
+.admin-content{flex:1;padding:26px;overflow-y:auto;}
+.admin-sec{display:none;}
+.admin-sec.active{display:block;}
+.admin-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap;}
+.admin-toolbar h2{font-size:16px;font-weight:700;}
+.data-table{width:100%;border-collapse:collapse;background:white;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.data-table th{background:var(--gray50);padding:9px 13px;text-align:left;font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid var(--gray200);}
+.data-table td{padding:11px 13px;font-size:13px;color:var(--gray700);border-bottom:1px solid var(--gray100);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--gray50);}
+.tbl-actions{display:flex;gap:5px;}
+
+/* EXAM ENGINE */
+.topbar{background:var(--navy);color:white;padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:200;}
+.topbar-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.tb-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;}
+.score-chip{background:rgba(255,255,255,0.18);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap;}
+.timers{display:flex;gap:6px;flex-shrink:0;}
+.timer-box{background:rgba(255,255,255,0.12);border-radius:8px;padding:4px 10px;text-align:center;min-width:72px;}
+.t-label{font-size:9px;opacity:0.7;text-transform:uppercase;letter-spacing:0.4px;}
+.t-val{font-size:14px;font-weight:700;font-family:monospace;color:var(--cyan);}
+.t-val.paused{color:#ffcc80;}
+.nav-strip{background:var(--navy3);padding:6px 16px;display:flex;align-items:center;}
+.nav-left{display:flex;align-items:center;gap:7px;width:150px;}
+.nav-center{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;}
+.nav-right{width:150px;}
+.sb-tog{background:rgba(255,255,255,0.12);border:none;color:white;padding:4px 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.sb-tog:hover{background:rgba(255,255,255,0.22);}
+.nav-ebtn{background:rgba(255,255,255,0.12);border:none;color:white;padding:4px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.nav-ebtn:hover:not(:disabled){background:rgba(255,255,255,0.25);}
+.nav-ebtn:disabled{opacity:0.3;cursor:default;}
+.nav-lbl{color:rgba(255,255,255,0.8);font-size:12px;white-space:nowrap;}
+.pw{background:rgba(255,255,255,0.15);height:3px;border-radius:2px;width:60px;}
+.pf{background:var(--cyan);height:3px;border-radius:2px;transition:width 0.4s;}
+.exam-layout{display:flex;flex:1;min-height:0;}
+.exam-sb{width:240px;background:white;border-right:1px solid var(--gray200);overflow-y:auto;flex-shrink:0;transition:width 0.22s;}
+.exam-sb.hidden{width:0;overflow:hidden;}
+.esb-inner{padding:10px;min-width:220px;}
+.esb-title{font-size:10px;font-weight:700;color:var(--gray400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;padding:0 5px;}
+.esb-item{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:7px;cursor:pointer;border:1.5px solid transparent;margin-bottom:2px;}
+.esb-item:hover{background:var(--gray100);}
+.esb-item.active{background:#eff6ff;border-color:#93c5fd;}
+.esb-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;}
+.esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.esb-st{font-size:12px;flex-shrink:0;}
+.exam-main{flex:1;overflow-y:auto;padding:16px 20px 90px;}
+.toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
+.sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
+.bc0{background:#eff6ff;color:#1d4ed8;}.bc1{background:#fdf2f8;color:#9d174d;}.bc2{background:#f0fdf4;color:#15803d;}
+.bc3{background:#fffbeb;color:#b45309;}.bc4{background:#faf5ff;color:#7e22ce;}.bc5{background:#fff1f2;color:#be123c;}
+.hl-panel{display:flex;align-items:center;gap:5px;margin-left:auto;background:white;border:1.5px solid var(--gray200);border-radius:20px;padding:3px 10px;cursor:pointer;}
+.hl-panel.on{border-color:#fbbf24;background:#fffbeb;}
+.hl-label{font-size:12px;font-weight:700;color:var(--gray400);user-select:none;}
+.hl-panel.on .hl-label{color:#92400e;}
+.hl-dot{width:8px;height:8px;border-radius:50%;background:var(--gray300);flex-shrink:0;}
+.hl-panel.on .hl-dot{background:#fbbf24;}
+.swatches{display:flex;gap:3px;}
+.swatch{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.1s;}
+.swatch:hover{transform:scale(1.25);}
+.swatch.sel{border-color:#333;transform:scale(1.15);}
+.hl-hint{font-size:11px;color:#92400e;margin-bottom:7px;display:none;}
+.hl-hint.on{display:block;}
+.qcard{background:white;border-radius:var(--radius);border:0.5px solid var(--gray200);padding:20px;box-shadow:var(--shadow);}
+.qnum{font-size:11px;color:var(--gray400);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;}
+.q-t-chip{background:var(--gray100);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--gray500);display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;}
+.q-t-chip span{font-weight:700;font-family:monospace;color:var(--navy2);}
+.qtext table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;}
+.qtext table td,.qtext table th{border:1px solid var(--gray300);padding:7px 11px;}
+.qtext table th{background:var(--gray100);font-weight:700;}
+.qtext img{max-width:100%;height:auto;border-radius:8px;margin:8px 0;display:block;}
+.qtext ul,.qtext ol{padding-left:22px;margin:6px 0;}
+.opts{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;}
+.opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
+.opt .L{font-weight:700;min-width:18px;color:var(--navy2);flex-shrink:0;}
+.opt-txt{flex:1;}
+.opt.sel-opt{border-color:var(--navy2);background:#eff6ff;}
+.opt.correct{border-color:var(--green)!important;background:var(--green-light)!important;}
+.opt.correct .L{color:var(--green)!important;}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-light)!important;}
+.opt.wrong .L{color:var(--red)!important;}
+.opt.show-ans{border-color:var(--green)!important;background:var(--green-light)!important;}
+.opt.show-ans .L{color:var(--green)!important;}
+.opt.excl .opt-txt{text-decoration:line-through;color:var(--gray300);}
+.opt.excl .L{color:var(--gray300)!important;}
+.opt.excl{border-color:var(--gray100);background:var(--gray50);}
+.excl-btn{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:none;font-size:11px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;}
+.opt:hover:not([disabled]) .excl-btn{display:flex;background:var(--red-light);color:var(--red);}
+.opt.excl .excl-btn{display:flex!important;background:var(--green-light);color:var(--green);}
+.opt[disabled] .excl-btn{display:none!important;}
+.sub-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;}
+.sub-btn:disabled{background:var(--gray300);cursor:default;}
+.sub-btn:hover:not(:disabled){background:var(--navy);}
+.exp-box{margin-top:14px;border-radius:10px;border:1px solid var(--gray200);overflow:hidden;}
+.exp-verdict{padding:11px 14px;font-weight:700;font-size:13px;}
+.verdict-ok{background:var(--green-light);color:#14532d;border-bottom:1px solid #bbf7d0;}
+.verdict-bad{background:var(--red-light);color:#7f1d1d;border-bottom:1px solid #fecaca;}
+.exp-sec{padding:12px 14px;border-bottom:1px solid var(--gray100);}
+.exp-sec:last-child{border-bottom:none;}
+.exp-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray400);margin-bottom:7px;}
+.exp-body{font-size:13px;line-height:1.75;color:var(--gray700);user-select:text;}
+.oa-list{display:flex;flex-direction:column;gap:5px;}
+.oa-item{display:flex;gap:7px;align-items:flex-start;padding:6px 9px;border-radius:7px;font-size:13px;line-height:1.5;}
+.oa-item.oa-right{background:var(--green-light);}
+.oa-item.oa-bad{background:#fff8f8;}
+.oa-tag{font-weight:700;min-width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;}
+.oa-item.oa-right .oa-tag{background:var(--green);color:white;}
+.oa-item.oa-bad .oa-tag{background:var(--gray200);color:var(--gray600);}
+.takehome{background:#fffbeb;border-radius:8px;padding:9px 12px;font-size:13px;line-height:1.65;color:#78350f;border-left:3px solid #fbbf24;}
+.next-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:11px;font-family:'DM Sans',sans-serif;}
+.next-btn:hover{background:var(--navy);}
+mark{border-radius:2px;padding:0 1px;cursor:pointer;}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid var(--gray200);padding:8px 16px;display:flex;justify-content:flex-end;gap:9px;z-index:100;}
+.suspend-fab{background:#f59e0b;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.end-fab{background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.home-fab-btn{background:var(--navy2);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.res-card{background:white;border-radius:var(--radius);border:0.5px solid var(--gray200);padding:28px;box-shadow:var(--shadow);}
+.res-top{text-align:center;border-bottom:1px solid var(--gray100);padding-bottom:20px;margin-bottom:20px;}
+.res-score{font-size:56px;font-weight:800;line-height:1;}
+.res-label{font-size:13px;color:var(--gray500);margin-top:3px;}
+.res-msg{font-size:18px;font-weight:700;margin-top:10px;}
+.res-sub{font-size:12px;color:var(--gray500);margin-top:2px;}
+.time-row{display:inline-flex;gap:16px;background:var(--gray100);border-radius:10px;padding:9px 18px;margin:10px 0;flex-wrap:wrap;justify-content:center;}
+.tr-item{text-align:center;}
+.tr-val{font-size:16px;font-weight:700;color:var(--navy2);font-family:monospace;}
+.tr-lbl{font-size:10px;color:var(--gray400);}
+.score-grid{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:12px 0;}
+.sdot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;cursor:pointer;}
+.rev-section h3{font-size:13px;font-weight:700;margin-bottom:9px;color:var(--navy2);}
+.rev-item{background:#fffbeb;border-left:3px solid #fbbf24;border-radius:6px;padding:9px 12px;margin-bottom:7px;font-size:13px;line-height:1.6;}
+.ri-num{font-weight:700;color:#92400e;margin-bottom:2px;font-size:10px;text-transform:uppercase;}
+.ri-q{color:var(--gray700);margin-bottom:3px;}
+.ri-ans{color:var(--green);font-weight:700;margin-bottom:3px;}
+.ri-exp{color:var(--gray500);font-size:12px;border-top:1px solid #fde68a;padding-top:3px;margin-top:3px;}
+.res-btns{display:flex;gap:9px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+
+/* ADMIN FORMS */
+.qform-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.opt-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.opt-letter{font-weight:700;color:var(--navy2);min-width:20px;font-size:14px;}
+.correct-sel{display:flex;gap:7px;flex-wrap:wrap;}
+.corr-btn{padding:7px 14px;border-radius:7px;border:1.5px solid var(--gray200);background:white;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.corr-btn.sel{background:var(--navy2);color:white;border-color:var(--navy2);}
+.oa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:white;border-radius:14px;padding:26px;max-width:400px;width:100%;text-align:center;box-shadow:var(--shadow-lg);}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:7px;}
+.modal p{font-size:13px;color:var(--gray500);line-height:1.6;margin-bottom:18px;}
+.modal-btns{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
+.qmodal{max-width:760px;text-align:left;max-height:90vh;overflow-y:auto;}
+.qmodal h2{margin-bottom:18px;}
+
+/* MISC */
+/* ?? DASHBOARD ?? */
+.dash-wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px;}
+.dash-greeting{margin-bottom:32px;}
+.dash-greeting h1{font-size:26px;font-weight:800;color:var(--gray800);}
+.dash-greeting p{font-size:14px;color:var(--gray500);margin-top:5px;}
+.dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:640px){.dash-cards{grid-template-columns:1fr;}}
+.dash-card{background:white;border-radius:16px;border:0.5px solid var(--gray200);padding:28px 24px;cursor:pointer;transition:all 0.18s;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;}
+.dash-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--gray300);}
+.dash-card-icon{font-size:36px;line-height:1;}
+.dash-card-title{font-size:17px;font-weight:800;color:var(--gray800);}
+.dash-card-desc{font-size:13px;color:var(--gray500);line-height:1.6;}
+.dash-card-arrow{position:absolute;bottom:24px;right:24px;font-size:18px;color:var(--gray300);transition:all 0.15s;}
+.dash-card:hover .dash-card-arrow{color:var(--navy2);transform:translateX(3px);}
+.dash-card.card-primary{background:var(--navy2);border-color:var(--navy2);}
+.dash-card.card-primary .dash-card-title{color:white;}
+.dash-card.card-primary .dash-card-desc{color:rgba(255,255,255,0.65);}
+.dash-card.card-primary .dash-card-arrow{color:rgba(255,255,255,0.4);}
+.dash-card.card-primary:hover .dash-card-arrow{color:white;}
+.dash-card.card-amber{background:#fffbeb;border-color:#fde68a;}
+.dash-card.card-amber .dash-card-title{color:#92400e;}
+.dash-card.card-amber .dash-card-desc{color:#b45309;}
+.dash-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.dash-stat{background:rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:12px;color:rgba(255,255,255,0.9);font-weight:600;}
+.dash-stat-dark{background:var(--gray100);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--gray600);font-weight:600;}
+/* ?? CREATE EXAM PAGE ?? */
+.back-header{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--gray200);}
+.back-header button{background:none;border:none;cursor:pointer;color:var(--gray500);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;padding:0;}
+.back-header button:hover{color:var(--gray800);}
+.back-header h2{font-size:18px;font-weight:800;color:var(--gray800);}
+/* ?? SETTINGS ?? */
+.settings-section{background:white;border-radius:var(--radius);border:0.5px solid var(--gray200);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);}
+.settings-section h3{font-size:15px;font-weight:700;color:var(--gray800);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--gray100);}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray100);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-left{flex:1;}
+.settings-row-label{font-size:14px;font-weight:600;color:var(--gray700);}
+.settings-row-sub{font-size:12px;color:var(--gray400);margin-top:2px;}
+.reset-zone{background:#fff5f5;border:1.5px solid #fecaca;border-radius:10px;padding:20px;margin-top:8px;}
+.reset-zone h4{font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;}
+.reset-zone p{font-size:13px;color:#7f1d1d;line-height:1.6;margin-bottom:14px;}
+.reset-confirm-input{display:flex;gap:8px;align-items:center;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--gray400);}
+.empty-state .esi{font-size:40px;margin-bottom:10px;}
+.spinner-wrap{display:flex;align-items:center;justify-content:center;padding:60px;}
+.spinner{width:36px;height:36px;border:3px solid var(--gray200);border-top-color:var(--navy2);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--gray800);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.toast.show{opacity:1;}
+.tag-pub{background:var(--green-light);color:var(--green);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.tag-draft{background:var(--gray100);color:var(--gray500);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.ans-stats{margin-top:10px;display:flex;flex-direction:column;gap:5px;}
+.ans-stat-row{display:flex;align-items:center;gap:8px;font-size:12px;}
+.ans-stat-letter{font-weight:700;min-width:18px;color:var(--gray600);}
+.ans-stat-bar-wrap{flex:1;background:var(--gray100);border-radius:4px;height:18px;overflow:hidden;position:relative;}
+.ans-stat-bar{height:100%;border-radius:4px;transition:width 0.6s ease;}
+.ans-stat-bar.correct-bar{background:rgba(22,163,74,0.25);}
+.ans-stat-bar.wrong-bar{background:rgba(148,163,184,0.3);}
+.ans-stat-bar.user-bar{background:rgba(220,38,38,0.25);}
+.ans-stat-pct{font-weight:700;min-width:36px;text-align:right;color:var(--gray600);}
+.ans-stat-count{color:var(--gray400);min-width:60px;}
+.ans-stats-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray400);margin-bottom:4px;}
+
+/* ?? RICH TEXT EDITOR ?? */
+.rte-wrap{border:1.5px solid var(--gray200);border-radius:8px;overflow:hidden;background:white;}
+.rte-wrap:focus-within{border-color:var(--blue);}
+.rte-toolbar{display:flex;align-items:center;gap:2px;padding:6px 8px;background:var(--gray50);border-bottom:1px solid var(--gray200);flex-wrap:wrap;}
+.rte-btn{background:white;border:1px solid var(--gray200);border-radius:5px;padding:4px 8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gray700);transition:all 0.1s;line-height:1.4;}
+.rte-btn:hover{background:var(--gray100);border-color:var(--gray300);}
+.rte-hl-btn{border:1.5px solid rgba(0,0,0,0.15);border-radius:5px;padding:3px 8px;font-size:12px;font-weight:800;cursor:pointer;color:rgba(0,0,0,0.7);}
+.rte-hl-btn:hover{transform:scale(1.1);}
+.rte-danger-btn{background:var(--red-light);border:1px solid #fca5a5;color:var(--red);border-radius:5px;padding:4px 8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.rte-sep{width:1px;height:18px;background:var(--gray200);margin:0 3px;flex-shrink:0;}
+.rte-editor{min-height:100px;max-height:320px;overflow-y:auto;padding:10px 14px;font-size:13px;line-height:1.75;color:var(--gray800);outline:none;font-family:'DM Sans',sans-serif;}
+.rte-editor:empty::before{content:attr(data-placeholder);color:var(--gray400);pointer-events:none;}
+.rte-editor img{max-width:100%;height:auto;border-radius:6px;margin:6px 0;display:block;}
+.rte-editor table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px;}
+.rte-editor table td,.rte-editor table th{border:1px solid var(--gray300);padding:6px 10px;min-width:60px;}
+.rte-editor table th{background:var(--gray100);font-weight:700;}
+.rte-editor ul,.rte-editor ol{padding-left:20px;}
+.tbl-grid{display:grid;grid-template-columns:repeat(8,26px);gap:3px;margin-bottom:10px;}
+.tbl-cell{width:26px;height:26px;border:1.5px solid var(--gray200);border-radius:3px;cursor:pointer;}
+.tbl-cell.hov{background:#bae6fd;border-color:#38bdf8;}
+</style>
+</head>
+<body>
+
+<!-- AUTH PAGE -->
+<div id="authPage" class="page active">
+  <div class="auth-wrap">
+    <div class="auth-left">
+      <div>
+        <div class="auth-logo"><svg height="44" viewBox="0 0 220 44" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16 0 L32 5.5 L32 24 Q32 38 16 44 Q0 38 0 24 L0 5.5 Z" fill="#1a3a5c"/>
+  <path d="M16 0 L32 5.5 L32 24 Q32 38 16 44 Q0 38 0 24 L0 5.5 Z" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
+  <rect x="8" y="17.5" width="16" height="5" rx="2.5" fill="#4fc3f7"/>
+  <rect x="13.5" y="12" width="5" height="16" rx="2.5" fill="#4fc3f7"/>
+  <text x="40" y="31" font-family="DM Serif Display,Georgia,serif" font-size="28" fill="white" letter-spacing="-0.5">Med</text>
+  <text x="98" y="31" font-family="DM Serif Display,Georgia,serif" font-size="28" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
+</svg></div>
+        <div class="auth-tagline">Medical Question Bank</div>
+        <div class="auth-features">
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Clinical questions by medical experts for University of Jordan students</div></div>
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Filter by subject, category, and question type</div></div>
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Track performance and focus on your weak areas</div></div>
+          <div class="auth-feat"><div class="auth-feat-icon">?</div><div>Suspend and continue exams anytime</div></div>
+        </div>
+      </div>
+      <div class="auth-left-foot">? 2025 MedExam ? University of Jordan</div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-box" id="loginBox">
+        <h2>Welcome back</h2>
+        <div class="auth-sub">Sign in to your MedExam account</div>
+        <div class="auth-err" id="loginErr"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"></div>
+        <div class="form-group">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label class="form-label" style="margin:0;">Password</label>
+            <a onclick="showForgot()" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;">Forgot password?</a>
+          </div>
+          <input type="password" class="form-input" id="loginPass" placeholder="????????" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()">Sign In</button>
+        <div class="auth-switch">No account? <a onclick="showReg()">Create one</a></div>
+      </div>
+
+      <!-- Forgot Password Box -->
+      <div class="auth-box" id="forgotBox" style="display:none;">
+        <h2>Reset Password</h2>
+        <div class="auth-sub">Enter your email and we'll send you a reset link</div>
+        <div class="auth-err" id="forgotErr"></div>
+        <div class="auth-ok" id="forgotOk"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="forgotEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doForgot()"></div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doForgot()">Send Reset Link</button>
+        <div class="auth-switch"><a onclick="showLogin()" style="cursor:pointer;">? Back to Sign In</a></div>
+      </div>
+      <div class="auth-box" id="regBox" style="display:none;">
+        <h2>Create account</h2>
+        <div class="auth-sub">Join MedExam today</div>
+        <div class="auth-err" id="regErr"></div>
+        <div class="auth-ok" id="regOk"></div>
+        <div class="form-group"><label class="form-label">Full name</label><input type="text" class="form-input" id="regName" placeholder="Your full name"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="regEmail" placeholder="your@email.com"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group"><label class="form-label">University</label>
+            <select class="form-input form-select" id="regUni">
+              <option value="University of Jordan">University of Jordan</option>
+              <option value="JUST">JUST</option>
+              <option value="Mutah University">Mutah</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Year</label>
+            <select class="form-input form-select" id="regYear">
+              <option value="1">Year 1</option><option value="2">Year 2</option><option value="3">Year 3</option>
+              <option value="4">Year 4</option><option value="5">Year 5</option><option value="6">Year 6</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="regPass" placeholder="Min. 6 characters" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doRegister()">Create Account</button>
+        <div class="auth-switch">Have an account? <a onclick="showLogin()">Sign in</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME PAGE -->
+<div id="homePage" class="page">
+  <nav class="app-nav">
+    <div class="nav-brand"><svg height="32" viewBox="0 0 180 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="#1a3a5c"/>
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="none" stroke="#4fc3f7" stroke-width="1.2"/>
+  <rect x="6.5" y="13" width="11" height="4" rx="2" fill="#4fc3f7"/>
+  <rect x="10" y="9.5" width="4" height="11" rx="2" fill="#4fc3f7"/>
+  <text x="30" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="white" letter-spacing="-0.5">Med</text>
+  <text x="72" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
+</svg></div>
+    <div class="nav-links">
+      <button class="nav-link active" id="nav-home" onclick="goHome()">? Home</button>
+    </div>
+    <div class="nav-right">
+      <span class="nav-user" id="navUser" style="display:none;"></span>
+      <span class="admin-badge" id="navAdminBadge" style="display:none;">ADMIN</span>
+      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">? Admin</button>
+      <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+  <div class="page-body" id="homeBody"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+</div>
+
+<!-- PENDING PAGE -->
+<div id="pendingPage" class="page">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--gray50);">
+    <div style="text-align:center;max-width:420px;padding:40px 24px;">
+      <div style="font-size:56px;margin-bottom:16px;">?</div>
+      <h2 style="font-size:22px;font-weight:800;color:var(--gray800);margin-bottom:10px;">Account Pending Approval</h2>
+      <p style="font-size:14px;color:var(--gray500);line-height:1.7;margin-bottom:24px;">Your account has been created and is waiting for admin approval. You'll be able to access the platform once approved. Please check back later.</p>
+      <div style="background:var(--amber-light);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--amber);font-weight:600;margin-bottom:24px;">
+        ? Contact your administrator if you've already completed payment and are waiting for access.
+      </div>
+      <button class="btn btn-secondary" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage" class="page" style="display:none;">
+  <nav class="app-nav">
+    <div class="nav-brand"><svg height="32" viewBox="0 0 180 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="#1a3a5c"/>
+  <path d="M12 0 L24 4 L24 18 Q24 28 12 32 Q0 28 0 18 L0 4 Z" fill="none" stroke="#4fc3f7" stroke-width="1.2"/>
+  <rect x="6.5" y="13" width="11" height="4" rx="2" fill="#4fc3f7"/>
+  <rect x="10" y="9.5" width="4" height="11" rx="2" fill="#4fc3f7"/>
+  <text x="30" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="white" letter-spacing="-0.5">Med</text>
+  <text x="72" y="23" font-family="DM Serif Display,Georgia,serif" font-size="20" fill="#4fc3f7" letter-spacing="-0.5">Exam</text>
+</svg><span style="font-size:11px;color:var(--cyan);font-family:'DM Sans',sans-serif;font-weight:600;margin-left:4px;">Admin</span></div>
+    <div class="nav-right">
+      <button class="btn btn-sm btn-secondary" onclick="showPage('homePage');renderDashboard()">? Back to App</button>
+      <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+  <div class="admin-layout">
+    <div class="admin-sb">
+      <div class="admin-sb-title">Content</div>
+      <button class="admin-nav active" onclick="aNav('subjects',event)">? Systems</button>
+      <button class="admin-nav" onclick="aNav('categories',event)">? Topics</button>
+      <button class="admin-nav" onclick="aNav('disciplines',event)">? Subjects</button>
+      <button class="admin-nav" onclick="aNav('questions',event)">? Questions</button>
+      <div class="admin-sb-title" style="margin-top:16px;">Data</div>
+      <button class="admin-nav" onclick="aNav('users',event)">? Users</button>
+    </div>
+    <div class="admin-content">
+      <div class="admin-sec active" id="asec-subjects">
+        <div class="admin-toolbar"><h2>? Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add System</button></div>
+        <div id="subj-wrap"><div class="empty-state"><div class="esi">?</div><p>No subjects yet. Add one!</p></div></div>
+      </div>
+      <div class="admin-sec" id="asec-categories">
+        <div class="admin-toolbar">
+          <h2>? Topics</h2>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select class="form-input form-select" id="catSubjFilter" onchange="loadCatsTable()" style="width:200px;font-size:13px;padding:7px 12px;"></select>
+            <button class="btn btn-primary btn-sm" onclick="openCatModal()">+ Add Category</button>
+          </div>
+        </div>
+        <div id="cats-wrap"><div class="empty-state"><div class="esi">?</div><p>Select a subject</p></div></div>
+      </div>
+      <div class="admin-sec" id="asec-disciplines">
+        <div class="admin-toolbar"><h2>? Subjects</h2><button class="btn btn-primary btn-sm" onclick="openDiscModal()">+ Add Subject</button></div>
+        <p style="font-size:13px;color:var(--gray500);margin-bottom:14px;">Subjects are cross-system categories like Anatomy, Physiology, Pathology ? just like UWorld. Assign them to questions.</p>
+        <div id="disc-wrap"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+      </div>
+      <div class="admin-sec" id="asec-questions">
+        <div class="admin-toolbar">
+          <h2>? Questions</h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select class="form-input form-select" id="qSubjFilter" onchange="loadQCatFilter()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
+            <select class="form-input form-select" id="qCatFilter" onchange="loadQTable()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
+            <button class="btn btn-primary btn-sm" onclick="openQModal()">+ Add Question</button>
+          </div>
+        </div>
+        <div id="q-wrap"><div class="empty-state"><div class="esi">?</div><p>Select a system and topic</p></div></div>
+      </div>
+      <div class="admin-sec" id="asec-users">
+        <div class="admin-toolbar"><h2>? Users</h2></div>
+        <div id="users-wrap"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM PAGE -->
+<div id="examPage" class="page">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="tb-title" id="tb-title">Exam</div>
+      <span class="score-chip" id="score-chip">Score: 0 / 0</span>
+    </div>
+    <div class="timers">
+      <div class="timer-box"><div class="t-label">Exam</div><div class="t-val" id="exam-t">00:00</div></div>
+      <div class="timer-box"><div class="t-label">Question</div><div class="t-val" id="q-t">00:00</div></div>
+    </div>
+  </div>
+  <div class="nav-strip">
+    <div class="nav-left"><button class="sb-tog" onclick="toggleESB()">? List</button><div class="pw"><div class="pf" id="eprog"></div></div></div>
+    <div class="nav-center">
+      <button class="nav-ebtn" id="prev-btn" onclick="eNav(ES.cur-1)" disabled>? Prev</button>
+      <span class="nav-lbl" id="enav-lbl">Q 1 / ?</span>
+      <button class="nav-ebtn" id="next-btn" onclick="eNav(ES.cur+1)">Next ?</button>
+    </div>
+    <div class="nav-right"></div>
+  </div>
+  <div class="exam-layout">
+    <div class="exam-sb hidden" id="exam-sb"><div class="esb-inner"><div class="esb-title">Questions</div><div id="esb-list"></div></div></div>
+    <div class="exam-main" id="exam-main"></div>
+  </div>
+  <div class="bottom-bar" id="exam-bb">
+    <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">? Home</button>
+    <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">? Suspend</button>
+    <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">? End Exam</button>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-bg" id="end-modal" style="display:none;"><div class="modal"><h2>End Exam?</h2><p>Unanswered questions will be marked incorrect.</p><div class="modal-btns"><button class="btn btn-secondary" onclick="hideEModal('end-modal')">Cancel</button><button class="btn btn-danger" onclick="eForceEnd()">End & See Results</button></div></div></div>
+<div class="modal-bg" id="sus-modal" style="display:none;"><div class="modal"><h2>Suspend Exam?</h2><p>Progress saved. Continue anytime from My Exams.</p><div class="modal-btns"><button class="btn btn-secondary" onclick="hideEModal('sus-modal')">Cancel</button><button class="btn btn-amber" onclick="eSuspend()">Suspend & Go Home</button></div></div></div>
+
+<!-- Admin modals -->
+<div class="modal-bg" id="subj-modal" style="display:none;">
+  <div class="modal" style="text-align:left;">
+    <h2 id="subj-modal-title">Add System</h2>
+    <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="sm-name" placeholder="e.g. Cardiology"></div>
+    <div class="form-group"><label class="form-label">Description</label><input type="text" class="form-input" id="sm-desc" placeholder="Brief description"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group"><label class="form-label">Icon (emoji)</label><input type="text" class="form-input" id="sm-icon" placeholder="??" style="width:80px;"></div>
+    </div>
+    <div class="modal-btns"><button class="btn btn-secondary" onclick="hideAModal('subj-modal')">Cancel</button><button class="btn btn-primary" onclick="saveSubj()">Save</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="cat-modal" style="display:none;">
+  <div class="modal" style="text-align:left;">
+    <h2 id="cat-modal-title">Add Topic</h2>
+    <div class="form-group"><label class="form-label">System</label><select class="form-input form-select" id="cm-subj"></select></div>
+    <div class="form-group"><label class="form-label">Category name</label><input type="text" class="form-input" id="cm-name" placeholder="e.g. Heart Failure"></div>
+    <div class="modal-btns"><button class="btn btn-secondary" onclick="hideAModal('cat-modal')">Cancel</button><button class="btn btn-primary" onclick="saveCat()">Save</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="disc-modal" style="display:none;">
+  <div class="modal" style="text-align:left;">
+    <h2 id="disc-modal-title">Add Subject</h2>
+    <div class="form-group"><label class="form-label">Discipline name</label><input type="text" class="form-input" id="dm-name" placeholder="e.g. Pathology, Physiology, Anatomy, Biochemistry"></div>
+    <div class="modal-btns"><button class="btn btn-secondary" onclick="hideAModal('disc-modal')">Cancel</button><button class="btn btn-primary" onclick="saveDisc()">Save</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="q-modal" style="display:none;">
+  <div class="modal qmodal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <h2 id="q-modal-title" style="margin:0;">Add Question</h2>
+      <button type="button" class="btn btn-sm" onclick="toggleParsePanel()" id="parse-toggle-btn"
+        style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;gap:5px;">
+        ? Paste Full Question
+      </button>
+    </div>
+
+    <!-- Parse Panel (hidden by default) -->
+    <div id="parse-panel" style="display:none;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:16px;margin-bottom:18px;">
+      <div style="font-size:13px;font-weight:700;color:var(--navy2);margin-bottom:6px;">? Paste the entire question block</div>
+      <div style="font-size:12px;color:var(--gray500);margin-bottom:10px;">Copy everything from UWorld or any source ? question, choices with percentages, correct answer, explanation, choice analyses, and educational objective. The parser fills <b>all fields</b> automatically.</div>
+      <textarea id="parse-input" class="form-input" rows="10" placeholder="Paste the full question here...
+
+Example:
+A 45-year-old man presents with...
+
+A. Aortic regurgitation
+B. Aortic stenosis
+C. Mitral stenosis
+
+The correct answer is A.
+Explanation: Aortic regurgitation causes...
+
+A. Correct ? bounding pulses indicate...
+B. Incorrect ? stenosis causes...
+
+Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."></textarea>
+      <div id="parse-error" style="display:none;background:var(--red-light);color:var(--red);border-radius:7px;padding:8px 12px;font-size:12px;margin-top:8px;"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" class="btn btn-primary" onclick="parseAndFill()">? Parse &amp; Fill Fields</button>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('parse-input').value=''">Clear</button>
+      </div>
+    </div>
+    <div class="qform-grid">
+      <div class="form-group"><label class="form-label">System</label><select class="form-input form-select" id="qm-subj" onchange="loadQModalCats()"></select></div>
+      <div class="form-group"><label class="form-label">Topic</label><select class="form-input form-select" id="qm-cat"></select></div>
+    </div>
+    <div class="qform-grid">
+      <div class="form-group"><label class="form-label">Subject <span style="color:var(--gray400);font-weight:400;">(e.g. Pathology, Physiology)</span></label><select class="form-input form-select" id="qm-disc"><option value="">? None ?</option></select></div>
+      <div class="form-group"><label class="form-label">Question ID <span style="color:var(--gray400);font-weight:400;">(optional, e.g. CARD-001)</span></label><input type="text" class="form-input" id="qm-cid" placeholder="e.g. CARD-001"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Question text</label>
+      <div class="rte-wrap">
+        <div class="rte-toolbar">
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','bold')"><b>B</b></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','italic')"><i>I</i></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','underline')"><u>U</u></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','insertUnorderedList')">? List</button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-qtext','insertOrderedList')">1. List</button>
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#fef08a')" style="background:#fef08a" title="Yellow">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#bbf7d0')" style="background:#bbf7d0" title="Green">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#bae6fd')" style="background:#bae6fd" title="Blue">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-qtext','#fecaca')" style="background:#fecaca" title="Red">A</button>
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-btn" onclick="rteInsertTable('rte-qtext')">? Table</button>
+          <button type="button" class="rte-btn" onclick="document.getElementById('rte-qtext-img').click()">? Image</button>
+          <input type="file" id="rte-qtext-img" accept="image/*" style="display:none" onchange="rteUploadImg(this,'rte-qtext')">
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-btn rte-danger-btn" onclick="document.getElementById('rte-qtext').innerHTML=''">? Clear</button>
+        </div>
+        <div class="rte-editor" id="rte-qtext" contenteditable="true" spellcheck="true" style="min-height:120px;" data-placeholder="A 45-year-old male presents with..."></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <label class="form-label" style="margin:0;">Answer choices</label>
+        <button class="btn btn-sm btn-secondary" onclick="addOpt()" type="button">+ Add Choice</button>
+      </div>
+      <div id="opts-container"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Correct answer</label><div class="correct-sel" id="corr-sel"></div></div>
+    <div class="form-group">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <label class="form-label" style="margin:0;">Full explanation</label>
+        <button type="button" class="btn btn-sm" onclick="toggleExpParsePanel()"
+          id="exp-parse-toggle-btn" style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;font-size:11px;">
+          ? Paste &amp; Parse Explanation
+        </button>
+      </div>
+      <!-- Explanation Parse Panel -->
+      <div id="exp-parse-panel" style="display:none;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--gray500);margin-bottom:8px;">Paste the full explanation block. The parser will extract the main explanation, each choice analysis <b>(Choice A)</b>, and the <b>Educational objective</b> automatically.</div>
+        <textarea id="exp-parse-input" class="form-input" rows="10" placeholder="Paste full explanation here...
+
+Example:
+This patient has aortic regurgitation because...
+
+(Choice A) Correct ? bounding pulses and head bobbing...
+(Choice B) Incorrect ? aortic stenosis causes...
+(Choices C and D) Both incorrect because...
+
+Educational objective: Aortic regurgitation presents with..."></textarea>
+        <div id="exp-parse-error" style="display:none;border-radius:7px;padding:8px 12px;font-size:12px;margin-top:8px;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button type="button" class="btn btn-primary" onclick="parseAndFillExp()">? Parse &amp; Fill</button>
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('exp-parse-input').value=''">Clear</button>
+        </div>
+      </div>
+      <div class="rte-wrap">
+        <div class="rte-toolbar">
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','bold')"><b>B</b></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','italic')"><i>I</i></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','underline')"><u>U</u></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','insertUnorderedList')">? List</button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','insertOrderedList')">1. List</button>
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-exp','#fef08a')" style="background:#fef08a" title="Yellow">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-exp','#bbf7d0')" style="background:#bbf7d0" title="Green">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-exp','#bae6fd')" style="background:#bae6fd" title="Blue">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-exp','#fecaca')" style="background:#fecaca" title="Red">A</button>
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-btn" onclick="rteInsertTable('rte-exp')">? Table</button>
+          <button type="button" class="rte-btn" onclick="document.getElementById('rte-exp-img').click()">? Image</button>
+          <input type="file" id="rte-exp-img" accept="image/*" style="display:none" onchange="rteUploadImg(this,'rte-exp')">
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-btn rte-danger-btn" onclick="document.getElementById('rte-exp').innerHTML=''">? Clear</button>
+        </div>
+        <div class="rte-editor" id="rte-exp" contenteditable="true" spellcheck="true"></div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Option analysis</label><div class="oa-grid" id="oa-container"></div></div>
+    <div class="form-group">
+      <label class="form-label">Take-home message</label>
+      <div class="rte-wrap">
+        <div class="rte-toolbar">
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-th','bold')"><b>B</b></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-th','italic')"><i>I</i></button>
+          <button type="button" class="rte-btn" onclick="rteCmd('rte-th','underline')"><u>U</u></button>
+          <div class="rte-sep"></div>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-th','#fef08a')" style="background:#fef08a" title="Yellow">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-th','#bbf7d0')" style="background:#bbf7d0" title="Green">A</button>
+          <button type="button" class="rte-hl-btn" onclick="rteHighlight('rte-th','#bae6fd')" style="background:#bae6fd" title="Blue">A</button>
+          <button type="button" class="rte-btn" onclick="document.getElementById('rte-th-img').click()">? Image</button>
+          <input type="file" id="rte-th-img" accept="image/*" style="display:none" onchange="rteUploadImg(this,'rte-th')">
+        </div>
+        <div class="rte-editor" id="rte-th" contenteditable="true" spellcheck="true"></div>
+      </div>
+    </div>
+    <div class="modal-btns"><button class="btn btn-secondary" onclick="hideAModal('q-modal')">Cancel</button><button class="btn btn-primary" onclick="saveQ()">Save Question</button></div>
+  </div>
+</div>
+
+
+<!-- Table Builder Modal -->
+<div class="modal-bg" id="tbl-modal" style="display:none;">
+  <div class="modal" style="max-width:320px;text-align:left;">
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:14px;">? Insert Table</h2>
+    <div style="font-size:12px;color:var(--gray500);margin-bottom:8px;" id="tbl-size-lbl">Hover to select size</div>
+    <div class="tbl-grid" id="tbl-grid"></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:600;color:var(--gray600);">Or enter manually:</label>
+      <input type="number" id="tbl-rows" min="1" max="20" value="3" style="width:54px;padding:5px 8px;border:1.5px solid var(--gray200);border-radius:6px;font-size:13px;">
+      <span style="font-size:12px;color:var(--gray400);">?</span>
+      <input type="number" id="tbl-cols" min="1" max="10" value="3" style="width:54px;padding:5px 8px;border:1.5px solid var(--gray200);border-radius:6px;font-size:13px;">
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <input type="checkbox" id="tbl-header" checked style="width:15px;height:15px;">
+      <label for="tbl-header" style="font-size:13px;cursor:pointer;">Include header row</label>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('tbl-modal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="doInsertTable()">Insert Table</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal-bg" id="reset-pass-modal" style="display:none;">
+  <div class="modal" style="text-align:left;max-width:380px;">
+    <h2>? Reset Password</h2>
+    <p style="font-size:13px;color:var(--gray500);margin-bottom:16px;">Set a new password for <b id="reset-pass-name"></b>. Share it with them securely.</p>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <input type="text" class="form-input" id="reset-pass-input" placeholder="Enter new password (min 6 chars)">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-secondary btn-sm" onclick="generateTempPass()">? Generate random</button>
     </div>
     <div class="auth-err" id="reset-pass-err"></div>
     <div class="modal-btns">
@@ -845,7 +1678,7 @@ const sb=supabase.createClient(SURL,SKEY);
 const LTRS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let CU=null,CP=null;
 
-// ── PAGE ──
+//    PAGE   
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
   const el=document.getElementById(id);el.classList.add('active');
@@ -853,7 +1686,7 @@ function showPage(id){
 }
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 
-// ── AUTH ──
+//    AUTH   
 function showLogin(){
   document.getElementById('loginBox').style.display='block';
   document.getElementById('regBox').style.display='none';
@@ -880,7 +1713,7 @@ async function doForgot(){
   });
   if(error){setErr('forgotErr',error.message);return;}
   const ok=document.getElementById('forgotOk');
-  ok.textContent='✓ Reset link sent! Check your email inbox (and spam folder).';
+  ok.textContent='  Reset link sent! Check your email inbox (and spam folder).';
   ok.classList.add('show');
   document.getElementById('forgotEmail').value='';
 }
@@ -922,7 +1755,7 @@ async function doLogout(){
   await sb.auth.signOut();CU=null;CP=null;showPage('authPage');showLogin();
 }
 
-// ── INIT ──
+//    INIT   
 async function initApp(){
   const{data:{user}}=await sb.auth.getUser();
   if(!user){showPage('authPage');return;}
@@ -944,7 +1777,7 @@ async function initApp(){
   showPage('homePage');renderDashboard();
 }
 
-// ── HOME ──
+//    HOME   
 let allSubjects=[];   // systems (from subjects table)
 let allDisciplines=[]; // subjects (from disciplines table)
 let selSubjects=new Set();    // selected system ids
@@ -997,13 +1830,13 @@ async function renderDashboard(){
   body.innerHTML=`
     <div class="dash-wrap">
       <div class="dash-greeting">
-        <h1>Welcome back, ${name} 👋</h1>
+        <h1>Welcome back, ${name}  </h1>
         <p>What would you like to do today?</p>
       </div>
       <div class="dash-cards">
         <!-- Create Exam -->
         <div class="dash-card card-primary" onclick="showCreateExam()">
-          <div class="dash-card-icon">✏️</div>
+          <div class="dash-card-icon">  </div>
           <div>
             <div class="dash-card-title">Create Exam</div>
             <div class="dash-card-desc">Build a custom practice session from your question bank</div>
@@ -1012,30 +1845,30 @@ async function renderDashboard(){
             <span class="dash-stat">${allSubjects.length} systems</span>
             <span class="dash-stat">${allDisciplines.length} subjects</span>
           </div>
-          <div class="dash-card-arrow">→</div>
+          <div class="dash-card-arrow"> </div>
         </div>
         <!-- My Exams -->
         <div class="dash-card" onclick="goMyExams()">
-          <div class="dash-card-icon">📋</div>
+          <div class="dash-card-icon"> </div>
           <div>
             <div class="dash-card-title">My Exams</div>
             <div class="dash-card-desc">Review your past sessions, continue suspended exams, and track progress</div>
           </div>
           <div class="dash-stats">
             <span class="dash-stat-dark">${done} done</span>
-            ${suspended>0?`<span class="dash-stat-dark">⏸ ${suspended} suspended</span>`:''}
+            ${suspended>0?`<span class="dash-stat-dark">  ${suspended} suspended</span>`:''}
             ${allAns.length>0?`<span class="dash-stat-dark">${pct}% avg score</span>`:''}
           </div>
-          <div class="dash-card-arrow">→</div>
+          <div class="dash-card-arrow"> </div>
         </div>
         <!-- Settings -->
         <div class="dash-card card-amber" onclick="showSettings()">
-          <div class="dash-card-icon">⚙️</div>
+          <div class="dash-card-icon">  </div>
           <div>
             <div class="dash-card-title">Settings</div>
             <div class="dash-card-desc">Edit your profile, change password, or reset your progress</div>
           </div>
-          <div class="dash-card-arrow">→</div>
+          <div class="dash-card-arrow"> </div>
         </div>
       </div>
     </div>`;
@@ -1086,8 +1919,8 @@ function showCreateExam(){
   body.innerHTML=`
     <div class="page-body" style="max-width:1000px;margin:0 auto;padding:28px 24px 80px;">
       <div class="back-header">
-        <button onclick="renderDashboard()">← Back</button>
-        <h2>✏️ Create Exam</h2>
+        <button onclick="renderDashboard()">  Back</button>
+        <h2>   Create Exam</h2>
       </div>
       ${renderCreateExamHTML()}
     </div>`;
@@ -1104,12 +1937,12 @@ function renderCreateExamHTML(){
   const anythingSelected=selSubjects.size>0;
   return `
     <div class="gen-card">
-      <h2>🎯 Generate Practice Session</h2>
+      <h2>  Generate Practice Session</h2>
       <div class="sub">Filter by subject and system, then set how many questions you want.</div>
 
       <!-- Random Mode Toggle -->
       <div style="display:flex;align-items:center;gap:12px;background:${randomMode?'#eff6ff':'var(--gray50)'};border:1.5px solid ${randomMode?'var(--blue)':'var(--gray200)'};border-radius:10px;padding:12px 16px;margin-bottom:20px;cursor:pointer;" onclick="toggleRandomMode()">
-        <div style="font-size:24px;">🎲</div>
+        <div style="font-size:24px;"> </div>
         <div style="flex:1;">
           <div style="font-size:14px;font-weight:700;color:${randomMode?'var(--blue)':'var(--gray700)'};">Random Mode</div>
           <div style="font-size:12px;color:var(--gray400);margin-top:2px;">Pull random questions from the entire question bank, ignoring systems and subjects</div>
@@ -1119,11 +1952,11 @@ function renderCreateExamHTML(){
         </div>
       </div>
 
-      <!-- Steps — hidden in random mode -->
+      <!-- Steps   hidden in random mode -->
       <div id="filter-steps-wrap" style="display:${randomMode?'none':'block'};">
       ${hasDiscs?`
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="gen-step-title" style="margin:0;">Step 1 — Select subjects</div>
+        <div class="gen-step-title" style="margin:0;">Step 1   Select subjects</div>
         <div style="display:flex;gap:10px;">
           <span style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;" onclick="selDisciplines=new Set();allDiscsSelected=true;showCreateExam()">Select all</span>
           <span style="font-size:12px;color:var(--gray400);">|</span>
@@ -1134,13 +1967,13 @@ function renderCreateExamHTML(){
         ${allDisciplines.map(d=>{
           const on=allDiscsSelected?true:selDisciplines.has(d.id);
           return `<div class="subj-chip${on?' selected':''}" onclick="toggleDisc('${d.id}')">
-            <span>${d.name}</span><span class="chip-check">${on?'✓':''}</span>
+            <span>${d.name}</span><span class="chip-check">${on?' ':''}</span>
           </div>`;
         }).join('')}
       </div>`:''}
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="gen-step-title" style="margin:0;">${hasDiscs?'Step 2':'Step 1'} — Select systems</div>
+        <div class="gen-step-title" style="margin:0;">${hasDiscs?'Step 2':'Step 1'}   Select systems</div>
         <div style="display:flex;gap:10px;">
           <span style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;" onclick="selectAllSystems()">Select all</span>
           <span style="font-size:12px;color:var(--gray400);">|</span>
@@ -1150,36 +1983,36 @@ function renderCreateExamHTML(){
       <div class="subjects-select-grid" id="subj-select-grid">
         ${allSubjects.map(s=>`
           <div class="subj-chip${selSubjects.has(s.id)?' selected':''}" onclick="toggleSubjectCE('${s.id}')">
-            <span class="chip-icon">${s.icon||'🫀'}</span>
+            <span class="chip-icon">${s.icon||' '}</span>
             <span>${s.name}</span>
-            <span class="chip-check">${selSubjects.has(s.id)?'✓':''}</span>
+            <span class="chip-check">${selSubjects.has(s.id)?' ':''}</span>
           </div>`).join('')}
         ${!allSubjects.length?'<div style="color:var(--gray400);font-size:13px;">No systems added yet</div>':''}
       </div>
 
       <div id="cat-accordion" style="display:${anythingSelected?'block':'none'};">
-        <div class="gen-step-title">${hasDiscs?'Step 3':'Step 2'} — Choose topics</div>
+        <div class="gen-step-title">${hasDiscs?'Step 3':'Step 2'}   Choose topics</div>
         <div class="subj-categories" id="cat-accordion-body"></div>
       </div>
       </div><!-- end filter-steps-wrap -->
 
       <div id="filter-step" style="display:${anythingSelected||randomMode?'block':'none'};">
-        <div class="gen-step-title">${hasDiscs?'Step 4':'Step 3'} — Question filter</div>
+        <div class="gen-step-title">${hasDiscs?'Step 4':'Step 3'}   Question filter</div>
         <div class="filter-row">
           <button class="filter-btn${qFilter==='all'?' active':''}" onclick="setFilter('all')">
-            <div class="fb-label">All Questions</div><div class="fb-count" id="cnt-all">Loading…</div>
+            <div class="fb-label">All Questions</div><div class="fb-count" id="cnt-all">Loading </div>
           </button>
           <button class="filter-btn${qFilter==='new'?' active':''}" onclick="setFilter('new')">
-            <div class="fb-label">New Only</div><div class="fb-count" id="cnt-new">Loading…</div>
+            <div class="fb-label">New Only</div><div class="fb-count" id="cnt-new">Loading </div>
           </button>
           <button class="filter-btn${qFilter==='wrong'?' active':''}" onclick="setFilter('wrong')">
-            <div class="fb-label">Wrong Only</div><div class="fb-count" id="cnt-wrong">Loading…</div>
+            <div class="fb-label">Wrong Only</div><div class="fb-count" id="cnt-wrong">Loading </div>
           </button>
         </div>
       </div>
 
       <div id="count-step" style="display:${anythingSelected||randomMode?'block':'none'};">
-        <div class="gen-step-title">${hasDiscs?'Step 5':'Step 4'} — Number of questions</div>
+        <div class="gen-step-title">${hasDiscs?'Step 5':'Step 4'}   Number of questions</div>
         <div class="qcount-row">
           <span class="qcount-label">Questions:</span>
           <input type="range" class="qcount-slider" id="qcount-slider" min="1" max="40" value="20" oninput="document.getElementById('qcount-val').textContent=this.value;">
@@ -1187,19 +2020,19 @@ function renderCreateExamHTML(){
           <span class="qcount-max" id="qcount-max"></span>
         </div>
         <div id="gen-warning" style="display:none;background:var(--amber-light);color:var(--amber);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:14px;"></div>
-        <button class="btn btn-primary btn-lg" id="gen-btn" onclick="generateSession()" disabled>Generate Session →</button>
+        <button class="btn btn-primary btn-lg" id="gen-btn" onclick="generateSession()" disabled>Generate Session  </button>
       </div>
     </div>
 
     <div class="gen-card" style="margin-top:0;">
-      <h2>🔢 Generate by Question IDs</h2>
+      <h2>  Generate by Question IDs</h2>
       <div class="sub" style="margin-bottom:16px;">Enter specific question IDs to build a custom exam.</div>
       <div class="form-group">
         <label class="form-label">Question IDs <span style="color:var(--gray400);font-weight:400;">(comma separated, e.g. CARD-001, CARD-005)</span></label>
         <textarea class="form-input" id="qid-input" rows="3" placeholder="CARD-001, CARD-002, NEUR-005..."></textarea>
       </div>
       <div id="qid-warning" style="display:none;background:var(--amber-light);color:var(--amber);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:12px;"></div>
-      <button class="btn btn-primary" onclick="generateByIds()">Generate from IDs →</button>
+      <button class="btn btn-primary" onclick="generateByIds()">Generate from IDs  </button>
     </div>`;
 }
 
@@ -1258,8 +2091,8 @@ function renderCatAccordion(){
     const allOn=cats.every(c=>selCategories[sid]?.has(c.id));
     return `<div class="subj-cat-block">
       <div class="subj-cat-header" onclick="toggleCatAccordion('cacc-${sid}',this)">
-        <div class="subj-cat-header-left"><span>${subj?.icon||'📚'}</span><span>${subj?.name||''}</span><span style="font-size:11px;color:var(--gray400);font-weight:400;">${cats.length} categories</span></div>
-        <span class="subj-cat-chevron open" id="chev-${sid}">▼</span>
+        <div class="subj-cat-header-left"><span>${subj?.icon||' '}</span><span>${subj?.name||''}</span><span style="font-size:11px;color:var(--gray400);font-weight:400;">${cats.length} categories</span></div>
+        <span class="subj-cat-chevron open" id="chev-${sid}"> </span>
       </div>
       <div class="subj-cat-body open" id="cacc-${sid}">
         <div class="cat-toggle-row">
@@ -1269,7 +2102,7 @@ function renderCatAccordion(){
         <div class="cat-chips">
           ${cats.map(c=>{
             const on=selCategories[sid]?.has(c.id);
-            return `<div class="cat-chip ${on?'on':'off'}" onclick="toggleCat('${sid}','${c.id}')">${on?'✓':''} ${c.name}</div>`;
+            return `<div class="cat-chip ${on?'on':'off'}" onclick="toggleCat('${sid}','${c.id}')">${on?' ':''} ${c.name}</div>`;
           }).join('')}
         </div>
       </div>
@@ -1373,7 +2206,7 @@ async function generateSession(){
   if(!pool.length){toast('No questions match your selection. Try a different filter.');return;}
   pool=pool.sort(()=>Math.random()-0.5).slice(0,qcount);
   const title=randomMode?'Random Session':
-    `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')} · ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':'Wrong Qs'}`;
+    `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')}   ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':'Wrong Qs'}`;
   await launchSession(pool,title);
 }
 
@@ -1384,26 +2217,26 @@ async function goMyExams(){
   body.innerHTML=`
     <div class="page-body" style="max-width:900px;margin:0 auto;padding:28px 24px 80px;">
       <div class="back-header">
-        <button onclick="renderDashboard()">← Back</button>
-        <h2>📋 My Exams</h2>
+        <button onclick="renderDashboard()">  Back</button>
+        <h2>  My Exams</h2>
       </div>
       <div class="attempts-list">
-        ${!atts?.length?'<div class="empty-state"><div class="esi">📭</div><p>No sessions yet. Go to Create Exam to get started!</p></div>':
+        ${!atts?.length?'<div class="empty-state"><div class="esi"> </div><p>No sessions yet. Go to Create Exam to get started!</p></div>':
           atts.map(att=>{
             const ans=att.answers||[];const done=ans.filter(a=>a!==null).length;
             const cor=ans.filter(a=>a===true).length;
             const pct=done>0?Math.round(cor/done*100):0;
-            const badge=att.status==='done'?`<span class="att-badge badge-done">✓ ${pct}%</span>`:
-                        att.status==='suspended'?`<span class="att-badge badge-sus">⏸ Suspended</span>`:
+            const badge=att.status==='done'?`<span class="att-badge badge-done">  ${pct}%</span>`:
+                        att.status==='suspended'?`<span class="att-badge badge-sus">  Suspended</span>`:
                         `<span class="att-badge badge-prog">In Progress</span>`;
             const qIds=att.question_ids||[];
             return `<div class="att-row">
               <div style="flex:1;cursor:pointer;" onclick="resumeSession('${att.id}')">
-                <div class="att-title">${att.filter_type||'Session'} — ${done}/${qIds.length} answered</div>
-                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${att.status==='done'?pct+'% score':'continue where you left off'}</div>
+                <div class="att-title">${att.filter_type||'Session'}   ${done}/${qIds.length} answered</div>
+                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}   ${att.status==='done'?pct+'% score':'continue where you left off'}</div>
               </div>
               ${badge}
-              <button onclick="deleteAtt('${att.id}')" style="background:var(--red-light);color:var(--red);border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-left:8px;">🗑 Delete</button>
+              <button onclick="deleteAtt('${att.id}')" style="background:var(--red-light);color:var(--red);border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-left:8px;">  Delete</button>
             </div>`;
           }).join('')}
       </div>
@@ -1415,13 +2248,13 @@ async function showSettings(){
   body.innerHTML=`
     <div class="page-body" style="max-width:600px;margin:0 auto;padding:28px 24px 80px;">
       <div class="back-header">
-        <button onclick="renderDashboard()">← Back</button>
-        <h2>⚙️ Settings</h2>
+        <button onclick="renderDashboard()">  Back</button>
+        <h2>   Settings</h2>
       </div>
 
       <!-- Profile -->
       <div class="settings-section">
-        <h3>👤 Profile</h3>
+        <h3>  Profile</h3>
         <div class="form-group"><label class="form-label">Full name</label><input type="text" class="form-input" id="set-name" value="${CP?.full_name||''}"></div>
         <div class="form-group"><label class="form-label">University</label><input type="text" class="form-input" id="set-uni" value="${CP?.university||''}"></div>
         <div class="form-group"><label class="form-label">Year of study</label>
@@ -1434,7 +2267,7 @@ async function showSettings(){
 
       <!-- Account -->
       <div class="settings-section">
-        <h3>🔐 Account</h3>
+        <h3>  Account</h3>
         <div class="settings-row">
           <div class="settings-row-left">
             <div class="settings-row-label">Email address</div>
@@ -1447,7 +2280,7 @@ async function showSettings(){
 
       <!-- Reset -->
       <div class="settings-section">
-        <h3 style="color:var(--red);">⚠️ Danger Zone</h3>
+        <h3 style="color:var(--red);">   Danger Zone</h3>
         <div class="reset-zone">
           <h4>Reset All Progress</h4>
           <p>This will permanently delete <b>all your exam attempts, scores, and history</b>. Your account will remain but everything will be reset as if you're new. This cannot be undone.</p>
@@ -1467,7 +2300,7 @@ async function saveProfile(){
   const{error}=await sb.from('profiles').update({full_name:name,university:uni,year_of_study:year}).eq('id',CU.id);
   if(error){toast('Error: '+error.message);return;}
   CP={...CP,full_name:name,university:uni,year_of_study:year};
-  toast('Profile saved! ✓');
+  toast('Profile saved!  ');
 }
 
 async function changePassword(){
@@ -1476,7 +2309,7 @@ async function changePassword(){
   const{error}=await sb.auth.updateUser({password:pass});
   if(error){toast('Error: '+error.message);return;}
   document.getElementById('set-pass').value='';
-  toast('Password updated! ✓');
+  toast('Password updated!  ');
 }
 
 async function resetProgress(){
@@ -1485,7 +2318,7 @@ async function resetProgress(){
   if(!confirm('Are you absolutely sure? This will delete ALL your exam history permanently.'))return;
   const{error}=await sb.from('attempts').delete().eq('user_id',CU.id);
   if(error){toast('Error: '+error.message);return;}
-  toast('All progress reset. Starting fresh! ✓',3000);
+  toast('All progress reset. Starting fresh!  ',3000);
   setTimeout(()=>renderDashboard(),1500);
 }
 
@@ -1507,7 +2340,7 @@ async function resumeSession(attId){
   await launchSession(ordered,att.filter_type||'Session',att);
 }
 
-// ── EXAM ENGINE ──
+//    EXAM ENGINE   
 const HLCOLS=['#fef08a','#bbf7d0','#bae6fd','#fbcfe8','#fed7aa'];
 const HLNAMES=['Yellow','Green','Blue','Pink','Orange'];
 let ES=null,eAttId=null,eSBOpen=false,eHLMode=false,eHLC=HLCOLS[0],eCheckMode=false;
@@ -1563,8 +2396,8 @@ function toggleESB(){eSBOpen=!eSBOpen;document.getElementById('exam-sb').classLi
 function eBuildSB(){
   const Q=ES.questions;let html='';
   Q.forEach((q,i)=>{
-    const r=ES.results[i];const st=r===null?'⭕':r?'✅':'❌';const ac=i===ES.cur?' active':'';
-    html+=`<div class="esb-item${ac}" onclick="eNav(${i})"><span class="esb-num">${i+1}</span><span class="esb-txt">${q.question_text.slice(0,36)}…</span><span class="esb-st">${st}</span></div>`;
+    const r=ES.results[i];const st=r===null?' ':r?' ':' ';const ac=i===ES.cur?' active':'';
+    html+=`<div class="esb-item${ac}" onclick="eNav(${i})"><span class="esb-num">${i+1}</span><span class="esb-txt">${q.question_text.slice(0,36)} </span><span class="esb-st">${st}</span></div>`;
   });
   document.getElementById('esb-list').innerHTML=html;
 }
@@ -1608,8 +2441,8 @@ function eTogExcl(i,ev){
   ev.stopPropagation();ev.preventDefault();
   if(ES.results[ES.cur]!==null)return;
   const excl=ES.excluded[ES.cur];const opt=document.getElementById('eopt'+i);
-  if(excl.has(i)){excl.delete(i);opt.classList.remove('excl');opt.querySelector('.excl-btn').textContent='✕';}
-  else{excl.add(i);opt.classList.add('excl');opt.querySelector('.excl-btn').textContent='↩';
+  if(excl.has(i)){excl.delete(i);opt.classList.remove('excl');opt.querySelector('.excl-btn').textContent=' ';}
+  else{excl.add(i);opt.classList.add('excl');opt.querySelector('.excl-btn').textContent=' ';
     if(ES.mySelections[ES.cur]===i){ES.mySelections[ES.cur]=null;opt.classList.remove('sel-opt');const sb=document.getElementById('esubBtn');if(sb)sb.disabled=true;}}
 }
 
@@ -1664,7 +2497,7 @@ async function eRenderQ(){
     else{if(excl.has(i))cls+=' excl';if(myI===i)cls+=' sel-opt';}
     return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})">
       <span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
-      ${!isAns?`<button class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</button>`:''}
+      ${!isAns?`<button class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?' ':' '}</button>`:''}
     </button>`;
   }).join('');
   let expHtml='';
@@ -1698,15 +2531,15 @@ async function eRenderQ(){
       </div>`;
     }
     expHtml=`<div class="exp-box">
-      <div class="exp-verdict ${ok?'verdict-ok':'verdict-bad'}">${ok?'✓ Correct!':'✗ Incorrect — Correct answer: '+LTRS[q.correct_answer]}</div>
+      <div class="exp-verdict ${ok?'verdict-ok':'verdict-bad'}">${ok?'  Correct!':'  Incorrect   Correct answer: '+LTRS[q.correct_answer]}</div>
       ${statsHtml}
       ${q.explanation?`<div class="exp-sec"><div class="exp-sec-title">Explanation</div><div class="exp-body hlable">${q.explanation}</div></div>`:''}
       ${oaHtml?`<div class="exp-sec"><div class="exp-sec-title">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
       ${q.take_home_message?`<div class="exp-sec"><div class="exp-sec-title">Take-Home Message</div><div class="takehome">${q.take_home_message}</div></div>`:''}
     </div>
-    ${cur<Q.length-1?`<button class="next-btn" onclick="${eCheckMode?'eNav(ES.cur+1)':'eGoNext()'}">Next Question →</button>`:''}
+    ${cur<Q.length-1?`<button class="next-btn" onclick="${eCheckMode?'eNav(ES.cur+1)':'eGoNext()'}">Next Question  </button>`:''}
     ${cur===Q.length-1&&!eCheckMode?`<button class="next-btn" onclick="eFinish()">See Final Results</button>`:''}
-    ${cur===Q.length-1&&eCheckMode?`<button class="next-btn" onclick="eGoHome()">🏠 Go Home</button>`:''}`;
+    ${cur===Q.length-1&&eCheckMode?`<button class="next-btn" onclick="eGoHome()">  Go Home</button>`:''}`;
   }
   const qTV=isAns?efmt(ES.qTimes[cur]):efmt(qSec);
   const catLabel=q.category||q.category_id||'General';
@@ -1719,10 +2552,10 @@ async function eRenderQ(){
         <div class="swatches">${HLCOLS.map((c,i)=>`<div class="swatch${c===eHLC?' sel':''}" style="background:${c}" onclick="eSetSwatch('${c}',${i})"></div>`).join('')}</div>
       </div>
     </div>
-    <div class="hl-hint${eHLMode?' on':''}" id="ehlhint">Select text to highlight · Click to remove</div>
+    <div class="hl-hint${eHLMode?' on':''}" id="ehlhint">Select text to highlight   Click to remove</div>
     <div class="qcard">
       <div class="qnum">Q${cur+1} of ${Q.length}</div>
-      <div class="q-t-chip">⏱ <span id="qtinline">${qTV}</span></div>
+      <div class="q-t-chip">  <span id="qtinline">${qTV}</span></div>
       <div class="qtext hlable" id="qtext-content"></div>
       <div class="opts">${optsHtml}</div>
       ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>Submit Answer</button>`:''}
@@ -1760,7 +2593,7 @@ async function eSuspend(){
 function eRenderResults(){
   const Q=ES.questions;const tot=ES.results.filter(r=>r!==null).length;const pct=tot>0?Math.round(ES.score/tot*100):0;
   let msg='',sub='',col='#16a34a';
-  if(pct===100){msg='Perfect Score! 🎉';sub='Absolutely flawless!';}
+  if(pct===100){msg='Perfect Score!  ';sub='Absolutely flawless!';}
   else if(pct>=85){msg='Excellent Work!';sub='Very strong.';col='#1a3a5c';}
   else if(pct>=70){msg='Good Job!';sub='Some areas to revisit.';col='#2563eb';}
   else{msg='Keep Going!';sub='Review missed questions.';col='#dc2626';}
@@ -1779,11 +2612,11 @@ function eRenderResults(){
         </div>
         <div class="score-grid">${ES.results.map((r,i)=>`<div class="sdot" style="background:${r===null?'#94a3b8':r?'#16a34a':'#dc2626'}" title="Q${i+1}" onclick="eCheckAt(${i})">${i+1}</div>`).join('')}</div>
       </div>
-      ${missed.length?`<div class="rev-section"><h3>Missed Questions (${missed.length})</h3>${missed.map(({i})=>{const q=Q[i];const opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d];return`<div class="rev-item"><div class="ri-num">Q${i+1}</div><div class="ri-q">${q.question_text}</div><div class="ri-ans">✓ ${LTRS[q.correct_answer]} — ${opts[q.correct_answer]}</div><div class="ri-exp">${q.take_home_message||''}</div></div>`;}).join('')}</div>`:`<div style="text-align:center;padding:18px;color:#16a34a;font-weight:700;">All correct! 🎉</div>`}
+      ${missed.length?`<div class="rev-section"><h3>Missed Questions (${missed.length})</h3>${missed.map(({i})=>{const q=Q[i];const opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d];return`<div class="rev-item"><div class="ri-num">Q${i+1}</div><div class="ri-q">${q.question_text}</div><div class="ri-ans">  ${LTRS[q.correct_answer]}   ${opts[q.correct_answer]}</div><div class="ri-exp">${q.take_home_message||''}</div></div>`;}).join('')}</div>`:`<div style="text-align:center;padding:18px;color:#16a34a;font-weight:700;">All correct!  </div>`}
       <div class="res-btns">
-        <button class="btn btn-secondary" onclick="eGoHome()">🏠 Home</button>
-        <button class="btn btn-primary" onclick="eRetake()">↺ Retake</button>
-        <button class="btn btn-secondary" onclick="eStartCheck()">🔍 Check Answers</button>
+        <button class="btn btn-secondary" onclick="eGoHome()">  Home</button>
+        <button class="btn btn-primary" onclick="eRetake()">  Retake</button>
+        <button class="btn btn-secondary" onclick="eStartCheck()">  Check Answers</button>
       </div>
     </div>`;
 }
@@ -1792,7 +2625,7 @@ function eStartCheck(){eCheckMode=true;document.getElementById('exam-bb').style.
 async function eRetake(){eCheckMode=false;if(eAttId){const{data:att}=await sb.from('attempts').select('*').eq('id',eAttId).single();if(att){const qIds=att.question_ids||[];const{data:qs}=await sb.from('questions').select('*').in('id',qIds);const qMap={};(qs||[]).forEach(q=>qMap[q.id]=q);const ordered=qIds.map(id=>qMap[id]).filter(Boolean);await launchSession(ordered,att.filter_type||'Session');}}}
 function eGoHome(){clearInterval(eTick);clearInterval(qTick);ES=null;eAttId=null;eCheckMode=false;showPage('homePage');renderDashboard();}
 
-// ── ADMIN ──
+//    ADMIN   
 let aSubjects=[];
 
 function aNav(sec,ev){
@@ -1813,9 +2646,9 @@ async function loadSubjTable(){
   const{data:s}=await sb.from('subjects').select('*, categories(id)').order('name');
   aSubjects=s||[];
   const w=document.getElementById('subj-wrap');
-  if(!s?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No subjects yet.</p></div>';return;}
+  if(!s?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No subjects yet.</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>Icon</th><th>Name</th><th>Description</th><th>Categories</th><th>Actions</th></tr></thead><tbody>
-    ${s.map(x=>`<tr><td style="font-size:20px;">${x.icon||'📚'}</td><td><b>${x.name}</b></td><td>${x.description||'—'}</td><td>${(x.categories||[]).length}</td><td class="tbl-actions">
+    ${s.map(x=>`<tr><td style="font-size:20px;">${x.icon||' '}</td><td><b>${x.name}</b></td><td>${x.description||' '}</td><td>${(x.categories||[]).length}</td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openSubjModal('${x.id}')">Edit</button>
       <button class="btn btn-sm btn-danger" onclick="delSubj('${x.id}')">Delete</button>
     </td></tr>`).join('')}</tbody></table>`;
@@ -1826,7 +2659,7 @@ function openSubjModal(id=null){
   const s=id?aSubjects.find(x=>x.id===id):null;
   document.getElementById('sm-name').value=s?.name||'';
   document.getElementById('sm-desc').value=s?.description||'';
-  document.getElementById('sm-icon').value=s?.icon||'📚';
+  document.getElementById('sm-icon').value=s?.icon||' ';
   showAModal('subj-modal');
 }
 async function saveSubj(){
@@ -1846,7 +2679,7 @@ async function loadACatSubjFilter(){
   const{data:s}=await sb.from('subjects').select('id,name').order('name');
   aSubjects=s||[];
   const sel=document.getElementById('catSubjFilter');
-  sel.innerHTML='<option value="">— Select system —</option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  sel.innerHTML='<option value="">  Select system  </option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   // also populate category modal subject select
   document.getElementById('cm-subj').innerHTML=(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   loadCatsTable();
@@ -1854,10 +2687,10 @@ async function loadACatSubjFilter(){
 async function loadCatsTable(){
   const sid=document.getElementById('catSubjFilter').value;
   const w=document.getElementById('cats-wrap');
-  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a subject</p></div>';return;}
+  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>Select a subject</p></div>';return;}
   const{data:c}=await sb.from('categories').select('*, questions(id)').eq('subject_id',sid).order('name');
   aCats=c||[];
-  if(!c?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No categories yet. Add one!</p></div>';return;}
+  if(!c?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No categories yet. Add one!</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>Name</th><th>Questions</th><th>Actions</th></tr></thead><tbody>
     ${c.map(x=>`<tr><td><b>${x.name}</b></td><td>${(x.questions||[]).length}</td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openCatModal('${x.id}')">Edit</button>
@@ -1891,14 +2724,14 @@ async function loadAQSubjFilter(){
   const{data:s}=await sb.from('subjects').select('id,name').order('name');
   aSubjects=s||[];
   const sel=document.getElementById('qSubjFilter');
-  sel.innerHTML='<option value="">— Select system —</option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  sel.innerHTML='<option value="">  Select system  </option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   document.getElementById('qm-subj').innerHTML=(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
-  document.getElementById('qCatFilter').innerHTML='<option value="">— Select topic —</option>';
+  document.getElementById('qCatFilter').innerHTML='<option value="">  Select topic  </option>';
 }
 async function loadQCatFilter(){
   const sid=document.getElementById('qSubjFilter').value;
   const sel=document.getElementById('qCatFilter');
-  if(!sid){sel.innerHTML='<option value="">— Select topic —</option>';return;}
+  if(!sid){sel.innerHTML='<option value="">  Select topic  </option>';return;}
   const{data:c}=await sb.from('categories').select('id,name').eq('subject_id',sid).order('name');
   sel.innerHTML='<option value="">All categories</option>'+(c||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   loadQTable();
@@ -1907,25 +2740,25 @@ async function loadQTable(){
   const sid=document.getElementById('qSubjFilter').value;
   const cid=document.getElementById('qCatFilter').value;
   const w=document.getElementById('q-wrap');
-  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a subject</p></div>';return;}
+  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>Select a subject</p></div>';return;}
   w.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   let query=sb.from('questions').select('*, categories(name), disciplines(name)').order('created_at',{ascending:false});
   // filter by subject via category
   const{data:cats}=await sb.from('categories').select('id').eq('subject_id',sid);
   const catIds=(cats||[]).map(c=>c.id);
-  if(!catIds.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No categories in this subject yet.</p></div>';return;}
+  if(!catIds.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No categories in this subject yet.</p></div>';return;}
   if(cid)query=query.eq('category_id',cid);
   else query=query.in('category_id',catIds);
   const{data:qs}=await query;
-  if(!qs?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No questions yet.</p></div>';return;}
+  if(!qs?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No questions yet.</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>ID</th><th>Question</th><th>Topic</th><th>Subject</th><th>Correct</th><th>Actions</th></tr></thead><tbody>
     ${qs.map((q,i)=>{
       const plainText=(q.question_text||'').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').trim();
       return`<tr>
-      <td><span style="background:var(--gray100);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace;">${q.custom_id||'—'}</span></td>
-      <td style="max-width:280px;">${plainText.slice(0,70)}${plainText.length>70?'…':''}</td>
-      <td><span style="background:var(--gray100);padding:2px 8px;border-radius:6px;font-size:12px;">${q.categories?.name||'—'}</span></td>
-      <td><span style="background:#eff6ff;padding:2px 8px;border-radius:6px;font-size:12px;color:var(--blue);">${q.disciplines?.name||'—'}</span></td>
+      <td><span style="background:var(--gray100);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace;">${q.custom_id||' '}</span></td>
+      <td style="max-width:280px;">${plainText.slice(0,70)}${plainText.length>70?' ':''}</td>
+      <td><span style="background:var(--gray100);padding:2px 8px;border-radius:6px;font-size:12px;">${q.categories?.name||' '}</span></td>
+      <td><span style="background:#eff6ff;padding:2px 8px;border-radius:6px;font-size:12px;color:var(--blue);">${q.disciplines?.name||' '}</span></td>
       <td><b>${LTRS2[q.correct_answer]}</b></td>
       <td class="tbl-actions">
         <button class="btn btn-sm btn-secondary" onclick="openQModal('${q.id}')">Edit</button>
@@ -1936,7 +2769,7 @@ async function loadQTable(){
 async function loadQModalCats(){
   const sid=document.getElementById('qm-subj').value;
   const{data:c}=await sb.from('categories').select('id,name').eq('subject_id',sid).order('name');
-  document.getElementById('qm-cat').innerHTML='<option value="">— Select topic —</option>'+(c||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  document.getElementById('qm-cat').innerHTML='<option value="">  Select topic  </option>'+(c||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
 }
 
 function rebuildCorrSel(){
@@ -1951,7 +2784,7 @@ function rebuildOA(){
   const vals=Array.from(existing).map(w=>w.querySelector('textarea').value);
   document.getElementById('oa-container').innerHTML=Array.from(inputs).map((inp,i)=>`
     <div class="dyn-oa-wrap">
-      <label class="form-label" style="font-size:11px;">${LTRS2[i]} —</label>
+      <label class="form-label" style="font-size:11px;">${LTRS2[i]}  </label>
       <textarea class="form-input dyn-oa" rows="2" placeholder="Why ${LTRS2[i]} is right/wrong">${vals[i]||''}</textarea>
     </div>`).join('');
 }
@@ -1961,7 +2794,7 @@ function addOpt(text=''){
   const row=document.createElement('div');row.className='opt-row';
   row.innerHTML=`<span class="opt-letter">${LTRS2[idx]}</span>
     <input type="text" class="form-input dyn-opt" placeholder="Option ${LTRS2[idx]}" value="${text}" style="flex:1;" oninput="rebuildCorrSel();rebuildOA()">
-    <button type="button" onclick="removeOpt(this)" style="background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:13px;">✕</button>`;
+    <button type="button" onclick="removeOpt(this)" style="background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:13px;"> </button>`;
   c.appendChild(row);rebuildCorrSel();rebuildOA();
 }
 function removeOpt(btn){
@@ -1985,7 +2818,7 @@ async function openQModal(id=null){
   document.getElementById('qm-subj').innerHTML=(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   // populate disciplines
   const{data:discs}=await sb.from('disciplines').select('id,name').order('name');
-  document.getElementById('qm-disc').innerHTML='<option value="">— None —</option>'+(discs||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  document.getElementById('qm-disc').innerHTML='<option value="">  None  </option>'+(discs||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   const sid=document.getElementById('qSubjFilter').value;
   if(sid){document.getElementById('qm-subj').value=sid;await loadQModalCats();}
   const cid=document.getElementById('qCatFilter').value;
@@ -2040,7 +2873,7 @@ async function saveQ(){
   if(editQId){const r=await sb.from('questions').update(payload).eq('id',editQId);err=r.error;}
   else{const r=await sb.from('questions').insert(payload);err=r.error;}
   if(err){toast('Error: '+err.message);console.error('saveQ error:',err);return;}
-  hideAModal('q-modal');toast('Question saved! ✓');loadQTable();
+  hideAModal('q-modal');toast('Question saved!  ');loadQTable();
 }
 async function delQ(id){if(!confirm('Delete this question?'))return;await sb.from('questions').delete().eq('id',id);toast('Deleted');loadQTable();}
 
@@ -2054,32 +2887,32 @@ async function loadUsersTable(){
   const renderRow=x=>{
     const isPending=x.status==='pending'||!x.status;
     const statusBadge=isPending
-      ?`<span style="background:var(--amber-light);color:var(--amber);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">⏳ Pending</span>`
-      :`<span style="background:var(--green-light);color:var(--green);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">✓ Approved</span>`;
+      ?`<span style="background:var(--amber-light);color:var(--amber);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">  Pending</span>`
+      :`<span style="background:var(--green-light);color:var(--green);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">  Approved</span>`;
     return `<tr>
-      <td><b>${x.full_name||'—'}</b></td>
-      <td>${x.email||'—'}</td>
-      <td>${x.university||'—'}</td>
-      <td>${x.year_of_study||'—'}</td>
+      <td><b>${x.full_name||' '}</b></td>
+      <td>${x.email||' '}</td>
+      <td>${x.university||' '}</td>
+      <td>${x.year_of_study||' '}</td>
       <td>${statusBadge}</td>
-      <td>${x.is_admin?'✅':'—'}</td>
+      <td>${x.is_admin?' ':' '}</td>
       <td class="tbl-actions">
         ${isPending
-          ?`<button class="btn btn-sm btn-success" onclick="approveUser('${x.id}')">✓ Approve</button>
-             <button class="btn btn-sm btn-danger" onclick="rejectUser('${x.id}','${x.email||''}')">✕ Reject</button>`
+          ?`<button class="btn btn-sm btn-success" onclick="approveUser('${x.id}')">  Approve</button>
+             <button class="btn btn-sm btn-danger" onclick="rejectUser('${x.id}','${x.email||''}')">  Reject</button>`
           :`<button class="btn btn-sm btn-danger" onclick="revokeUser('${x.id}')">Revoke</button>`}
         <button class="btn btn-sm btn-secondary" onclick="toggleAdmin('${x.id}',${x.is_admin})">${x.is_admin?'Remove Admin':'Make Admin'}</button>
-        <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">🔑 Reset Pass</button>
+        <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">  Reset Pass</button>
       </td>
     </tr>`;
   };
   w.innerHTML=`
     ${pending.length?`
-    <div style="font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">⏳ Pending Approval (${pending.length})</div>
+    <div style="font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">  Pending Approval (${pending.length})</div>
     <table class="data-table" style="margin-bottom:20px;"><thead><tr><th>Name</th><th>Email</th><th>University</th><th>Year</th><th>Status</th><th>Admin</th><th>Actions</th></tr></thead><tbody>
       ${pending.map(renderRow).join('')}
     </tbody></table>`:''}
-    <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">✓ Approved Users (${approved.length})</div>
+    <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">  Approved Users (${approved.length})</div>
     <table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>University</th><th>Year</th><th>Status</th><th>Admin</th><th>Actions</th></tr></thead><tbody>
       ${approved.length?approved.map(renderRow).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--gray400);">No approved users yet</td></tr>'}
     </tbody></table>`;
@@ -2087,7 +2920,7 @@ async function loadUsersTable(){
 async function approveUser(id){
   const{error}=await sb.from('profiles').update({status:'approved'}).eq('id',id);
   if(error){toast('Error: '+error.message);console.error('approveUser error:',error);return;}
-  toast('User approved! ✓');loadUsersTable();
+  toast('User approved!  ');loadUsersTable();
 }
 async function revokeUser(id){
   if(!confirm('Revoke this user\'s access? They will see the pending screen again.'))return;
@@ -2103,7 +2936,7 @@ async function rejectUser(id,email){
 }
 async function toggleAdmin(id,is){await sb.from('profiles').update({is_admin:!is}).eq('id',id);toast(is?'Admin removed':'Admin granted');loadUsersTable();}
 
-// ── RESET PASSWORD ──
+//    RESET PASSWORD   
 let resetPassUserId=null;
 function openResetPassModal(userId,name){
   resetPassUserId=userId;
@@ -2125,7 +2958,7 @@ async function doResetPass(){
   const{error}=await sb.rpc('admin_reset_user_password',{target_user_id:resetPassUserId,new_password:pass});
   if(error){errEl.textContent='Error: '+error.message;errEl.classList.add('show');return;}
   hideAModal('reset-pass-modal');
-  toast('Password reset! ✓ Share the new password with the user.',4000);
+  toast('Password reset!   Share the new password with the user.',4000);
 }
 function toggleExpParsePanel(){
   const panel=document.getElementById('exp-parse-panel');
@@ -2145,14 +2978,14 @@ function parseAndFillExp(){
 
   const lines=raw.split('\n');
 
-  // ── Detect option analysis lines ──
+  //    Detect option analysis lines   
   // Patterns: (Choice A) / (Choices A and B) / (Choice A and B) / (Choice A, B, and C)
   const choiceRegex=/^\(Choice[s]?\s+([A-Z](?:\s+and\s+[A-Z]|,\s*[A-Z])*)\)/i;
 
-  // ── Detect Educational objective ──
+  //    Detect Educational objective   
   const eduRegex=/^educational objective[:\s]*/i;
 
-  // ── Separate into blocks ──
+  //    Separate into blocks   
   const mainExpLines=[];
   const choiceBlocks={};// letter -> text
   let takeHome='';
@@ -2190,7 +3023,7 @@ function parseAndFillExp(){
       const lettersStr=choiceMatch[1];
       currentChoiceLetters=lettersStr.match(/[A-Z]/g)||[];
       // rest of line after "(Choice X)"
-      const rest=trimmed.replace(choiceRegex,'').replace(/^[–—\s]+/,'').trim();
+      const rest=trimmed.replace(choiceRegex,'').replace(/^[  \s]+/,'').trim();
       currentChoiceLines=rest?[rest]:[];
       continue;
     }
@@ -2218,35 +3051,42 @@ function parseAndFillExp(){
     const txt=currentChoiceLines.join(' ').trim();
     currentChoiceLetters.forEach(l=>{choiceBlocks[l]=txt;});
   }
-  takeHome=eduLines.join(' ').trim();
+  takeHome=eduLines.join(' ').trim()
+    .replace(/\bFREE\b/g,'')
+    .replace(/\bBlock\s+Time.*$/i,'')
+    .replace(/\bVideo\s+Tutorial.*$/i,'')
+    .replace(/\bStep\s+\d+.*$/i,'')
+    .replace(/\bUnlock.*$/i,'')
+    .replace(/\s{2,}/g,' ')
+    .trim();
 
   // Remove trailing choice lines from main exp
   // (main exp stops when first choice block starts)
   const mainExp=mainExpLines.join('\n').trim();
 
-  // ── Fill fields ──
+  //    Fill fields   
   const parsed=[];
 
   if(mainExp){
     // convert newlines to <p> tags for better formatting
     const html=mainExp.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
     rteSetHTML('rte-exp',html);
-    parsed.push('✓ Main explanation');
+    parsed.push('  Main explanation');
   }
 
   if(Object.keys(choiceBlocks).length){
-    // fill option analyses — match letter to index
+    // fill option analyses   match letter to index
     const oaInputs=document.querySelectorAll('.dyn-oa');
     oaInputs.forEach((ta,i)=>{
       const letter=String.fromCharCode(65+i);
       if(choiceBlocks[letter])ta.value=choiceBlocks[letter];
     });
-    parsed.push(`✓ ${Object.keys(choiceBlocks).length} choice analyses`);
+    parsed.push(`  ${Object.keys(choiceBlocks).length} choice analyses`);
   }
 
   if(takeHome){
     rteSetHTML('rte-th',takeHome);
-    parsed.push('✓ Educational objective');
+    parsed.push('  Educational objective');
   }
 
   if(!parsed.length){
@@ -2257,11 +3097,11 @@ function parseAndFillExp(){
   errEl.style.display='block';
   errEl.style.background='var(--green-light)';
   errEl.style.color='var(--green)';
-  errEl.textContent='Parsed: '+parsed.join(' · ')+'. Review fields below.';
+  errEl.textContent='Parsed: '+parsed.join('   ')+'. Review fields below.';
   toggleExpParsePanel();
 }
 
-// ── PASTE & PARSE ──
+//    PASTE & PARSE   
 function toggleParsePanel(){
   const panel=document.getElementById('parse-panel');
   const btn=document.getElementById('parse-toggle-btn');
@@ -2270,6 +3110,11 @@ function toggleParsePanel(){
   btn.style.background=visible?'#eff6ff':'#1a3a5c';
   btn.style.color=visible?'var(--blue)':'white';
   btn.style.borderColor=visible?'#93c5fd':'#1a3a5c';
+  // always clear input when opening
+  if(!visible){
+    document.getElementById('parse-input').value='';
+    document.getElementById('parse-error').style.display='none';
+  }
 }
 
 async function parseAndFill(){
@@ -2305,7 +3150,7 @@ async function parseAndFill(){
     if(/^system$/i.test(l))parsedSystem=prev;
     if(/^topic$/i.test(l))parsedTopic=prev;
   }
-  // Also handle "Question Details\nPathology\nSubject" — look for label two lines ahead
+  // Also handle "Question Details\nPathology\nSubject"   look for label two lines ahead
   for(var i=0;i<allLines.length-2;i++){
     if(/^question\s*details$/i.test(allLines[i])){
       // next meaningful lines should be: Subject value, "Subject", System value, "System", etc.
@@ -2325,7 +3170,7 @@ async function parseAndFill(){
   var pctRegex=/\(\d+%\)\s*$/;
   var optRegex=/^([A-Z])\.\s*(.*)$/;
 
-  // ── Find option lines ──
+  //    Find option lines   
   var optIdxs=[];
   lines.forEach(function(l,i){
     if(optRegex.test(l))optIdxs.push(i);
@@ -2336,7 +3181,7 @@ async function parseAndFill(){
     errEl.style.display='block';return;
   }
 
-  // ── Question text = everything before first option ──
+  //    Question text = everything before first option   
   var qLines=[];
   for(var i=0;i<optIdxs[0];i++){
     var l=lines[i];
@@ -2345,7 +3190,7 @@ async function parseAndFill(){
   }
   var questionText=qLines.join('\n').trim();
 
-  // ── Parse options (UWorld: letter on one line, text on next) ──
+  //    Parse options (UWorld: letter on one line, text on next)   
   var options=[];
   for(var k=0;k<optIdxs.length;k++){
     var idx=optIdxs[k];
@@ -2363,16 +3208,30 @@ async function parseAndFill(){
     options.push(optText.trim());
   }
 
-  // ── Detect correct answer: "Correct: D" ──
+  // Detect correct answer - multiple patterns
   var correctIdx=null;
   for(var i=0;i<allLines.length;i++){
-    var m1=allLines[i].match(/^[Cc]orrect[:\s]+([A-Z])\b/);
+    var l=allLines[i];
+    // "Correct: D" or "Correct D"
+    var m1=l.match(/^[Cc]orrect[:\s]+([A-Z])\b/);
     if(m1){correctIdx=m1[1].charCodeAt(0)-65;break;}
-    var m2=allLines[i].match(/correct answer is\s+([A-Z])\b/i);
+    // "correct answer is D"
+    var m2=l.match(/correct answer is\s+([A-Z])\b/i);
     if(m2){correctIdx=m2[1].charCodeAt(0)-65;break;}
+    // "Correct:" on one line, letter on next line
+    if(/^[Cc]orrect[:\s]*$/.test(l)&&i+1<allLines.length){
+      var nxt=allLines[i+1].trim();
+      var m3=nxt.match(/^([A-Z])$/);
+      if(m3){correctIdx=m3[1].charCodeAt(0)-65;break;}
+    }
+    // Correct-then-letter pattern - letter alone on line after Correct
+    if(/^[Cc]orrect$/.test(l.trim())&&i+1<allLines.length){
+      var nxt2=allLines[i+1].trim();
+      if(/^([A-Z])$/.test(nxt2)){correctIdx=nxt2.charCodeAt(0)-65;break;}
+    }
   }
 
-  // ── Find explanation section ──
+  //    Find explanation section   
   var expSectionStart=-1;
   for(var i=0;i<lines.length;i++){
     if(/^explanation[:\s]*$/i.test(lines[i])){expSectionStart=i+1;break;}
@@ -2388,7 +3247,7 @@ async function parseAndFill(){
     }
   }
 
-  // ── Parse explanation + choice analyses + take-home ──
+  //    Parse explanation + choice analyses + take-home   
   var eduRegex=/^educational objective[:\s]*/i;
   var choiceLineRegex=/^\(Choice[s]?\s+([A-Z](?:[\s,]+(?:and\s+)?[A-Z])*)\)/i;
   var thRegex=/^(?:take[\s-]?home|key point|pearl|summary)[:\s]*/i;
@@ -2434,12 +3293,19 @@ async function parseAndFill(){
     }
     if(mode==='choice'&&curLines.length){var txt=curLines.join(' ').trim();curLetters.forEach(function(lt){choiceBlocks[lt]=txt;});}
   }
-  takeHome=eduLines.join(' ').trim();
+  takeHome=eduLines.join(' ').trim()
+    .replace(/\bFREE\b/g,'')
+    .replace(/\bBlock\s+Time.*$/i,'')
+    .replace(/\bVideo\s+Tutorial.*$/i,'')
+    .replace(/\bStep\s+\d+.*$/i,'')
+    .replace(/\bUnlock.*$/i,'')
+    .replace(/\s{2,}/g,' ')
+    .trim();
   var expHTML=mainExpParas.filter(function(l){return l;}).map(function(l){return '<p>'+l+'</p>';}).join('');
 
   if(!questionText){errEl.textContent='Could not detect question text.';errEl.style.display='block';return;}
 
-  // ── Fill all fields ──
+  //    Fill all fields   
   rteSetHTML('rte-qtext',questionText.replace(/\n/g,'<br>'));
   document.getElementById('opts-container').innerHTML='';
   document.getElementById('oa-container').innerHTML='';
@@ -2456,7 +3322,7 @@ async function parseAndFill(){
   if(takeHome)rteSetHTML('rte-th',takeHome);
   if(questionId)document.getElementById('qm-cid').value=questionId;
 
-  // ── Auto-select Subject (discipline) ──
+  //    Auto-select Subject (discipline)   
   var parsedArr=[];
   if(parsedSubject){
     var discSel=document.getElementById('qm-disc');
@@ -2464,10 +3330,10 @@ async function parseAndFill(){
       return o.text.toLowerCase().includes(parsedSubject.toLowerCase())||parsedSubject.toLowerCase().includes(o.text.toLowerCase());
     });
     if(discMatch){discSel.value=discMatch.value;parsedArr.push('Subject: '+parsedSubject);}
-    else parsedArr.push('Subject: '+parsedSubject+' (not found — select manually)');
+    else parsedArr.push('Subject: '+parsedSubject+' (not found   select manually)');
   }
 
-  // ── Auto-select System ──
+  //    Auto-select System   
   if(parsedSystem){
     var subjSel=document.getElementById('qm-subj');
     var subjMatch=Array.from(subjSel.options).find(function(o){
@@ -2498,12 +3364,12 @@ async function parseAndFill(){
             if(newMatch){catSel2.value=newMatch.value;}
             parsedArr.push('Topic: '+parsedTopic+' (auto-created)');
           } else {
-            parsedArr.push('Topic: '+parsedTopic+' (could not create — add manually)');
+            parsedArr.push('Topic: '+parsedTopic+' (could not create   add manually)');
           }
         }
       }
     } else {
-      parsedArr.push('System: '+parsedSystem+' (not found — select manually)');
+      parsedArr.push('System: '+parsedSystem+' (not found   select manually)');
     }
   }
 
@@ -2528,19 +3394,19 @@ function hideAModal(id){document.getElementById(id).style.display='none';}
   else showPage('authPage');
 })();
 
-// ── DISCIPLINES ──
+//    DISCIPLINES   
 let editDiscId=null;
 async function loadDiscTable(){
   const{data:d}=await sb.from('disciplines').select('*').order('name');
   const w=document.getElementById('disc-wrap');
-  if(!d?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add some like Pathology, Physiology, Anatomy...</p></div>';return;}
+  if(!d?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No subjects yet. Add some like Pathology, Physiology, Anatomy...</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody>
     ${d.map(x=>`<tr><td><b>${x.name}</b></td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openDiscModal('${x.id}','${x.name.replace(/'/g,"\\'")}')">Edit</button>
       <button class="btn btn-sm btn-danger" onclick="delDisc('${x.id}')">Delete</button>
     </td></tr>`).join('')}</tbody></table>
     <div style="margin-top:14px;padding:12px 14px;background:var(--gray50);border-radius:8px;font-size:12px;color:var(--gray500);">
-      💡 Common subject examples: Anatomy, Physiology, Pathology, Pharmacology, Biochemistry, Microbiology, Immunology, Behavioral Science, Embryology
+        Common subject examples: Anatomy, Physiology, Pathology, Pharmacology, Biochemistry, Microbiology, Immunology, Behavioral Science, Embryology
     </div>`;
 }
 function openDiscModal(id=null,name=''){
@@ -2564,7 +3430,7 @@ async function delDisc(id){
   toast('Deleted');loadDiscTable();
 }
 
-// ── GENERATE BY IDs ──
+//    GENERATE BY IDs   
 async function generateByIds(){
   const raw=document.getElementById('qid-input').value.trim();
   const warn=document.getElementById('qid-warning');
@@ -2587,11 +3453,11 @@ async function generateByIds(){
     warn.style.display='block';
     warn.textContent=`Note: ${notFound.length} ID(s) not found: ${notFound.join(', ')}`;
   }
-  const title=`Custom Session — ${ordered.length} question${ordered.length!==1?'s':''}`;
+  const title=`Custom Session   ${ordered.length} question${ordered.length!==1?'s':''}`;
   await launchSession(ordered,title);
 }
 
-// ── RICH TEXT EDITOR ──
+//    RICH TEXT EDITOR   
 let rteTarget=null; // which editor is receiving the table insert
 
 function rteCmd(edId,cmd){
@@ -2616,7 +3482,7 @@ function rteInsertTable(edId){
       cell.dataset.r=r;cell.dataset.c=c;
       cell.addEventListener('mouseover',function(){
         const tr=parseInt(this.dataset.r),tc=parseInt(this.dataset.c);
-        document.getElementById('tbl-size-lbl').textContent=tr+' × '+tc+' table';
+        document.getElementById('tbl-size-lbl').textContent=tr+'   '+tc+' table';
         grid.querySelectorAll('.tbl-cell').forEach(x=>{
           x.classList.toggle('hov',parseInt(x.dataset.r)<=tr&&parseInt(x.dataset.c)<=tc);
         });
@@ -2666,7 +3532,7 @@ async function rteUploadImg(input,edId){
   ed.focus();
   document.execCommand('insertHTML',false,`<img src="${publicUrl}" alt="explanation image" style="max-width:100%;border-radius:6px;margin:6px 0;">`);
   input.value='';
-  toast('Image inserted! ✓');
+  toast('Image inserted!  ');
 }
 
 function rteGetHTML(edId){
