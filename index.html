@@ -411,9 +411,26 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
         <div class="auth-sub">Sign in to your MedExam account</div>
         <div class="auth-err" id="loginErr"></div>
         <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"></div>
-        <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="form-group">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label class="form-label" style="margin:0;">Password</label>
+            <a onclick="showForgot()" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;">Forgot password?</a>
+          </div>
+          <input type="password" class="form-input" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
         <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()">Sign In</button>
         <div class="auth-switch">No account? <a onclick="showReg()">Create one</a></div>
+      </div>
+
+      <!-- Forgot Password Box -->
+      <div class="auth-box" id="forgotBox" style="display:none;">
+        <h2>Reset Password</h2>
+        <div class="auth-sub">Enter your email and we'll send you a reset link</div>
+        <div class="auth-err" id="forgotErr"></div>
+        <div class="auth-ok" id="forgotOk"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="forgotEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doForgot()"></div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doForgot()">Send Reset Link</button>
+        <div class="auth-switch"><a onclick="showLogin()" style="cursor:pointer;">← Back to Sign In</a></div>
       </div>
       <div class="auth-box" id="regBox" style="display:none;">
         <h2>Create account</h2>
@@ -710,8 +727,36 @@ function showPage(id){
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 
 // ── AUTH ──
-function showLogin(){document.getElementById('loginBox').style.display='block';document.getElementById('regBox').style.display='none';}
-function showReg(){document.getElementById('loginBox').style.display='none';document.getElementById('regBox').style.display='block';}
+function showLogin(){
+  document.getElementById('loginBox').style.display='block';
+  document.getElementById('regBox').style.display='none';
+  document.getElementById('forgotBox').style.display='none';
+}
+function showReg(){
+  document.getElementById('loginBox').style.display='none';
+  document.getElementById('regBox').style.display='block';
+  document.getElementById('forgotBox').style.display='none';
+}
+function showForgot(){
+  document.getElementById('loginBox').style.display='none';
+  document.getElementById('regBox').style.display='none';
+  document.getElementById('forgotBox').style.display='block';
+  document.getElementById('forgotErr').classList.remove('show');
+  document.getElementById('forgotOk').classList.remove('show');
+}
+async function doForgot(){
+  clrErr('forgotErr');
+  const email=document.getElementById('forgotEmail').value.trim();
+  if(!email){setErr('forgotErr','Please enter your email.');return;}
+  const{error}=await sb.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.origin+'/'
+  });
+  if(error){setErr('forgotErr',error.message);return;}
+  const ok=document.getElementById('forgotOk');
+  ok.textContent='✓ Reset link sent! Check your email inbox (and spam folder).';
+  ok.classList.add('show');
+  document.getElementById('forgotEmail').value='';
+}
 function setErr(id,m){const e=document.getElementById(id);e.textContent=m;e.classList.add('show');}
 function clrErr(id){document.getElementById(id).classList.remove('show');}
 
