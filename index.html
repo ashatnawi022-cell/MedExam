@@ -2495,9 +2495,12 @@ async function eRenderQ(){
     let cls='opt';
     if(isAns){if(i===myI&&ES.results[cur])cls+=' correct';else if(i===myI&&!ES.results[cur])cls+=' wrong';if(i===q.correct_answer&&!ES.results[cur])cls+=' show-ans';}
     else{if(excl.has(i))cls+=' excl';if(myI===i)cls+=' sel-opt';}
-    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})">
-      <span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
-      ${!isAns?`<button class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</button>`:''}
+    const imgs=q.options_images||[];
+    const imgHtml=imgs[i]?`<img src="${imgs[i]}" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;display:block;">`:'';
+    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})" style="${imgs[i]?'flex-direction:column;align-items:flex-start;height:auto;padding:10px 14px;':''}">
+      <div style="display:flex;align-items:center;width:100%;"><span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
+      ${!isAns?`<button class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</button>`:''}</div>
+      ${imgHtml}
     </button>`;
   }).join('');
   let expHtml='';
@@ -2788,14 +2791,50 @@ function rebuildOA(){
       <textarea class="form-input dyn-oa" rows="2" placeholder="Why ${LTRS2[i]} is right/wrong">${vals[i]||''}</textarea>
     </div>`).join('');
 }
-function addOpt(text=''){
+function addOpt(text='',imgUrl=''){
   const c=document.getElementById('opts-container');
   const idx=c.querySelectorAll('.opt-row').length;
   const row=document.createElement('div');row.className='opt-row';
-  row.innerHTML=`<span class="opt-letter">${LTRS2[idx]}</span>
-    <input type="text" class="form-input dyn-opt" placeholder="Option ${LTRS2[idx]}" value="${text}" style="flex:1;" oninput="rebuildCorrSel();rebuildOA()">
-    <button type="button" onclick="removeOpt(this)" style="background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:13px;"> </button>`;
+  row.style.cssText='flex-wrap:wrap;align-items:flex-start;';
+  row.innerHTML=`<span class="opt-letter" style="margin-top:8px;">${LTRS2[idx]}</span>
+    <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;gap:6px;">
+        <input type="text" class="form-input dyn-opt" placeholder="Option ${LTRS2[idx]} (leave blank if image only)" value="${text}" style="flex:1;" oninput="rebuildCorrSel();rebuildOA()">
+        <button type="button" title="Upload image for this option" onclick="triggerOptImg(this)" style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap;">🖼</button>
+        <input type="file" accept="image/*" style="display:none;" onchange="uploadOptImg(this)">
+        <button type="button" onclick="removeOpt(this)" style="background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:13px;">✕</button>
+      </div>
+      <div class="opt-img-wrap" style="${imgUrl?'':'display:none;'}">
+        ${imgUrl?`<div style="position:relative;display:inline-block;">
+          <img src="${imgUrl}" class="opt-img-preview" data-url="${imgUrl}">
+          <button type="button" onclick="removeOptImg(this)" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1;">✕</button>
+        </div>`:''}
+      </div>
+    </div>`;
   c.appendChild(row);rebuildCorrSel();rebuildOA();
+}
+function triggerOptImg(btn){
+  btn.nextElementSibling.click();
+}
+async function uploadOptImg(input){
+  const file=input.files[0];if(!file)return;
+  const wrap=input.closest('.opt-row').querySelector('.opt-img-wrap');
+  wrap.innerHTML='<span style="font-size:12px;color:var(--gray400);">Uploading...</span>';
+  wrap.style.display='block';
+  const ext=file.name.split('.').pop();
+  const path='opt-'+Date.now()+'.'+ext;
+  const{data,error}=await sb.storage.from('question-images').upload(path,file,{upsert:true});
+  if(error){wrap.innerHTML='<span style="color:var(--red);font-size:12px;">Upload failed: '+error.message+'</span>';return;}
+  const{data:pub}=sb.storage.from('question-images').getPublicUrl(path);
+  const url=pub.publicUrl;
+  wrap.innerHTML=`<div style="position:relative;display:inline-block;">
+    <img src="${url}" class="opt-img-preview" data-url="${url}">
+    <button type="button" onclick="removeOptImg(this)" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1;">✕</button>
+  </div>`;
+}
+function removeOptImg(btn){
+  const wrap=btn.closest('.opt-img-wrap');
+  wrap.innerHTML='';wrap.style.display='none';
 }
 function removeOpt(btn){
   const c=document.getElementById('opts-container');
@@ -2836,7 +2875,8 @@ async function openQModal(id=null){
       rteSetHTML('rte-th',q.take_home_message||'');
       const opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d].filter(Boolean);
       const oa=q.options_analysis&&q.options_analysis.length?q.options_analysis:[q.option_a_explanation,q.option_b_explanation,q.option_c_explanation,q.option_d_explanation];
-      opts.forEach(o=>addOpt(o));
+      const imgs=q.options_images&&q.options_images.length?q.options_images:[];
+      opts.forEach((o,i)=>addOpt(o,imgs[i]||''));
       document.querySelectorAll('.dyn-oa').forEach((ta,i)=>{ta.value=oa[i]||'';});
       selCorrect(q.correct_answer);
     }
@@ -2850,6 +2890,10 @@ async function saveQ(){
   const custom_id=document.getElementById('qm-cid').value.trim();
   const text=rteGetHTML('rte-qtext');
   const opts=Array.from(document.querySelectorAll('.dyn-opt')).map(i=>i.value.trim());
+  const optsImgs=Array.from(document.querySelectorAll('.opt-row')).map(r=>{
+    const img=r.querySelector('.opt-img-preview');
+    return img?img.dataset.url:'';
+  });
   const oa=Array.from(document.querySelectorAll('.dyn-oa')).map(i=>i.value.trim());
   if(!cat_id){toast('Please select a category');return;}
   if(!subj_id){toast('Please select a subject');return;}
@@ -2863,6 +2907,7 @@ async function saveQ(){
     question_text:text,
     correct_answer:selCorr,
     options:opts,
+    options_images:optsImgs,
     options_analysis:oa,
     explanation:rteGetHTML('rte-exp'),
     take_home_message:rteGetHTML('rte-th'),
