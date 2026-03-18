@@ -73,7 +73,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .nav-brand{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-right:4px;}
 .nav-brand span{color:var(--cyan);}
 .nav-links{display:flex;gap:2px;flex:1;min-width:0;overflow:hidden;}
-.nav-link{color:rgba(255,255,255,0.6);font-size:12px;font-weight:500;padding:5px 9px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
+.nav-link{color:rgba(255,255,255,0.6);font-size:14px;font-weight:600;padding:6px 12px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
 .nav-link:hover{color:white;background:rgba(255,255,255,0.1);}
 .nav-link.active{color:white;background:rgba(255,255,255,0.15);}
 .nav-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto;}
@@ -492,8 +492,8 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="nav-right">
       <span class="nav-user" id="navUser" style="display:none;"></span>
       <span class="admin-badge" id="navAdminBadge" style="display:none;">ADMIN</span>
-      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">? Admin</button>
-      <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
+      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">⚙️ Admin</button>
+      <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </nav>
   <div class="page-body" id="homeBody"><div class="spinner-wrap"><div class="spinner"></div></div></div>
@@ -509,7 +509,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <div style="background:var(--amber-light);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--amber);font-weight:600;margin-bottom:24px;">
         📧 Contact your administrator if you've already completed payment and are waiting for access.
       </div>
-      <button class="btn btn-secondary" onclick="doLogout()">Sign out</button>
+      <button class="btn btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </div>
 </div>
@@ -527,7 +527,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 </svg><span style="font-size:11px;color:var(--cyan);font-family:'DM Sans',sans-serif;font-weight:600;margin-left:4px;">Admin</span></div>
     <div class="nav-right">
       <button class="btn btn-sm btn-secondary" onclick="showPage('homePage');renderDashboard()">← Back to App</button>
-      <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
+      <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </nav>
   <div class="admin-layout">
@@ -906,7 +906,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .nav-brand{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-right:4px;}
 .nav-brand span{color:var(--cyan);}
 .nav-links{display:flex;gap:2px;flex:1;min-width:0;overflow:hidden;}
-.nav-link{color:rgba(255,255,255,0.6);font-size:12px;font-weight:500;padding:5px 9px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
+.nav-link{color:rgba(255,255,255,0.6);font-size:14px;font-weight:600;padding:6px 12px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
 .nav-link:hover{color:white;background:rgba(255,255,255,0.1);}
 .nav-link.active{color:white;background:rgba(255,255,255,0.15);}
 .nav-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto;}
@@ -1325,8 +1325,8 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="nav-right">
       <span class="nav-user" id="navUser" style="display:none;"></span>
       <span class="admin-badge" id="navAdminBadge" style="display:none;">ADMIN</span>
-      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">? Admin</button>
-      <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
+      <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">⚙️ Admin</button>
+      <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </nav>
   <div class="page-body" id="homeBody"><div class="spinner-wrap"><div class="spinner"></div></div></div>
@@ -1342,7 +1342,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <div style="background:var(--amber-light);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--amber);font-weight:600;margin-bottom:24px;">
         📧 Contact your administrator if you've already completed payment and are waiting for access.
       </div>
-      <button class="btn btn-secondary" onclick="doLogout()">Sign out</button>
+      <button class="btn btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </div>
 </div>
@@ -1360,7 +1360,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 </svg><span style="font-size:11px;color:var(--cyan);font-family:'DM Sans',sans-serif;font-weight:600;margin-left:4px;">Admin</span></div>
     <div class="nav-right">
       <button class="btn btn-sm btn-secondary" onclick="showPage('homePage');renderDashboard()">← Back to App</button>
-      <button class="btn btn-sm btn-secondary" onclick="doLogout()">Sign out</button>
+      <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </nav>
   <div class="admin-layout">
@@ -1830,7 +1830,7 @@ async function renderDashboard(){
   body.innerHTML=`
     <div class="dash-wrap">
       <div class="dash-greeting">
-        <h1>Welcome back, ${name}  </h1>
+        <h1>Welcome back, ${name} 👋</h1>
         <p>What would you like to do today?</p>
       </div>
       <div class="dash-cards">
