@@ -2281,8 +2281,17 @@ function parseAndFill(){
   const rawLines=raw.split('\n');
   const lines=rawLines.map(function(l){return l.trim();});
 
+  // Extract UWorld metadata: Subject, System, Topic
+  // Pattern: "Pathology\nSubject\nCardiovascular System\nSystem\nCoronary heart disease\nTopic"
+  var parsedSubject='', parsedSystem='', parsedTopic='';
+  for(var mi=0;mi<lines.length;mi++){
+    if(/^subject$/i.test(lines[mi])&&mi>0)parsedSubject=lines[mi-1].trim();
+    if(/^system$/i.test(lines[mi])&&mi>0)parsedSystem=lines[mi-1].trim();
+    if(/^topic$/i.test(lines[mi])&&mi>0)parsedTopic=lines[mi-1].trim();
+  }
+
   // Skip UWorld metadata lines
-  const skipRegex=/^(\d+%.*rate|correct rate|time spent|\d{2}:\d{2}:\d{2}|version|question details|consult ai tutor|incorrect$|explanation:?\s*$|answer reference guide)/i;
+  const skipRegex=/^(\d+%.*rate|correct rate|time spent|\d{2}:\d{2}:\d{2}|version|question details|consult ai tutor|incorrect$|explanation:?\s*$|answer reference guide|^subject$|^system$|^topic$|^pathophysiology$|^pathology$|^physiology$|^pharmacology$|^biochemistry$|^microbiology$|^immunology$|^anatomy$|^histology$|^embryology$|^genetics$|^biostatistics$|^behavioral science$)/i;
   const pctRegex=/\(\d+%\)\s*$/;
   const optRegex=/^([A-Z])\.\s*(.*)$/;
   const eduRegex=/^educational objective[:\s]*/i;
@@ -2417,13 +2426,40 @@ function parseAndFill(){
   }
   if(takeHome)rteSetHTML('rte-th',takeHome);
 
+  // Auto-select Subject (discipline), System (subject), Topic (category)
+  if(parsedSubject){
+    var discSel=document.getElementById('qm-disc');
+    var discOpts=Array.from(discSel.options);
+    var discMatch=discOpts.find(function(o){return o.text.toLowerCase().includes(parsedSubject.toLowerCase())||parsedSubject.toLowerCase().includes(o.text.toLowerCase());});
+    if(discMatch)discSel.value=discMatch.value;
+  }
+  if(parsedSystem){
+    var subjSel=document.getElementById('qm-subj');
+    var subjOpts=Array.from(subjSel.options);
+    var subjMatch=subjOpts.find(function(o){return o.text.toLowerCase().includes(parsedSystem.toLowerCase())||parsedSystem.toLowerCase().includes(o.text.toLowerCase());});
+    if(subjMatch){
+      subjSel.value=subjMatch.value;
+      // load topics for this system then match topic
+      loadQModalCats().then(function(){
+        if(parsedTopic){
+          var catSel=document.getElementById('qm-cat');
+          var catOpts=Array.from(catSel.options);
+          var catMatch=catOpts.find(function(o){return o.text.toLowerCase().includes(parsedTopic.toLowerCase())||parsedTopic.toLowerCase().includes(o.text.toLowerCase());});
+          if(catMatch)catSel.value=catMatch.value;
+        }
+      });
+    }
+  }
+
   var parsed=['checkmark '+options.length+' choices'];
   if(correctIdx!==null)parsed.push('Correct: '+String.fromCharCode(65+correctIdx));
   if(expHTML)parsed.push('Explanation');
   if(Object.keys(choiceBlocks).length)parsed.push(Object.keys(choiceBlocks).length+' choice analyses');
   if(takeHome)parsed.push('Take-home');
 
-  errEl.style.display='block';errEl.style.background='var(--green-light)';errEl.style.color='var(--green)';
+  if(parsedSubject)parsed.push('Subject: '+parsedSubject);
+  if(parsedSystem)parsed.push('System: '+parsedSystem);
+  if(parsedTopic)parsed.push('Topic: '+parsedTopic);
   errEl.textContent='Parsed: '+parsed.join(' | ')+'. Review fields below before saving.';
   toggleParsePanel();
 }
