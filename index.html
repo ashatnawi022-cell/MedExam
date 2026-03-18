@@ -1836,7 +1836,7 @@ async function renderDashboard(){
       <div class="dash-cards">
         <!-- Create Exam -->
         <div class="dash-card card-primary" onclick="showCreateExam()">
-          <div class="dash-card-icon">  </div>
+          <div class="dash-card-icon">✏️</div>
           <div>
             <div class="dash-card-title">Create Exam</div>
             <div class="dash-card-desc">Build a custom practice session from your question bank</div>
@@ -1849,21 +1849,21 @@ async function renderDashboard(){
         </div>
         <!-- My Exams -->
         <div class="dash-card" onclick="goMyExams()">
-          <div class="dash-card-icon"> </div>
+          <div class="dash-card-icon">📋</div>
           <div>
             <div class="dash-card-title">My Exams</div>
             <div class="dash-card-desc">Review your past sessions, continue suspended exams, and track progress</div>
           </div>
           <div class="dash-stats">
             <span class="dash-stat-dark">${done} done</span>
-            ${suspended>0?`<span class="dash-stat-dark">  ${suspended} suspended</span>`:''}
+            ${suspended>0?`<span class="dash-stat-dark">⏸ ${suspended} suspended</span>`:''}
             ${allAns.length>0?`<span class="dash-stat-dark">${pct}% avg score</span>`:''}
           </div>
           <div class="dash-card-arrow"> </div>
         </div>
         <!-- Settings -->
         <div class="dash-card card-amber" onclick="showSettings()">
-          <div class="dash-card-icon">  </div>
+          <div class="dash-card-icon">⚙️</div>
           <div>
             <div class="dash-card-title">Settings</div>
             <div class="dash-card-desc">Edit your profile, change password, or reset your progress</div>
@@ -1942,7 +1942,7 @@ function renderCreateExamHTML(){
 
       <!-- Random Mode Toggle -->
       <div style="display:flex;align-items:center;gap:12px;background:${randomMode?'#eff6ff':'var(--gray50)'};border:1.5px solid ${randomMode?'var(--blue)':'var(--gray200)'};border-radius:10px;padding:12px 16px;margin-bottom:20px;cursor:pointer;" onclick="toggleRandomMode()">
-        <div style="font-size:24px;"> </div>
+        <div style="font-size:24px;">🎲</div>
         <div style="flex:1;">
           <div style="font-size:14px;font-weight:700;color:${randomMode?'var(--blue)':'var(--gray700)'};">Random Mode</div>
           <div style="font-size:12px;color:var(--gray400);margin-top:2px;">Pull random questions from the entire question bank, ignoring systems and subjects</div>
@@ -1967,7 +1967,7 @@ function renderCreateExamHTML(){
         ${allDisciplines.map(d=>{
           const on=allDiscsSelected?true:selDisciplines.has(d.id);
           return `<div class="subj-chip${on?' selected':''}" onclick="toggleDisc('${d.id}')">
-            <span>${d.name}</span><span class="chip-check">${on?' ':''}</span>
+            <span>${d.name}</span><span class="chip-check">${on?'✓':''}</span>
           </div>`;
         }).join('')}
       </div>`:''}
@@ -1985,7 +1985,7 @@ function renderCreateExamHTML(){
           <div class="subj-chip${selSubjects.has(s.id)?' selected':''}" onclick="toggleSubjectCE('${s.id}')">
             <span class="chip-icon">${s.icon||' '}</span>
             <span>${s.name}</span>
-            <span class="chip-check">${selSubjects.has(s.id)?' ':''}</span>
+            <span class="chip-check">${selSubjects.has(s.id)?'✓':''}</span>
           </div>`).join('')}
         ${!allSubjects.length?'<div style="color:var(--gray400);font-size:13px;">No systems added yet</div>':''}
       </div>
@@ -2102,7 +2102,7 @@ function renderCatAccordion(){
         <div class="cat-chips">
           ${cats.map(c=>{
             const on=selCategories[sid]?.has(c.id);
-            return `<div class="cat-chip ${on?'on':'off'}" onclick="toggleCat('${sid}','${c.id}')">${on?' ':''} ${c.name}</div>`;
+            return `<div class="cat-chip ${on?'on':'off'}" onclick="toggleCat('${sid}','${c.id}')">${on?'✓':''} ${c.name}</div>`;
           }).join('')}
         </div>
       </div>
@@ -2206,7 +2206,7 @@ async function generateSession(){
   if(!pool.length){toast('No questions match your selection. Try a different filter.');return;}
   pool=pool.sort(()=>Math.random()-0.5).slice(0,qcount);
   const title=randomMode?'Random Session':
-    `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')}   ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':'Wrong Qs'}`;
+    `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')} · ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':'Wrong Qs'}`;
   await launchSession(pool,title);
 }
 
@@ -2221,19 +2221,19 @@ async function goMyExams(){
         <h2>  My Exams</h2>
       </div>
       <div class="attempts-list">
-        ${!atts?.length?'<div class="empty-state"><div class="esi"> </div><p>No sessions yet. Go to Create Exam to get started!</p></div>':
+        ${!atts?.length?'<div class="empty-state"><div class="esi">📭</div><p>No sessions yet. Go to Create Exam to get started!</p></div>':
           atts.map(att=>{
             const ans=att.answers||[];const done=ans.filter(a=>a!==null).length;
             const cor=ans.filter(a=>a===true).length;
             const pct=done>0?Math.round(cor/done*100):0;
-            const badge=att.status==='done'?`<span class="att-badge badge-done">  ${pct}%</span>`:
-                        att.status==='suspended'?`<span class="att-badge badge-sus">  Suspended</span>`:
+            const badge=att.status==='done'?`<span class="att-badge badge-done">✓ ${pct}%</span>`:
+                        att.status==='suspended'?`<span class="att-badge badge-sus">⏸ Suspended</span>`:
                         `<span class="att-badge badge-prog">In Progress</span>`;
             const qIds=att.question_ids||[];
             return `<div class="att-row">
               <div style="flex:1;cursor:pointer;" onclick="resumeSession('${att.id}')">
                 <div class="att-title">${att.filter_type||'Session'}   ${done}/${qIds.length} answered</div>
-                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}   ${att.status==='done'?pct+'% score':'continue where you left off'}</div>
+                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${att.status==='done'?pct+'% score':'continue where you left off'}</div>
               </div>
               ${badge}
               <button onclick="deleteAtt('${att.id}')" style="background:var(--red-light);color:var(--red);border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-left:8px;">  Delete</button>
@@ -2497,7 +2497,7 @@ async function eRenderQ(){
     else{if(excl.has(i))cls+=' excl';if(myI===i)cls+=' sel-opt';}
     return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})">
       <span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
-      ${!isAns?`<button class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?' ':' '}</button>`:''}
+      ${!isAns?`<button class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</button>`:''}
     </button>`;
   }).join('');
   let expHtml='';
@@ -2531,13 +2531,13 @@ async function eRenderQ(){
       </div>`;
     }
     expHtml=`<div class="exp-box">
-      <div class="exp-verdict ${ok?'verdict-ok':'verdict-bad'}">${ok?'✓ Correct!':'  Incorrect   Correct answer: '+LTRS[q.correct_answer]}</div>
+      <div class="exp-verdict ${ok?'verdict-ok':'verdict-bad'}">${ok?'✓ Correct!':'✗ Incorrect — Correct answer: '+LTRS[q.correct_answer]}</div>
       ${statsHtml}
       ${q.explanation?`<div class="exp-sec"><div class="exp-sec-title">Explanation</div><div class="exp-body hlable">${q.explanation}</div></div>`:''}
       ${oaHtml?`<div class="exp-sec"><div class="exp-sec-title">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
       ${q.take_home_message?`<div class="exp-sec"><div class="exp-sec-title">Take-Home Message</div><div class="takehome">${q.take_home_message}</div></div>`:''}
     </div>
-    ${cur<Q.length-1?`<button class="next-btn" onclick="${eCheckMode?'eNav(ES.cur+1)':'eGoNext()'}">Next Question  </button>`:''}
+    ${cur<Q.length-1?`<button class="next-btn" onclick="${eCheckMode?'eNav(ES.cur+1)':'eGoNext()'}">Next Question →</button>`:''}
     ${cur===Q.length-1&&!eCheckMode?`<button class="next-btn" onclick="eFinish()">See Final Results</button>`:''}
     ${cur===Q.length-1&&eCheckMode?`<button class="next-btn" onclick="eGoHome()">  Go Home</button>`:''}`;
   }
@@ -2646,7 +2646,7 @@ async function loadSubjTable(){
   const{data:s}=await sb.from('subjects').select('*, categories(id)').order('name');
   aSubjects=s||[];
   const w=document.getElementById('subj-wrap');
-  if(!s?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No subjects yet.</p></div>';return;}
+  if(!s?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No subjects yet.</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>Icon</th><th>Name</th><th>Description</th><th>Categories</th><th>Actions</th></tr></thead><tbody>
     ${s.map(x=>`<tr><td style="font-size:20px;">${x.icon||' '}</td><td><b>${x.name}</b></td><td>${x.description||' '}</td><td>${(x.categories||[]).length}</td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openSubjModal('${x.id}')">Edit</button>
@@ -2687,10 +2687,10 @@ async function loadACatSubjFilter(){
 async function loadCatsTable(){
   const sid=document.getElementById('catSubjFilter').value;
   const w=document.getElementById('cats-wrap');
-  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>Select a subject</p></div>';return;}
+  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>Select a subject</p></div>';return;}
   const{data:c}=await sb.from('categories').select('*, questions(id)').eq('subject_id',sid).order('name');
   aCats=c||[];
-  if(!c?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No categories yet. Add one!</p></div>';return;}
+  if(!c?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No categories yet. Add one!</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>Name</th><th>Questions</th><th>Actions</th></tr></thead><tbody>
     ${c.map(x=>`<tr><td><b>${x.name}</b></td><td>${(x.questions||[]).length}</td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openCatModal('${x.id}')">Edit</button>
@@ -2740,17 +2740,17 @@ async function loadQTable(){
   const sid=document.getElementById('qSubjFilter').value;
   const cid=document.getElementById('qCatFilter').value;
   const w=document.getElementById('q-wrap');
-  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>Select a subject</p></div>';return;}
+  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>Select a subject</p></div>';return;}
   w.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   let query=sb.from('questions').select('*, categories(name), disciplines(name)').order('created_at',{ascending:false});
   // filter by subject via category
   const{data:cats}=await sb.from('categories').select('id').eq('subject_id',sid);
   const catIds=(cats||[]).map(c=>c.id);
-  if(!catIds.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No categories in this subject yet.</p></div>';return;}
+  if(!catIds.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No categories in this subject yet.</p></div>';return;}
   if(cid)query=query.eq('category_id',cid);
   else query=query.in('category_id',catIds);
   const{data:qs}=await query;
-  if(!qs?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No questions yet.</p></div>';return;}
+  if(!qs?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No questions yet.</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>ID</th><th>Question</th><th>Topic</th><th>Subject</th><th>Correct</th><th>Actions</th></tr></thead><tbody>
     ${qs.map((q,i)=>{
       const plainText=(q.question_text||'').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').trim();
@@ -3399,7 +3399,7 @@ let editDiscId=null;
 async function loadDiscTable(){
   const{data:d}=await sb.from('disciplines').select('*').order('name');
   const w=document.getElementById('disc-wrap');
-  if(!d?.length){w.innerHTML='<div class="empty-state"><div class="esi"> </div><p>No subjects yet. Add some like Pathology, Physiology, Anatomy...</p></div>';return;}
+  if(!d?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add some like Pathology, Physiology, Anatomy...</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody>
     ${d.map(x=>`<tr><td><b>${x.name}</b></td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openDiscModal('${x.id}','${x.name.replace(/'/g,"\\'")}')">Edit</button>
