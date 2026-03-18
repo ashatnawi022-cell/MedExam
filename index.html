@@ -651,14 +651,14 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <h2 id="q-modal-title" style="margin:0;">Add Question</h2>
       <button type="button" class="btn btn-sm" onclick="toggleParsePanel()" id="parse-toggle-btn"
         style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;gap:5px;">
-        📋 Paste &amp; Parse
+        📋 Paste Full Question
       </button>
     </div>
 
     <!-- Parse Panel (hidden by default) -->
     <div id="parse-panel" style="display:none;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:16px;margin-bottom:18px;">
-      <div style="font-size:13px;font-weight:700;color:var(--navy2);margin-bottom:6px;">📋 Paste your full question block below</div>
-      <div style="font-size:12px;color:var(--gray500);margin-bottom:10px;">Include the question text, answer choices (A. B. C. etc.), correct answer, explanations, and take-home message. The parser will fill all fields automatically.</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy2);margin-bottom:6px;">📋 Paste the entire question block</div>
+      <div style="font-size:12px;color:var(--gray500);margin-bottom:10px;">Copy everything from UWorld or any source — question, choices with percentages, correct answer, explanation, choice analyses, and educational objective. The parser fills <b>all fields</b> automatically.</div>
       <textarea id="parse-input" class="form-input" rows="10" placeholder="Paste the full question here...
 
 Example:
@@ -722,7 +722,32 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
     </div>
     <div class="form-group"><label class="form-label">Correct answer</label><div class="correct-sel" id="corr-sel"></div></div>
     <div class="form-group">
-      <label class="form-label">Full explanation</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <label class="form-label" style="margin:0;">Full explanation</label>
+        <button type="button" class="btn btn-sm" onclick="toggleExpParsePanel()"
+          id="exp-parse-toggle-btn" style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;font-size:11px;">
+          📋 Paste &amp; Parse Explanation
+        </button>
+      </div>
+      <!-- Explanation Parse Panel -->
+      <div id="exp-parse-panel" style="display:none;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--gray500);margin-bottom:8px;">Paste the full explanation block. The parser will extract the main explanation, each choice analysis <b>(Choice A)</b>, and the <b>Educational objective</b> automatically.</div>
+        <textarea id="exp-parse-input" class="form-input" rows="10" placeholder="Paste full explanation here...
+
+Example:
+This patient has aortic regurgitation because...
+
+(Choice A) Correct — bounding pulses and head bobbing...
+(Choice B) Incorrect — aortic stenosis causes...
+(Choices C and D) Both incorrect because...
+
+Educational objective: Aortic regurgitation presents with..."></textarea>
+        <div id="exp-parse-error" style="display:none;border-radius:7px;padding:8px 12px;font-size:12px;margin-top:8px;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button type="button" class="btn btn-primary" onclick="parseAndFillExp()">✨ Parse &amp; Fill</button>
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('exp-parse-input').value=''">Clear</button>
+        </div>
+      </div>
       <div class="rte-wrap">
         <div class="rte-toolbar">
           <button type="button" class="rte-btn" onclick="rteCmd('rte-exp','bold')"><b>B</b></button>
@@ -2102,6 +2127,140 @@ async function doResetPass(){
   hideAModal('reset-pass-modal');
   toast('Password reset! ✓ Share the new password with the user.',4000);
 }
+function toggleExpParsePanel(){
+  const panel=document.getElementById('exp-parse-panel');
+  const btn=document.getElementById('exp-parse-toggle-btn');
+  const visible=panel.style.display!=='none';
+  panel.style.display=visible?'none':'block';
+  btn.style.background=visible?'#eff6ff':'#1a3a5c';
+  btn.style.color=visible?'var(--blue)':'white';
+  btn.style.borderColor=visible?'#93c5fd':'#1a3a5c';
+}
+
+function parseAndFillExp(){
+  const raw=document.getElementById('exp-parse-input').value;
+  const errEl=document.getElementById('exp-parse-error');
+  errEl.style.display='none';
+  if(!raw.trim()){errEl.textContent='Please paste explanation text first.';errEl.style.background='var(--red-light)';errEl.style.color='var(--red)';errEl.style.display='block';return;}
+
+  const lines=raw.split('\n');
+
+  // ── Detect option analysis lines ──
+  // Patterns: (Choice A) / (Choices A and B) / (Choice A and B) / (Choice A, B, and C)
+  const choiceRegex=/^\(Choice[s]?\s+([A-Z](?:\s+and\s+[A-Z]|,\s*[A-Z])*)\)/i;
+
+  // ── Detect Educational objective ──
+  const eduRegex=/^educational objective[:\s]*/i;
+
+  // ── Separate into blocks ──
+  const mainExpLines=[];
+  const choiceBlocks={};// letter -> text
+  let takeHome='';
+  let mode='main'; // main | choice | edu
+  let currentChoiceLetters=[];
+  let currentChoiceLines=[];
+  let eduLines=[];
+
+  for(const line of lines){
+    const trimmed=line.trim();
+
+    // Check for educational objective
+    if(eduRegex.test(trimmed)){
+      // save any pending choice block
+      if(currentChoiceLetters.length&&currentChoiceLines.length){
+        const txt=currentChoiceLines.join(' ').trim();
+        currentChoiceLetters.forEach(l=>{choiceBlocks[l]=txt;});
+      }
+      mode='edu';
+      const afterKey=trimmed.replace(eduRegex,'').trim();
+      if(afterKey)eduLines.push(afterKey);
+      continue;
+    }
+
+    // Check for choice line
+    const choiceMatch=trimmed.match(choiceRegex);
+    if(choiceMatch){
+      // save previous choice block
+      if(currentChoiceLetters.length&&currentChoiceLines.length){
+        const txt=currentChoiceLines.join(' ').trim();
+        currentChoiceLetters.forEach(l=>{choiceBlocks[l]=txt;});
+      }
+      mode='choice';
+      // extract all letters mentioned
+      const lettersStr=choiceMatch[1];
+      currentChoiceLetters=lettersStr.match(/[A-Z]/g)||[];
+      // rest of line after "(Choice X)"
+      const rest=trimmed.replace(choiceRegex,'').replace(/^[–—\s]+/,'').trim();
+      currentChoiceLines=rest?[rest]:[];
+      continue;
+    }
+
+    if(mode==='main'){
+      mainExpLines.push(line);
+    } else if(mode==='choice'){
+      // blank line ends a choice block
+      if(!trimmed){
+        if(currentChoiceLines.length){
+          const txt=currentChoiceLines.join(' ').trim();
+          currentChoiceLetters.forEach(l=>{choiceBlocks[l]=txt;});
+          currentChoiceLetters=[];currentChoiceLines=[];
+          mode='main';
+        }
+      } else {
+        currentChoiceLines.push(trimmed);
+      }
+    } else if(mode==='edu'){
+      if(trimmed)eduLines.push(trimmed);
+    }
+  }
+  // flush last choice block
+  if(currentChoiceLetters.length&&currentChoiceLines.length){
+    const txt=currentChoiceLines.join(' ').trim();
+    currentChoiceLetters.forEach(l=>{choiceBlocks[l]=txt;});
+  }
+  takeHome=eduLines.join(' ').trim();
+
+  // Remove trailing choice lines from main exp
+  // (main exp stops when first choice block starts)
+  const mainExp=mainExpLines.join('\n').trim();
+
+  // ── Fill fields ──
+  const parsed=[];
+
+  if(mainExp){
+    // convert newlines to <p> tags for better formatting
+    const html=mainExp.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+    rteSetHTML('rte-exp',html);
+    parsed.push('✓ Main explanation');
+  }
+
+  if(Object.keys(choiceBlocks).length){
+    // fill option analyses — match letter to index
+    const oaInputs=document.querySelectorAll('.dyn-oa');
+    oaInputs.forEach((ta,i)=>{
+      const letter=String.fromCharCode(65+i);
+      if(choiceBlocks[letter])ta.value=choiceBlocks[letter];
+    });
+    parsed.push(`✓ ${Object.keys(choiceBlocks).length} choice analyses`);
+  }
+
+  if(takeHome){
+    rteSetHTML('rte-th',takeHome);
+    parsed.push('✓ Educational objective');
+  }
+
+  if(!parsed.length){
+    errEl.textContent='Could not parse. Make sure choice analyses use (Choice A) format and educational objective starts with "Educational objective:".';
+    errEl.style.background='var(--red-light)';errEl.style.color='var(--red)';errEl.style.display='block';return;
+  }
+
+  errEl.style.display='block';
+  errEl.style.background='var(--green-light)';
+  errEl.style.color='var(--green)';
+  errEl.textContent='Parsed: '+parsed.join(' · ')+'. Review fields below.';
+  toggleExpParsePanel();
+}
+
 // ── PASTE & PARSE ──
 function toggleParsePanel(){
   const panel=document.getElementById('parse-panel');
@@ -2116,163 +2275,158 @@ function toggleParsePanel(){
 function parseAndFill(){
   const raw=document.getElementById('parse-input').value;
   const errEl=document.getElementById('parse-error');
-  errEl.style.display='none';
+  errEl.style.display='none';errEl.style.background='var(--red-light)';errEl.style.color='var(--red)';
   if(!raw.trim()){errEl.textContent='Please paste a question first.';errEl.style.display='block';return;}
 
-  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  const rawLines=raw.split('\n');
+  const lines=rawLines.map(function(l){return l.trim();});
 
-  // ── 1. Detect option lines ──
-  // Matches: A. text  |  A) text  |  (A) text  |  A.\n text (multiline)
-  const optRegex=/^([A-Z])[.\)]\s*(.*)$/;
-  const optLineIdxs=[];
-  lines.forEach((l,i)=>{if(optRegex.test(l))optLineIdxs.push(i);});
+  // Skip UWorld metadata lines
+  const skipRegex=/^(\d+%.*rate|correct rate|time spent|\d{2}:\d{2}:\d{2}|version|question details|consult ai tutor|incorrect$|explanation:?\s*$|answer reference guide)/i;
+  const pctRegex=/\(\d+%\)\s*$/;
+  const optRegex=/^([A-Z])\.\s*(.*)$/;
+  const eduRegex=/^educational objective[:\s]*/i;
+  const choiceLineRegex=/^\(Choice[s]?\s+([A-Z](?:[\s,]+(?:and\s+)?[A-Z])*)\)/i;
+  const thRegex=/^(?:take[\s-]?home|key point|pearl|summary)[:\s]*/i;
 
-  if(optLineIdxs.length<2){
-    errEl.textContent='Could not detect answer choices. Make sure they start with A. B. C. etc.';
+  // Find option line indices
+  const optIdxs=[];
+  lines.forEach(function(l,i){
+    if(optRegex.test(l)&&!skipRegex.test(l))optIdxs.push(i);
+  });
+
+  if(optIdxs.length<2){
+    errEl.textContent='Could not detect answer choices (A. B. C.). Check the format.';
     errEl.style.display='block';return;
   }
 
-  // ── 2. Question text = everything before first option ──
-  const firstOptIdx=optLineIdxs[0];
-  // check if option text is on next line (e.g. "A.\n Aortic regurgitation")
-  const questionLines=[];
-  let i=0;
-  while(i<firstOptIdx){
-    // skip empty lines at start
-    questionLines.push(lines[i]);i++;
+  // Question text = everything before first option
+  var qLines=[];
+  for(var i=0;i<optIdxs[0];i++){
+    var l=lines[i];
+    if(!l||skipRegex.test(l)||pctRegex.test(l))continue;
+    qLines.push(l);
   }
-  const questionText=questionLines.join('\n').trim();
+  var questionText=qLines.join('\n').trim();
 
-  // ── 3. Parse options (handle multiline options) ──
-  const options=[];
-  for(let k=0;k<optLineIdxs.length;k++){
-    const idx=optLineIdxs[k];
-    const match=lines[idx].match(optRegex);
-    let optText=match[2].trim();
-    // if option text is empty, next line is the text
-    if(!optText&&idx+1<lines.length&&!optRegex.test(lines[idx+1])){
-      optText=lines[idx+1].trim();
-    }
-    // accumulate continuation lines until next option or blank
-    let nextOptIdx=k+1<optLineIdxs.length?optLineIdxs[k+1]:lines.length;
-    let j=idx+1;
+  // Parse options - UWorld puts text on next line after "A."
+  var options=[];
+  for(var k=0;k<optIdxs.length;k++){
+    var idx=optIdxs[k];
+    var match=lines[idx].match(optRegex);
+    var optText=match[2].replace(pctRegex,'').trim();
+    var nextOptIdx=k+1<optIdxs.length?optIdxs[k+1]:lines.length;
+    var j=idx+1;
     while(j<nextOptIdx){
-      const l=lines[j];
-      if(optRegex.test(l))break;
-      if(l&&l!==optText)optText+=' '+l;
+      var ln=lines[j];
+      if(pctRegex.test(ln)||skipRegex.test(ln)||!ln){j++;continue;}
+      if(!optText)optText=ln;
+      else if(optText!==ln)optText+=' '+ln;
       j++;
     }
     options.push(optText.trim());
   }
 
-  // ── 4. Detect correct answer ──
-  // "The correct answer is B" / "Answer: B" / "Answer is B." / "Correct answer: B"
-  let correctIdx=null;
-  const corrRegex=/(?:correct answer is|answer(?:\s+is)?[:\s]+|the answer is)\s*[:\s]*([A-Z])/i;
-  for(const l of lines){
-    const m=l.match(corrRegex);
-    if(m){correctIdx=m[1].toUpperCase().charCodeAt(0)-65;break;}
+  // Detect correct answer - "Correct: C" or in explanation text
+  var correctIdx=null;
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+    var m1=l.match(/^[Cc]orrect[:\s]+([A-Z])\b/);
+    if(m1){correctIdx=m1[1].charCodeAt(0)-65;break;}
+    var m2=l.match(/correct answer is\s+([A-Z])\b/i);
+    if(m2){correctIdx=m2[1].charCodeAt(0)-65;break;}
   }
-  // fallback: look for standalone "Answer: B" lines
-  if(correctIdx===null){
-    for(const l of lines){
-      const m=l.match(/^[Aa]nswer[:\s]+([A-Z])\b/);
-      if(m){correctIdx=m[1].toUpperCase().charCodeAt(0)-65;break;}
+
+  // Find explanation section
+  var expSectionStart=-1;
+  for(var i=0;i<lines.length;i++){
+    if(/^explanation[:\s]*$/i.test(lines[i])){expSectionStart=i+1;break;}
+  }
+  if(expSectionStart<0){
+    var lastOptIdx=optIdxs[optIdxs.length-1];
+    for(var i=lastOptIdx+1;i<lines.length;i++){
+      var l=lines[i];
+      if(!l||skipRegex.test(l)||pctRegex.test(l))continue;
+      if(/^[Cc]orrect/.test(l))continue;
+      if(optRegex.test(l))continue;
+      if(l.length>40){expSectionStart=i;break;}
     }
   }
 
-  // ── 5. Parse explanation block ──
-  // Find line containing "explanation" or "discussion" keyword
-  let expStart=-1;
-  for(let k=0;k<lines.length;k++){
-    if(/^(explanation|discussion|rationale)[:\s]*/i.test(lines[k])){expStart=k;break;}
-  }
+  // Parse explanation, choice analyses, take-home
+  var mainExpParas=[];
+  var choiceBlocks={};
+  var takeHome='';
+  var mode='main';
+  var curLetters=[];
+  var curLines=[];
+  var eduLines=[];
 
-  // ── 6. Parse option analyses ──
-  // Look for lines like "A. Correct — ..." or "A) Incorrect because..." after options
-  const optAnalysis=Array(options.length).fill('');
-  const afterOpts=lines.slice(optLineIdxs[optLineIdxs.length-1]+1);
-  const oaRegex=/^([A-Z])[.\)]\s*(?:–|-|—|correct|incorrect|wrong|right)?\s*(.+)/i;
-  // also match "A. Correct — explanation text"
-  const oaRegex2=/^([A-Z])[.\)]\s*(.{10,})/;
-  afterOpts.forEach(l=>{
-    const m=l.match(oaRegex)||l.match(oaRegex2);
-    if(m){
-      const idx=m[1].toUpperCase().charCodeAt(0)-65;
-      if(idx>=0&&idx<options.length)optAnalysis[idx]=m[2].trim();
+  if(expSectionStart>=0){
+    for(var i=expSectionStart;i<lines.length;i++){
+      var l=lines[i];
+      if(!l){
+        if(mode==='choice'&&curLines.length){
+          var txt=curLines.join(' ').trim();
+          curLetters.forEach(function(lt){choiceBlocks[lt]=txt;});
+          curLetters=[];curLines=[];mode='main';
+        }
+        continue;
+      }
+      if(skipRegex.test(l))continue;
+      if(eduRegex.test(l)||thRegex.test(l)){
+        if(mode==='choice'&&curLines.length){var txt=curLines.join(' ').trim();curLetters.forEach(function(lt){choiceBlocks[lt]=txt;});curLetters=[];curLines=[];}
+        mode='edu';
+        var rest=l.replace(eduRegex,'').replace(thRegex,'').trim();
+        if(rest)eduLines.push(rest);
+        continue;
+      }
+      var cm=l.match(choiceLineRegex);
+      if(cm){
+        if(mode==='choice'&&curLines.length){var txt=curLines.join(' ').trim();curLetters.forEach(function(lt){choiceBlocks[lt]=txt;});curLetters=[];curLines=[];}
+        mode='choice';
+        curLetters=cm[1].match(/[A-Z]/g)||[];
+        var rest=l.replace(choiceLineRegex,'').replace(/^[-\s]+/,'').trim();
+        if(rest)curLines=[rest];
+        continue;
+      }
+      if(mode==='main')mainExpParas.push(l);
+      else if(mode==='choice')curLines.push(l);
+      else if(mode==='edu')eduLines.push(l);
     }
-  });
-
-  // ── 7. Parse take-home / educational objective ──
-  let takeHome='';
-  const thRegex=/^(?:take[\s-]?home|key point|educational objective|objective|pearl|summary)[:\s]*/i;
-  for(let k=0;k<lines.length;k++){
-    if(thRegex.test(lines[k])){
-      // collect lines until next blank or end
-      let th=lines[k].replace(thRegex,'').trim();
-      let j=k+1;
-      while(j<lines.length&&lines[j]&&!thRegex.test(lines[j])){th+=' '+lines[j];j++;}
-      takeHome=th.trim();
-      break;
-    }
+    if(mode==='choice'&&curLines.length){var txt=curLines.join(' ').trim();curLetters.forEach(function(lt){choiceBlocks[lt]=txt;});}
   }
+  takeHome=eduLines.join(' ').trim();
 
-  // ── 8. Parse full explanation text ──
-  let expText='';
-  if(expStart>=0){
-    let expLines=[];
-    let j=expStart+1;
-    // collect until take-home or end
-    while(j<lines.length){
-      if(thRegex.test(lines[j]))break;
-      // stop if we hit option analysis block
-      if(oaRegex.test(lines[j])&&j>expStart+2)break;
-      expLines.push(lines[j]);j++;
-    }
-    expText=expLines.join('\n').trim();
-  }
+  var expHTML=mainExpParas.filter(function(l){return l;}).map(function(l){return '<p>'+l+'</p>';}).join('');
 
-  // ── 9. Fill fields ──
-  if(!questionText){errEl.textContent='Could not detect question text. Make sure it comes before the answer choices.';errEl.style.display='block';return;}
+  if(!questionText){errEl.textContent='Could not detect question text.';errEl.style.display='block';return;}
 
-  // Fill question text RTE
   rteSetHTML('rte-qtext',questionText.replace(/\n/g,'<br>'));
-
-  // Fill options
   document.getElementById('opts-container').innerHTML='';
   document.getElementById('oa-container').innerHTML='';
   document.getElementById('corr-sel').innerHTML='';
-  options.forEach(o=>addOpt(o));
-
-  // Fill option analyses
-  document.querySelectorAll('.dyn-oa').forEach((ta,i)=>{ta.value=optAnalysis[i]||'';});
-
-  // Set correct answer
+  options.forEach(function(o){addOpt(o);});
   if(correctIdx!==null&&correctIdx<options.length)selCorrect(correctIdx);
-
-  // Fill explanation
-  if(expText)rteSetHTML('rte-exp',expText.replace(/\n/g,'<br>'));
-
-  // Fill take-home
+  if(expHTML)rteSetHTML('rte-exp',expHTML);
+  if(Object.keys(choiceBlocks).length){
+    document.querySelectorAll('.dyn-oa').forEach(function(ta,i){
+      var letter=String.fromCharCode(65+i);
+      if(choiceBlocks[letter])ta.value=choiceBlocks[letter];
+    });
+  }
   if(takeHome)rteSetHTML('rte-th',takeHome);
 
-  // Show success
-  const parsed=[];
-  parsed.push(`✓ ${options.length} answer choices`);
-  if(correctIdx!==null)parsed.push(`✓ Correct answer: ${String.fromCharCode(65+correctIdx)}`);
-  if(expText)parsed.push('✓ Explanation');
-  if(takeHome)parsed.push('✓ Take-home message');
-  if(optAnalysis.some(a=>a))parsed.push(`✓ ${optAnalysis.filter(a=>a).length} option analyses`);
+  var parsed=['checkmark '+options.length+' choices'];
+  if(correctIdx!==null)parsed.push('Correct: '+String.fromCharCode(65+correctIdx));
+  if(expHTML)parsed.push('Explanation');
+  if(Object.keys(choiceBlocks).length)parsed.push(Object.keys(choiceBlocks).length+' choice analyses');
+  if(takeHome)parsed.push('Take-home');
 
-  errEl.style.display='block';
-  errEl.style.background='var(--green-light)';
-  errEl.style.color='var(--green)';
-  errEl.textContent='Parsed: '+parsed.join(' · ')+'. Review the fields below before saving.';
-
-  // Hide parse panel
+  errEl.style.display='block';errEl.style.background='var(--green-light)';errEl.style.color='var(--green)';
+  errEl.textContent='Parsed: '+parsed.join(' | ')+'. Review fields below before saving.';
   toggleParsePanel();
 }
-
 // ADMIN MODALS
 function showAModal(id){document.getElementById(id).style.display='flex';}
 function hideAModal(id){document.getElementById(id).style.display='none';}
