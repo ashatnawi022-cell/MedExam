@@ -2272,36 +2272,63 @@ function toggleParsePanel(){
   btn.style.borderColor=visible?'#93c5fd':'#1a3a5c';
 }
 
-function parseAndFill(){
+async function parseAndFill(){
   const raw=document.getElementById('parse-input').value;
   const errEl=document.getElementById('parse-error');
   errEl.style.display='none';errEl.style.background='var(--red-light)';errEl.style.color='var(--red)';
   if(!raw.trim()){errEl.textContent='Please paste a question first.';errEl.style.display='block';return;}
 
-  const rawLines=raw.split('\n');
-  const lines=rawLines.map(function(l){return l.trim();});
+  // Split into lines and trim
+  var allLines=raw.split('\n').map(function(l){return l.trim();});
 
-  // Extract UWorld metadata: Subject, System, Topic
-  // Pattern: "Pathology\nSubject\nCardiovascular System\nSystem\nCoronary heart disease\nTopic"
-  var parsedSubject='', parsedSystem='', parsedTopic='';
-  for(var mi=0;mi<lines.length;mi++){
-    if(/^subject$/i.test(lines[mi])&&mi>0)parsedSubject=lines[mi-1].trim();
-    if(/^system$/i.test(lines[mi])&&mi>0)parsedSystem=lines[mi-1].trim();
-    if(/^topic$/i.test(lines[mi])&&mi>0)parsedTopic=lines[mi-1].trim();
+  // STRIP all UWorld page noise
+  // Handles: number list (1-40), Item X of XX, Question Id, nav buttons,
+  // toolbar items, footer, pricing, video tutorial section, block timer etc.
+  var noiseRegex=/^(\d{1,2}|item\s+\d+\s+of\s+\d+|question\s*(?:id)?[:\s]*\d*|mark|previous\s*next|previous|next|full\s*screen\s*highlighter.*|highlighter|off|on|lab\s*values\s*notes.*|lab\s*values|notes|calculator|settings|help|block\s*time.*|tutor|medical\s*library|flashcards|suspend\s*end\s*block|suspend|end\s*block|unlock.*|free question.*|\$\d+|one-time\s*payment|unlock\s*now|expert\s*walkthrough|watch\s*how.*|video\s*tutorial|step\s*\d+\s*qbank|qid[:\s]*\d*|full\s*access.*|consult\s*ai\s*tutor|incorrect$|^correct$|explanation:\s*$|answer\s*reference\s*guide|question\s*details|\d+%.*rate|correct\s*rate|time\s*spent|\d{2}:\d{2}:\d{2}|\d{2}:\d{2}:\d{2}.*elapsed.*|^\d{4}$|version|^subject$|^system$|^topic$|pathophysiology|full\s*screen|^\s*$)$/i;
+
+  var lines=allLines.filter(function(l){return l.length>0&&!noiseRegex.test(l);});
+
+  // Extract Question ID from raw (before noise stripping)
+  var questionId='';
+  for(var i=0;i<allLines.length;i++){
+    var m=allLines[i].match(/question\s*id[:\s]+(\d+)/i)||allLines[i].match(/qid[:\s]+(\d+)/i);
+    if(m){questionId=m[1];break;}
   }
 
-  // Skip UWorld metadata lines
-  const skipRegex=/^(\d+%.*rate|correct rate|time spent|\d{2}:\d{2}:\d{2}|version|question details|consult ai tutor|incorrect$|explanation:?\s*$|answer reference guide|^subject$|^system$|^topic$|^pathophysiology$|^pathology$|^physiology$|^pharmacology$|^biochemistry$|^microbiology$|^immunology$|^anatomy$|^histology$|^embryology$|^genetics$|^biostatistics$|^behavioral science$)/i;
-  const pctRegex=/\(\d+%\)\s*$/;
-  const optRegex=/^([A-Z])\.\s*(.*)$/;
-  const eduRegex=/^educational objective[:\s]*/i;
-  const choiceLineRegex=/^\(Choice[s]?\s+([A-Z](?:[\s,]+(?:and\s+)?[A-Z])*)\)/i;
-  const thRegex=/^(?:take[\s-]?home|key point|pearl|summary)[:\s]*/i;
+  // Extract Subject/System/Topic - value appears on line BEFORE its label in UWorld
+  var parsedSubject='', parsedSystem='', parsedTopic='';
+  for(var i=1;i<allLines.length;i++){
+    var l=allLines[i].trim();
+    var prev=allLines[i-1].trim();
+    if(!prev||prev.length<2)continue;
+    if(/^subject$/i.test(l))parsedSubject=prev;
+    if(/^system$/i.test(l))parsedSystem=prev;
+    if(/^topic$/i.test(l))parsedTopic=prev;
+  }
+  // Also handle "Question Details\nPathology\nSubject" — look for label two lines ahead
+  for(var i=0;i<allLines.length-2;i++){
+    if(/^question\s*details$/i.test(allLines[i])){
+      // next meaningful lines should be: Subject value, "Subject", System value, "System", etc.
+      var j=i+1;
+      while(j<allLines.length&&j<i+10){
+        var cur=allLines[j].trim();
+        var nxt=j+1<allLines.length?allLines[j+1].trim():'';
+        if(/^subject$/i.test(nxt)&&cur&&cur.length>1)parsedSubject=parsedSubject||cur;
+        if(/^system$/i.test(nxt)&&cur&&cur.length>1)parsedSystem=parsedSystem||cur;
+        if(/^topic$/i.test(nxt)&&cur&&cur.length>1)parsedTopic=parsedTopic||cur;
+        j++;
+      }
+      break;
+    }
+  }
 
-  // Find option line indices
-  const optIdxs=[];
+  var pctRegex=/\(\d+%\)\s*$/;
+  var optRegex=/^([A-Z])\.\s*(.*)$/;
+
+  // ── Find option lines ──
+  var optIdxs=[];
   lines.forEach(function(l,i){
-    if(optRegex.test(l)&&!skipRegex.test(l))optIdxs.push(i);
+    if(optRegex.test(l))optIdxs.push(i);
   });
 
   if(optIdxs.length<2){
@@ -2309,16 +2336,16 @@ function parseAndFill(){
     errEl.style.display='block';return;
   }
 
-  // Question text = everything before first option
+  // ── Question text = everything before first option ──
   var qLines=[];
   for(var i=0;i<optIdxs[0];i++){
     var l=lines[i];
-    if(!l||skipRegex.test(l)||pctRegex.test(l))continue;
+    if(!l||pctRegex.test(l))continue;
     qLines.push(l);
   }
   var questionText=qLines.join('\n').trim();
 
-  // Parse options - UWorld puts text on next line after "A."
+  // ── Parse options (UWorld: letter on one line, text on next) ──
   var options=[];
   for(var k=0;k<optIdxs.length;k++){
     var idx=optIdxs[k];
@@ -2328,25 +2355,24 @@ function parseAndFill(){
     var j=idx+1;
     while(j<nextOptIdx){
       var ln=lines[j];
-      if(pctRegex.test(ln)||skipRegex.test(ln)||!ln){j++;continue;}
+      if(pctRegex.test(ln)||!ln){j++;continue;}
       if(!optText)optText=ln;
-      else if(optText!==ln)optText+=' '+ln;
+      else optText+=' '+ln;
       j++;
     }
     options.push(optText.trim());
   }
 
-  // Detect correct answer - "Correct: C" or in explanation text
+  // ── Detect correct answer: "Correct: D" ──
   var correctIdx=null;
-  for(var i=0;i<lines.length;i++){
-    var l=lines[i];
-    var m1=l.match(/^[Cc]orrect[:\s]+([A-Z])\b/);
+  for(var i=0;i<allLines.length;i++){
+    var m1=allLines[i].match(/^[Cc]orrect[:\s]+([A-Z])\b/);
     if(m1){correctIdx=m1[1].charCodeAt(0)-65;break;}
-    var m2=l.match(/correct answer is\s+([A-Z])\b/i);
+    var m2=allLines[i].match(/correct answer is\s+([A-Z])\b/i);
     if(m2){correctIdx=m2[1].charCodeAt(0)-65;break;}
   }
 
-  // Find explanation section
+  // ── Find explanation section ──
   var expSectionStart=-1;
   for(var i=0;i<lines.length;i++){
     if(/^explanation[:\s]*$/i.test(lines[i])){expSectionStart=i+1;break;}
@@ -2355,14 +2381,18 @@ function parseAndFill(){
     var lastOptIdx=optIdxs[optIdxs.length-1];
     for(var i=lastOptIdx+1;i<lines.length;i++){
       var l=lines[i];
-      if(!l||skipRegex.test(l)||pctRegex.test(l))continue;
+      if(!l||pctRegex.test(l))continue;
       if(/^[Cc]orrect/.test(l))continue;
       if(optRegex.test(l))continue;
       if(l.length>40){expSectionStart=i;break;}
     }
   }
 
-  // Parse explanation, choice analyses, take-home
+  // ── Parse explanation + choice analyses + take-home ──
+  var eduRegex=/^educational objective[:\s]*/i;
+  var choiceLineRegex=/^\(Choice[s]?\s+([A-Z](?:[\s,]+(?:and\s+)?[A-Z])*)\)/i;
+  var thRegex=/^(?:take[\s-]?home|key point|pearl|summary)[:\s]*/i;
+
   var mainExpParas=[];
   var choiceBlocks={};
   var takeHome='';
@@ -2382,7 +2412,6 @@ function parseAndFill(){
         }
         continue;
       }
-      if(skipRegex.test(l))continue;
       if(eduRegex.test(l)||thRegex.test(l)){
         if(mode==='choice'&&curLines.length){var txt=curLines.join(' ').trim();curLetters.forEach(function(lt){choiceBlocks[lt]=txt;});curLetters=[];curLines=[];}
         mode='edu';
@@ -2406,11 +2435,11 @@ function parseAndFill(){
     if(mode==='choice'&&curLines.length){var txt=curLines.join(' ').trim();curLetters.forEach(function(lt){choiceBlocks[lt]=txt;});}
   }
   takeHome=eduLines.join(' ').trim();
-
   var expHTML=mainExpParas.filter(function(l){return l;}).map(function(l){return '<p>'+l+'</p>';}).join('');
 
   if(!questionText){errEl.textContent='Could not detect question text.';errEl.style.display='block';return;}
 
+  // ── Fill all fields ──
   rteSetHTML('rte-qtext',questionText.replace(/\n/g,'<br>'));
   document.getElementById('opts-container').innerHTML='';
   document.getElementById('oa-container').innerHTML='';
@@ -2425,29 +2454,56 @@ function parseAndFill(){
     });
   }
   if(takeHome)rteSetHTML('rte-th',takeHome);
+  if(questionId)document.getElementById('qm-cid').value=questionId;
 
-  // Auto-select Subject (discipline), System (subject), Topic (category)
+  // ── Auto-select Subject (discipline) ──
+  var parsedArr=[];
   if(parsedSubject){
     var discSel=document.getElementById('qm-disc');
-    var discOpts=Array.from(discSel.options);
-    var discMatch=discOpts.find(function(o){return o.text.toLowerCase().includes(parsedSubject.toLowerCase())||parsedSubject.toLowerCase().includes(o.text.toLowerCase());});
-    if(discMatch)discSel.value=discMatch.value;
+    var discMatch=Array.from(discSel.options).find(function(o){
+      return o.text.toLowerCase().includes(parsedSubject.toLowerCase())||parsedSubject.toLowerCase().includes(o.text.toLowerCase());
+    });
+    if(discMatch){discSel.value=discMatch.value;parsedArr.push('Subject: '+parsedSubject);}
+    else parsedArr.push('Subject: '+parsedSubject+' (not found — select manually)');
   }
+
+  // ── Auto-select System ──
   if(parsedSystem){
     var subjSel=document.getElementById('qm-subj');
-    var subjOpts=Array.from(subjSel.options);
-    var subjMatch=subjOpts.find(function(o){return o.text.toLowerCase().includes(parsedSystem.toLowerCase())||parsedSystem.toLowerCase().includes(o.text.toLowerCase());});
+    var subjMatch=Array.from(subjSel.options).find(function(o){
+      return o.text.toLowerCase().includes(parsedSystem.toLowerCase())||parsedSystem.toLowerCase().includes(o.text.toLowerCase());
+    });
     if(subjMatch){
       subjSel.value=subjMatch.value;
-      // load topics for this system then match topic
-      loadQModalCats().then(function(){
-        if(parsedTopic){
-          var catSel=document.getElementById('qm-cat');
-          var catOpts=Array.from(catSel.options);
-          var catMatch=catOpts.find(function(o){return o.text.toLowerCase().includes(parsedTopic.toLowerCase())||parsedTopic.toLowerCase().includes(o.text.toLowerCase());});
-          if(catMatch)catSel.value=catMatch.value;
+      parsedArr.push('System: '+parsedSystem);
+      // load topics then auto-select or create
+      await loadQModalCats();
+      if(parsedTopic){
+        var catSel=document.getElementById('qm-cat');
+        var catMatch=Array.from(catSel.options).find(function(o){
+          return o.text.toLowerCase().includes(parsedTopic.toLowerCase())||parsedTopic.toLowerCase().includes(o.text.toLowerCase());
+        });
+        if(catMatch){
+          catSel.value=catMatch.value;
+          parsedArr.push('Topic: '+parsedTopic);
+        } else {
+          // auto-create the topic
+          var newCat={name:parsedTopic,subject_id:subjMatch.value};
+          var res=await sb.from('categories').insert(newCat).select().single();
+          if(res.data){
+            // reload topics and select new one
+            await loadQModalCats();
+            var catSel2=document.getElementById('qm-cat');
+            var newMatch=Array.from(catSel2.options).find(function(o){return o.value===res.data.id;});
+            if(newMatch){catSel2.value=newMatch.value;}
+            parsedArr.push('Topic: '+parsedTopic+' (auto-created)');
+          } else {
+            parsedArr.push('Topic: '+parsedTopic+' (could not create — add manually)');
+          }
         }
-      });
+      }
+    } else {
+      parsedArr.push('System: '+parsedSystem+' (not found — select manually)');
     }
   }
 
@@ -2456,10 +2512,10 @@ function parseAndFill(){
   if(expHTML)parsed.push('Explanation');
   if(Object.keys(choiceBlocks).length)parsed.push(Object.keys(choiceBlocks).length+' choice analyses');
   if(takeHome)parsed.push('Take-home');
+  if(questionId)parsed.push('ID: '+questionId);
+  parsed=parsed.concat(parsedArr);
 
-  if(parsedSubject)parsed.push('Subject: '+parsedSubject);
-  if(parsedSystem)parsed.push('System: '+parsedSystem);
-  if(parsedTopic)parsed.push('Topic: '+parsedTopic);
+  errEl.style.display='block';errEl.style.background='var(--green-light)';errEl.style.color='var(--green)';
   errEl.textContent='Parsed: '+parsed.join(' | ')+'. Review fields below before saving.';
   toggleParsePanel();
 }
