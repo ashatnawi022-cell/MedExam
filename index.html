@@ -2569,6 +2569,9 @@ async function launchSession(questions,title,existingAtt=null){
   eTick=setInterval(()=>{if(eRun){eSec++;document.getElementById('exam-t').textContent=efmt(eSec);}},1000);
   qTick=setInterval(()=>{if(qRun){qSec++;document.getElementById('q-t').textContent=efmt(qSec);const el=document.getElementById('qtinline');if(el)el.textContent=efmt(qSec);}},1000);
   showPage('examPage');eRenderQ();
+  // Hide support chat during exam so it doesn't cover buttons
+  const supFab=document.getElementById('support-fab');
+  if(supFab)supFab.style.display='none';
 }
 
 async function eSave(){
@@ -2830,6 +2833,8 @@ async function eSuspend(){
   ES=null;eAttId=null;eCheckMode=false;showPage('homePage');renderDashboard();
 }
 function eRenderResults(){
+  // Restore support fab now that exam is over
+  initSupportFab();
   const Q=ES.questions;const tot=ES.results.filter(r=>r!==null).length;const pct=tot>0?Math.round(ES.score/tot*100):0;
   let msg='',sub='',col='#16a34a',emoji='';
   if(pct===100){msg='Perfect Score!';sub='Absolutely flawless! Keep it up!';col='#16a34a';emoji='🏆';}
@@ -2863,7 +2868,12 @@ function eRenderResults(){
 function eCheckAt(i){eStartCheck();eNav(i);}
 function eStartCheck(){eCheckMode=true;document.getElementById('exam-bb').style.display='flex';document.getElementById('home-fab').style.display='inline-block';document.getElementById('sus-fab').style.display='none';document.getElementById('end-fab').style.display='none';ES.cur=0;eRenderQ();}
 async function eRetake(){eCheckMode=false;if(eAttId){const{data:att}=await sb.from('attempts').select('*').eq('id',eAttId).single();if(att){const qIds=att.question_ids||[];const{data:qs}=await sb.from('questions').select('*').in('id',qIds);const qMap={};(qs||[]).forEach(q=>qMap[q.id]=q);const ordered=qIds.map(id=>qMap[id]).filter(Boolean);await launchSession(ordered,att.filter_type||'Session');}}}
-function eGoHome(){clearInterval(eTick);clearInterval(qTick);ES=null;eAttId=null;eCheckMode=false;showPage('homePage');renderDashboard();}
+function eGoHome(){
+  clearInterval(eTick);clearInterval(qTick);ES=null;eAttId=null;eCheckMode=false;
+  showPage('homePage');renderDashboard();
+  // Restore support fab
+  initSupportFab();
+}
 
 // ── SUPPORT CHAT ──
 let supConvId=null;
