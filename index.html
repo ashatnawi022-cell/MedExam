@@ -373,6 +373,32 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .ans-stat-count{color:var(--gray400);min-width:60px;}
 .ans-stats-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray400);margin-bottom:4px;}
 
+/* -- ANALYTICS -- */
+.analytics-wrap{max-width:900px;margin:0 auto;padding:28px 24px 80px;}
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+@media(max-width:640px){.analytics-grid{grid-template-columns:1fr;}}
+.stat-card{background:white;border:1px solid var(--gray200);border-radius:12px;padding:18px;text-align:center;box-shadow:var(--shadow);}
+.stat-card-val{font-size:32px;font-weight:800;color:var(--navy2);line-height:1;}
+.stat-card-lbl{font-size:12px;color:var(--gray500);margin-top:6px;}
+.topic-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray100);}
+.topic-row:last-child{border-bottom:none;}
+.topic-name{font-size:13px;font-weight:600;color:var(--gray800);width:180px;flex-shrink:0;}
+.topic-bar-wrap{flex:1;background:var(--gray100);border-radius:6px;height:10px;overflow:hidden;}
+.topic-bar{height:100%;border-radius:6px;transition:width 0.4s;}
+.topic-pct{font-size:12px;font-weight:700;width:38px;text-align:right;flex-shrink:0;}
+.topic-count{font-size:11px;color:var(--gray400);width:60px;text-align:right;flex-shrink:0;}
+/* -- TIMED MODE -- */
+.timed-toggle{display:flex;align-items:center;gap:12px;background:var(--gray50);border:1.5px solid var(--gray200);border-radius:10px;padding:12px 16px;margin-bottom:20px;cursor:pointer;}
+.timed-toggle.on{background:#fff5f5;border-color:#fca5a5;}
+.q-timer-countdown{font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--green-light);color:var(--green);}
+.q-timer-countdown.warn{background:var(--amber-light);color:var(--amber);}
+.q-timer-countdown.danger{background:var(--red-light);color:var(--red);animation:pulse 0.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+/* -- FLAG BUTTON -- */
+.flag-btn{background:none;border:1px solid var(--gray200);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--gray400);transition:all 0.15s;}
+.flag-btn:hover{border-color:#fca5a5;color:var(--red);background:#fff5f5;}
+.flag-btn.flagged{border-color:#fca5a5;color:var(--red);background:#fff5f5;}
+/* -- END CSS -- */
 /* -- SUPPORT CHAT -- */
 /* -- LOADING OVERLAY -- */
 #app-loader{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999;}
@@ -597,6 +623,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="admin-nav" onclick="aNav('questions',event)">❓ Questions</button>
       <div class="admin-sb-title" style="margin-top:16px;">Data</div>
       <button class="admin-nav" onclick="aNav('users',event)">👥 Users</button>
+      <button class="admin-nav" onclick="aNav('flags',event)" id="admin-flags-btn">🚩 Flags <span id="admin-flags-badge" style="display:none;background:#ef4444;color:white;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;align-items:center;justify-content:center;margin-left:4px;padding:0 3px;"></span></button>
       <button class="admin-nav" onclick="aNav('support',event)" id="admin-support-btn">💬 Support <span id="admin-sup-badge" style="display:none;background:#ef4444;color:white;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;align-items:center;justify-content:center;margin-left:4px;padding:0 3px;">!</span></button>
     </div>
     <div class="admin-content">
@@ -633,6 +660,10 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <div class="admin-sec" id="asec-users">
         <div class="admin-toolbar"><h2>👥 Users</h2></div>
         <div id="users-wrap"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+      </div>
+      <div class="admin-sec" id="asec-flags">
+        <div class="admin-toolbar"><h2>🚩 Flagged Questions</h2></div>
+        <div id="flags-wrap"><div class="empty-state"><div class="esi">🚩</div><p>No flagged questions.</p></div></div>
       </div>
       <div class="admin-sec" id="asec-support">
         <div class="admin-toolbar"><h2>💬 Support Messages</h2></div>
@@ -1899,7 +1930,7 @@ const PAGE_ROUTES={
 };
 const ROUTE_PAGES=Object.fromEntries(Object.entries(PAGE_ROUTES).map(([k,v])=>[v,k]));
 // Sub-page routes within homePage
-const SUB_ROUTES={'create':showCreateExam,'settings':showSettings,'exams':goMyExams};
+const SUB_ROUTES={'create':showCreateExam,'settings':showSettings,'exams':goMyExams,'analytics':showAnalytics};
 
 function showPage(id,pushHistory=true){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
@@ -1921,6 +1952,7 @@ window.addEventListener('popstate',async function(ev){
   const hash=window.location.hash.replace('#','');
   // Handle sub-pages within homePage (forward navigation)
   if(hash==='create'){showPage('homePage',false);showCreateExam();return;}
+  if(hash==='analytics'){showPage('homePage',false);showAnalytics();return;}
   if(hash==='settings'){showPage('homePage',false);showSettings();return;}
   if(hash==='exams'){showPage('homePage',false);goMyExams();return;}
   const pageId=ROUTE_PAGES[hash]||'homePage';
@@ -2122,6 +2154,15 @@ async function renderDashboard(){
           </div>
           <div class="dash-card-arrow"> </div>
         </div>
+        <!-- Analytics -->
+        <div class="dash-card" onclick="showAnalytics()" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#86efac;">
+          <div class="dash-card-icon">📊</div>
+          <div>
+            <div class="dash-card-title" style="color:#166534;">Analytics</div>
+            <div class="dash-card-desc" style="color:#16a34a;">View your performance by topic and track improvement</div>
+          </div>
+          <div class="dash-card-arrow"> </div>
+        </div>
         <!-- Settings -->
         <div class="dash-card card-amber" onclick="showSettings()">
           <div class="dash-card-icon">⚙️</div>
@@ -2211,6 +2252,18 @@ function renderCreateExamHTML(){
         </div>
         <div style="width:40px;height:22px;background:${randomMode?'var(--blue)':'var(--gray300)'};border-radius:11px;position:relative;transition:background 0.2s;flex-shrink:0;">
           <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;${randomMode?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+        </div>
+      </div>
+
+      <!-- Timed Mode Toggle -->
+      <div class="timed-toggle${timedMode?' on':''}" onclick="toggleTimedMode()">
+        <div style="font-size:22px;">⏱️</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:${timedMode?'var(--red)':'var(--gray700)'};">Timed Mode</div>
+          <div style="font-size:12px;color:var(--gray400);margin-top:2px;">60 seconds per question — auto-submits when time runs out</div>
+        </div>
+        <div style="width:40px;height:22px;background:${timedMode?'#ef4444':'var(--gray300)'};border-radius:11px;position:relative;transition:background 0.2s;flex-shrink:0;">
+          <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;${timedMode?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
         </div>
       </div>
 
@@ -2327,7 +2380,9 @@ function deselectAllSystems(){
 }
 
 let allDiscsSelected=true; // true = all on, false = use selDisciplines (empty = none)
-let randomMode=false; // true = ignore all filters, pull from all questions
+let randomMode=false;
+let timedMode=false;
+let timedPerQ=60; // seconds per question in timed mode // true = ignore all filters, pull from all questions
 
 function toggleDisc(id){
   if(allDiscsSelected){
@@ -2641,7 +2696,7 @@ async function launchSession(questions,title,existingAtt=null){
     mySelections:Array(questions.length).fill(null),
     qTimes:att.question_times||Array(questions.length).fill(0),
     excluded:Array(questions.length).fill(null).map(()=>new Set()),
-    examSec:att.exam_seconds||0,title};
+    examSec:att.exam_seconds||0,title,timed:timedMode,flagged:{}};
   eSec=ES.examSec;qSec=ES.qTimes[ES.cur]||0;
   document.getElementById('tb-title').textContent=title;
   document.getElementById('exam-t').textContent=efmt(eSec);
@@ -2734,7 +2789,7 @@ function ePickOpt(i){
   const sb=document.getElementById('esubBtn');if(sb)sb.disabled=false;
 }
 
-async function eSubmit(){
+async function eSubmit(autoSubmit=false){
   const cur=ES.cur;const i=ES.mySelections[cur];if(i===null||i===undefined)return;
   const Q=ES.questions;const ok=i===Q[cur].correct_answer;
   ES.results[cur]=ok;if(ok)ES.score++;
@@ -2844,10 +2899,16 @@ async function eRenderQ(){
     <div class="hl-hint${eHLMode?' on':''}" id="ehlhint">Select text to highlight   Click to remove</div>
     <div class="qcard">
       <div class="qnum">Q${cur+1} of ${Q.length}</div>
-      <div class="q-t-chip">  <span id="qtinline">${qTV}</span></div>
+      <div class="q-t-chip" style="display:flex;align-items:center;gap:8px;">
+        <span id="qtinline">${qTV}</span>
+        ${ES.timed&&!isAns?`<span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span>`:''}
+      </div>
       <div class="qtext hlable" id="qtext-content"></div>
       <div class="opts">${optsHtml}</div>
-      ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>Submit Answer</button>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+        ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>Submit Answer</button>`:'<div></div>'}
+        <button class="flag-btn" id="flag-btn-q" onclick="flagQ(cur)" title="Flag this question for review">🚩 Flag</button>
+      </div>
       ${expHtml}
     </div>`;
   document.querySelectorAll('mark').forEach(m=>{
@@ -2857,6 +2918,17 @@ async function eRenderQ(){
   // render question text as HTML (supports tables and images)
   const qtEl=document.getElementById('qtext-content');
   if(qtEl)qtEl.innerHTML=formatQuestionText(q.question_text||'');
+  // Update flag button state
+  const flagBtn=document.getElementById('flag-btn-q');
+  if(flagBtn){
+    const isFlagged=ES.flagged&&ES.flagged[cur];
+    flagBtn.className='flag-btn'+(isFlagged?' flagged':'');
+    flagBtn.textContent=isFlagged?'🚩 Flagged':'🚩 Flag';
+  }
+  // Start timed countdown if in timed mode and question unanswered
+  clearTimedTick();
+  if(ES.timed&&ES.results[cur]===null){startTimedCountdown();}
+  else{stopTimedCountdown();}
 }
 
 function formatQuestionText(txt){
@@ -2898,7 +2970,7 @@ function formatQuestionText(txt){
   flushTable();
   return result.join('');
 }
-function eGoNext(){eRun=true;document.getElementById('exam-t').className='t-val';eNav(ES.cur+1);}
+function eGoNext(){clearTimedTick();eRun=true;document.getElementById('exam-t').className='t-val';eNav(ES.cur+1);}
 async function eFinish(){
   clearInterval(eTick);clearInterval(qTick);eRun=false;qRun=false;
   await sb.from('attempts').update({status:'done',updated_at:new Date().toISOString()}).eq('id',eAttId);
@@ -2956,10 +3028,261 @@ function eCheckAt(i){eStartCheck();eNav(i);}
 function eStartCheck(){eCheckMode=true;document.getElementById('exam-bb').style.display='flex';document.getElementById('home-fab').style.display='inline-block';document.getElementById('sus-fab').style.display='none';document.getElementById('end-fab').style.display='none';ES.cur=0;eRenderQ();}
 async function eRetake(){eCheckMode=false;if(eAttId){const{data:att}=await sb.from('attempts').select('*').eq('id',eAttId).single();if(att){const qIds=att.question_ids||[];const{data:qs}=await sb.from('questions').select('*').in('id',qIds);const qMap={};(qs||[]).forEach(q=>qMap[q.id]=q);const ordered=qIds.map(id=>qMap[id]).filter(Boolean);await launchSession(ordered,att.filter_type||'Session');}}}
 function eGoHome(){
-  clearInterval(eTick);clearInterval(qTick);ES=null;eAttId=null;eCheckMode=false;
+  clearInterval(eTick);clearInterval(qTick);clearTimedTick();
+  ES=null;eAttId=null;eCheckMode=false;
   showPage('homePage');renderDashboard();
-  // Restore support fab
   initSupportFab();
+}
+
+// ── TIMED MODE ──
+var timedTick=null;
+var timedSecsLeft=0;
+function toggleTimedMode(){timedMode=!timedMode;showCreateExam();}
+function clearTimedTick(){if(timedTick){clearInterval(timedTick);timedTick=null;}}
+function startTimedCountdown(){
+  clearTimedTick();
+  if(!timedMode||ES.results[ES.cur]!==null)return;
+  timedSecsLeft=timedPerQ;
+  updateTimedDisplay();
+  timedTick=setInterval(function(){
+    timedSecsLeft--;
+    updateTimedDisplay();
+    if(timedSecsLeft<=0){
+      clearTimedTick();
+      // Auto-submit with no answer selected
+      eSubmit(true);
+    }
+  },1000);
+}
+function updateTimedDisplay(){
+  var el=document.getElementById('timed-countdown');
+  if(!el)return;
+  el.textContent='⏱ '+timedSecsLeft+'s';
+  el.className='q-timer-countdown';
+  if(timedSecsLeft<=10)el.className='q-timer-countdown danger';
+  else if(timedSecsLeft<=20)el.className='q-timer-countdown warn';
+}
+function stopTimedCountdown(){clearTimedTick();var el=document.getElementById('timed-countdown');if(el)el.style.display='none';}
+
+// ── FLAGGING ──
+async function flagQ(qIdx){
+  if(!ES)return;
+  var q=ES.questions[qIdx];
+  if(!ES.flagged)ES.flagged={};
+  if(ES.flagged[qIdx]){
+    // Unflag
+    ES.flagged[qIdx]=false;
+    await sb.from('question_flags').delete().eq('question_id',q.id).eq('user_id',CU.id);
+    toast('Flag removed');
+  } else {
+    // Show flag reason picker
+    var reason=prompt('Why are you flagging this question?\n1. Wrong answer\n2. Typo/error in text\n3. Unclear question\n4. Other\n\nType your reason:','');
+    if(!reason)return;
+    ES.flagged[qIdx]=true;
+    await sb.from('question_flags').upsert({question_id:q.id,user_id:CU.id,reason:reason,status:'pending'},{onConflict:'question_id,user_id'});
+    toast('Question flagged! Admin will review it. 🚩');
+  }
+  eRenderQ();
+}
+
+// ── ANALYTICS ──
+async function showAnalytics(){
+  history.pushState({page:'analytics'},'','#analytics');
+  const body=document.getElementById('homeBody');
+  body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
+  // Fetch all attempts with question data
+  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done');
+  if(!atts||!atts.length){
+    body.innerHTML=`<div class="analytics-wrap"><div class="back-header"><button onclick="renderDashboard()">← Back</button><h2>📊 Analytics</h2></div><div class="empty-state"><div class="esi">📊</div><p>No completed exams yet. Complete some sessions to see your analytics!</p></div></div>`;
+    return;
+  }
+  // Gather all question IDs attempted
+  const allQIds=[...new Set(atts.flatMap(a=>a.question_ids||[]))];
+  const{data:questions}=await sb.from('questions').select('id,category_id,subject_id,categories(name),subjects(name)').in('id',allQIds);
+  const qMap={};(questions||[]).forEach(function(q){qMap[q.id]=q;});
+  // Build per-question result map: qId -> [true/false results]
+  const qResults={};
+  atts.forEach(function(att){
+    const ids=att.question_ids||[];
+    const ans=att.answers||[];
+    ids.forEach(function(id,i){
+      if(ans[i]===null)return;
+      if(!qResults[id])qResults[id]=[];
+      qResults[id].push(ans[i]===true);
+    });
+  });
+  // Aggregate by topic
+  const topicStats={};
+  Object.keys(qResults).forEach(function(qId){
+    var q=qMap[qId];if(!q)return;
+    var topicName=q.categories?.name||'Uncategorized';
+    if(!topicStats[topicName])topicStats[topicName]={correct:0,total:0};
+    var results=qResults[qId];
+    topicStats[topicName].total+=results.length;
+    topicStats[topicName].correct+=results.filter(Boolean).length;
+  });
+  // Sort topics by % correct ascending (weakest first)
+  var topics=Object.keys(topicStats).map(function(name){
+    var s=topicStats[name];
+    return{name:name,correct:s.correct,total:s.total,pct:Math.round(s.correct/s.total*100)};
+  }).sort(function(a,b){return a.pct-b.pct;});
+  // Overall stats
+  var totalAns=atts.flatMap(function(a){return(a.answers||[]).filter(function(x){return x!==null;});});
+  var totalCorrect=totalAns.filter(Boolean).length;
+  var overallPct=totalAns.length>0?Math.round(totalCorrect/totalAns.length*100):0;
+  var uniqueQs=Object.keys(qResults).length;
+  var avgTime=atts.length>0?Math.round(atts.reduce(function(s,a){return s+(a.exam_seconds||0);},0)/atts.length):0;
+  body.innerHTML=`
+    <div class="analytics-wrap">
+      <div class="back-header">
+        <button onclick="renderDashboard()">← Back</button>
+        <h2>📊 Analytics</h2>
+      </div>
+      <!-- Overview stats -->
+      <div class="analytics-grid">
+        <div class="stat-card">
+          <div class="stat-card-val" style="color:${overallPct>=70?'#16a34a':overallPct>=50?'#d97706':'#dc2626'}">${overallPct}%</div>
+          <div class="stat-card-lbl">Overall score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-val">${totalCorrect}<span style="font-size:16px;color:var(--gray400);">/${totalAns.length}</span></div>
+          <div class="stat-card-lbl">Questions correct</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-val">${atts.length}</div>
+          <div class="stat-card-lbl">Sessions completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-val">${uniqueQs}</div>
+          <div class="stat-card-lbl">Unique questions seen</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-val">${Math.floor(avgTime/60)}<span style="font-size:16px;color:var(--gray400);">min</span></div>
+          <div class="stat-card-lbl">Avg session time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-val" style="color:${topics.length>0&&topics[0].pct<50?'#dc2626':'#16a34a'}">${topics.length>0?topics[0].pct+'%':'—'}</div>
+          <div class="stat-card-lbl">Weakest topic score</div>
+        </div>
+      </div>
+      <!-- Topic breakdown -->
+      <div style="background:white;border:1px solid var(--gray200);border-radius:14px;padding:20px;box-shadow:var(--shadow);margin-bottom:20px;">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--gray800);">Performance by Topic <span style="font-size:12px;font-weight:400;color:var(--gray400);">(weakest first)</span></h3>
+        ${topics.length===0?'<p style="color:var(--gray400);font-size:13px;">No topic data yet.</p>':topics.map(function(t){
+          var col=t.pct>=70?'#16a34a':t.pct>=50?'#d97706':'#dc2626';
+          return '<div class="topic-row">'
+            +'<div class="topic-name">'+t.name+'</div>'
+            +'<div class="topic-bar-wrap"><div class="topic-bar" style="width:'+t.pct+'%;background:'+col+';"></div></div>'
+            +'<div class="topic-pct" style="color:'+col+'">'+t.pct+'%</div>'
+            +'<div class="topic-count">'+t.correct+'/'+t.total+'</div>'
+            +'</div>';
+        }).join('')}
+      </div>
+      <!-- Study suggestion -->
+      ${topics.length>0?`<div style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:16px;">
+        <div style="font-weight:700;color:#dc2626;margin-bottom:6px;">📌 Focus Area</div>
+        <div style="font-size:13px;color:var(--gray700);">Your weakest topic is <b>${topics[0].name}</b> at ${topics[0].pct}%. Consider creating an exam focused on this topic to improve.</div>
+      </div>`:''}
+    </div>`;
+}
+
+// ── EXPORT PDF (wrong answers) ──
+async function exportWrongAnswers(){
+  const body=document.getElementById('homeBody');
+  const origHTML=body.innerHTML;
+  body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div><p style="text-align:center;margin-top:12px;color:var(--gray500);font-size:13px;">Preparing PDF...</p></div>';
+  // Get all done attempts
+  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done');
+  if(!atts||!atts.length){toast('No completed exams found');body.innerHTML=origHTML;return;}
+  // Collect wrong question IDs
+  const wrongIds=[];
+  atts.forEach(function(att){
+    const ids=att.question_ids||[];
+    const ans=att.answers||[];
+    ids.forEach(function(id,i){if(ans[i]===false)wrongIds.push(id);});
+  });
+  const uniqueWrongIds=[...new Set(wrongIds)];
+  if(!uniqueWrongIds.length){toast('No wrong answers found!');body.innerHTML=origHTML;return;}
+  const{data:qs}=await sb.from('questions').select('*,categories(name)').in('id',uniqueWrongIds);
+  if(!qs||!qs.length){toast('Could not load questions');body.innerHTML=origHTML;return;}
+  // Build printable HTML
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Wrong Answers — MedExam</title>';
+  html+='<style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:24px;font-size:13px;line-height:1.6;}';
+  html+='.q-block{border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:20px;break-inside:avoid;}';
+  html+='.q-num{font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;}';
+  html+='.q-text{font-size:14px;font-weight:600;margin-bottom:12px;color:#1e293b;}';
+  html+='.q-correct{background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:8px 12px;color:#166534;font-weight:600;margin-bottom:8px;}';
+  html+='.q-exp{font-size:12px;color:#475569;margin-top:8px;}';
+  html+='.q-topic{font-size:11px;color:#94a3b8;margin-bottom:6px;}';
+  html+='h1{color:#1e293b;border-bottom:2px solid #e2e8f0;padding-bottom:12px;}';
+  html+='@media print{.q-block{break-inside:avoid;}}';
+  html+='</style></head><body>';
+  html+='<h1>📋 Wrong Answers Review</h1>';
+  html+='<p style="color:#64748b;margin-bottom:24px;">'+qs.length+' questions · Generated '+new Date().toLocaleDateString()+'</p>';
+  qs.forEach(function(q,i){
+    var opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d].filter(Boolean);
+    var correctOpt=opts[q.correct_answer]||'';
+    var correctLetter='ABCDEFGHIJ'[q.correct_answer]||'?';
+    var plainQ=(q.question_text||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+    html+='<div class="q-block">';
+    html+='<div class="q-num">Q'+(i+1)+(q.custom_id?' · '+q.custom_id:'')+(q.categories?.name?' · '+q.categories.name:'')+'</div>';
+    html+='<div class="q-text">'+plainQ+'</div>';
+    html+='<div class="q-correct">✓ '+correctLetter+'. '+correctOpt+'</div>';
+    if(q.take_home_message){
+      var plainTH=(q.take_home_message||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+      html+='<div class="q-exp"><b>Key point:</b> '+plainTH+'</div>';
+    }
+    html+='</div>';
+  });
+  html+='</body></html>';
+  // Open print window
+  var win=window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload=function(){win.print();};
+  body.innerHTML=origHTML;
+  toast('PDF ready — use your browser\'s print dialog to save as PDF 📄');
+}
+
+// ── TIMED MODE INTEGRATION WITH EXAM ──
+
+// ── ADMIN FLAGS ──
+async function loadFlagsTable(){
+  const wrap=document.getElementById('flags-wrap');
+  wrap.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
+  const{data:flags}=await sb.from('question_flags')
+    .select('*,questions(id,question_text,custom_id),profiles(full_name,email)')
+    .order('created_at',{ascending:false});
+  const badge=document.getElementById('admin-flags-badge');
+  const pending=(flags||[]).filter(function(f){return f.status==='pending';});
+  if(badge){badge.style.display=pending.length>0?'inline-flex':'none';badge.textContent=String(pending.length);}
+  if(!flags||!flags.length){
+    wrap.innerHTML='<div class="empty-state"><div class="esi">🚩</div><p>No flagged questions yet.</p></div>';
+    return;
+  }
+  wrap.innerHTML='<div class="sup-conv-list">'+flags.map(function(f){
+    var q=f.questions;var u=f.profiles;
+    var qText=q?(q.question_text||'').replace(/<[^>]*>/g,'').slice(0,60)+'…':'Unknown question';
+    var isPending=f.status==='pending';
+    return '<div class="sup-conv-item'+(isPending?' unread':'')+'" style="cursor:default;">'
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
+      +'<div style="flex:1;">'
+      +'<div class="sup-conv-name">'+(q?.custom_id||'Q')+' — '+qText+'</div>'
+      +'<div class="sup-conv-preview">🚩 '+f.reason+'</div>'
+      +'<div class="sup-conv-meta">by '+(u?.full_name||u?.email||'Unknown')+' · '+fmtSupTime(f.created_at)+'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0;">'
+      +(q?'<button class="btn btn-sm btn-secondary" onclick="openQModal(\''+q.id+'\')">Edit Q</button>':'')
+      +(isPending?'<button class="btn btn-sm" onclick="resolveFlagAdmin(\''+f.id+'\')" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac;">✓ Resolve</button>':'<span style="font-size:11px;color:#16a34a;font-weight:600;">Resolved</span>')
+      +'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('')+'</div>';
+}
+async function resolveFlagAdmin(flagId){
+  await sb.from('question_flags').update({status:'resolved'}).eq('id',flagId);
+  toast('Flag resolved ✓');
+  loadFlagsTable();
 }
 
 // ── SUPPORT CHAT ──
@@ -3287,6 +3610,7 @@ function aNav(sec,ev){
   else if(sec==='disciplines')loadDiscTable();
   else if(sec==='questions')loadAQSubjFilter();
   else if(sec==='users')loadUsersTable();
+  else if(sec==='flags'){loadFlagsTable();}
   else if(sec==='support'){loadSupportTable();document.getElementById('support-conv-wrap').style.display='block';document.getElementById('support-reply-panel').style.display='none';}
 }
 
