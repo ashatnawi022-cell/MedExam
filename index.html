@@ -910,6 +910,57 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
   </div>
 </div>
 
+<!-- Edit User Modal -->
+<div class="modal-bg" id="edit-user-modal" style="display:none;">
+  <div class="modal" style="max-width:420px;text-align:left;">
+    <button onclick="hideAModal('edit-user-modal')" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray400);line-height:1;padding:0;">×</button>
+    <h2>✏️ Edit User</h2>
+    <p style="font-size:13px;color:var(--gray500);margin-bottom:16px;">Editing: <b id="edit-user-name-label"></b></p>
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input type="text" class="form-input" id="edit-user-name" placeholder="Full name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">University</label>
+      <select class="form-input form-select" id="edit-user-uni">
+        <option value="University of Jordan">University of Jordan</option>
+        <option value="JUST">JUST</option>
+        <option value="Mutah University">Mutah University</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Year of Study</label>
+      <select class="form-input form-select" id="edit-user-year">
+        <option value="1">Year 1</option>
+        <option value="2">Year 2</option>
+        <option value="3">Year 3</option>
+        <option value="4">Year 4</option>
+        <option value="5">Year 5</option>
+        <option value="6">Year 6</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input form-select" id="edit-user-status">
+        <option value="approved">Approved</option>
+        <option value="pending">Pending</option>
+      </select>
+    </div>
+    <hr style="margin:16px 0;border:none;border-top:1px solid var(--gray100);">
+    <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:10px;padding:14px;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px;">⚠️ Reset User Progress</div>
+      <p style="font-size:12px;color:var(--gray500);margin-bottom:10px;">This will permanently delete all exam attempts and history for this user.</p>
+      <button class="btn btn-danger btn-sm" onclick="adminResetUserProgress()">Reset All Progress</button>
+    </div>
+    <div class="auth-err" id="edit-user-err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="hideAModal('edit-user-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditUser()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- Reset Password Modal -->
 <div class="modal-bg" id="reset-pass-modal" style="display:none;">
   <div class="modal" style="text-align:left;max-width:380px;">
@@ -3548,7 +3599,8 @@ async function loadUsersTable(){
              <button class="btn btn-sm btn-danger" onclick="rejectUser('${x.id}','${x.email||''}')">  Reject</button>`
           :`<button class="btn btn-sm btn-danger" onclick="revokeUser('${x.id}')">Revoke</button>`}
         <button class="btn btn-sm btn-secondary" onclick="toggleAdmin('${x.id}',${x.is_admin})">${x.is_admin?'Remove Admin':'Make Admin'}</button>
-        <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">  Reset Pass</button>
+        <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">🔑 Reset Pass</button>
+        <button class="btn btn-sm" onclick="openEditUserModal('${x.id}')" style="background:#eff6ff;color:var(--blue);border:1px solid #93c5fd;">✏️ Edit</button>
       </td>
     </tr>`;
   };
@@ -3581,6 +3633,46 @@ async function rejectUser(id,email){
   toast('User rejected and removed');loadUsersTable();
 }
 async function toggleAdmin(id,is){await sb.from('profiles').update({is_admin:!is}).eq('id',id);toast(is?'Admin removed':'Admin granted');loadUsersTable();}
+
+// ── EDIT USER (ADMIN) ──
+let editUserId=null;
+async function openEditUserModal(id){
+  editUserId=id;
+  const{data:u}=await sb.from('profiles').select('*').eq('id',id).single();
+  if(!u){toast('Could not load user');return;}
+  document.getElementById('edit-user-name-label').textContent=u.full_name||u.email||id;
+  document.getElementById('edit-user-name').value=u.full_name||'';
+  document.getElementById('edit-user-uni').value=u.university||'University of Jordan';
+  document.getElementById('edit-user-year').value=String(u.year_of_study||1);
+  document.getElementById('edit-user-status').value=u.status||'approved';
+  document.getElementById('edit-user-err').classList.remove('show');
+  showAModal('edit-user-modal');
+}
+async function saveEditUser(){
+  const name=document.getElementById('edit-user-name').value.trim();
+  const uni=document.getElementById('edit-user-uni').value;
+  const year=parseInt(document.getElementById('edit-user-year').value);
+  const status=document.getElementById('edit-user-status').value;
+  const errEl=document.getElementById('edit-user-err');
+  errEl.classList.remove('show');
+  if(!name){errEl.textContent='Name cannot be empty.';errEl.classList.add('show');return;}
+  const{error}=await sb.from('profiles').update({
+    full_name:name,
+    university:uni,
+    year_of_study:year,
+    status:status
+  }).eq('id',editUserId);
+  if(error){errEl.textContent='Error: '+error.message;errEl.classList.add('show');return;}
+  hideAModal('edit-user-modal');
+  toast('User updated! ✓');
+  loadUsersTable();
+}
+async function adminResetUserProgress(){
+  if(!confirm('Reset ALL exam progress for this user? This cannot be undone.'))return;
+  const{error}=await sb.from('attempts').delete().eq('user_id',editUserId);
+  if(error){toast('Error: '+error.message);return;}
+  toast('Progress reset! ✓');
+}
 
 //    RESET PASSWORD   
 let resetPassUserId=null;
