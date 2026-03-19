@@ -374,6 +374,12 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .ans-stats-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray400);margin-bottom:4px;}
 
 /* -- SUPPORT CHAT -- */
+/* -- LOADING OVERLAY -- */
+#app-loader{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999;}
+#app-loader .load-logo{color:white;font-family:'DM Serif Display',serif;font-size:28px;}
+#app-loader .load-logo span{color:#4fc3f7;}
+#app-loader .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;}
+/* -- END LOADING OVERLAY -- */
 .support-fab{position:fixed;bottom:20px;right:20px;background:var(--navy2);color:white;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.25);z-index:200;display:flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
 .support-fab:hover{background:#0f2744;transform:translateY(-1px);}
 .support-fab .sup-badge{background:#ef4444;color:white;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-left:2px;}
@@ -426,7 +432,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <body>
 
 <!-- AUTH PAGE -->
-<div id="authPage" class="page active">
+<div id="authPage" class="page" style="display:none;">
   <div class="auth-wrap">
     <div class="auth-left">
       <div>
@@ -1401,7 +1407,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <body>
 
 <!-- AUTH PAGE -->
-<div id="authPage" class="page active">
+<div id="authPage" class="page" style="display:none;">
   <div class="auth-wrap">
     <div class="auth-left">
       <div>
@@ -1842,6 +1848,12 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
   </div>
 </div>
 
+<!-- App Loading Overlay -->
+<div id="app-loader">
+  <div class="load-logo">Med<span>Exam</span></div>
+  <div class="spinner"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -1868,6 +1880,8 @@ const PAGE_ROUTES={
   'pendingPage':'pending'
 };
 const ROUTE_PAGES=Object.fromEntries(Object.entries(PAGE_ROUTES).map(([k,v])=>[v,k]));
+// Sub-page routes within homePage
+const SUB_ROUTES={'create':showCreateExam,'settings':showSettings,'exams':goMyExams};
 
 function showPage(id,pushHistory=true){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
@@ -1887,13 +1901,15 @@ function showPage(id,pushHistory=true){
 window.addEventListener('popstate',async function(ev){
   if(!CU){showPage('authPage',false);return;}
   const hash=window.location.hash.replace('#','');
+  // Handle sub-pages within homePage (forward navigation)
+  if(hash==='create'){showPage('homePage',false);showCreateExam();return;}
+  if(hash==='settings'){showPage('homePage',false);showSettings();return;}
+  if(hash==='exams'){showPage('homePage',false);goMyExams();return;}
   const pageId=ROUTE_PAGES[hash]||'homePage';
-  // Don't navigate to auth/pending via back button if logged in
   if(pageId==='authPage'||pageId==='pendingPage'){
     showPage('homePage',false);renderDashboard();return;
   }
   if(pageId==='examPage'){
-    // Can't resume exam via back button - go home
     showPage('homePage',false);renderDashboard();return;
   }
   if(pageId==='adminPage'){
@@ -1901,7 +1917,6 @@ window.addEventListener('popstate',async function(ev){
     else{showPage('homePage',false);renderDashboard();}
     return;
   }
-
   showPage('homePage',false);renderDashboard();
 });
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
@@ -2041,6 +2056,7 @@ async function loadHome(){
 }
 
 async function renderDashboard(){
+  if(window.location.hash&&window.location.hash!=='#home'&&window.location.hash!=='#exam')history.pushState({page:"homePage"},"","#home");
   const body=document.getElementById('homeBody');
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   await loadHome();
@@ -2141,6 +2157,7 @@ function setFilter(f){
 }
 
 function showCreateExam(){
+  history.pushState({page:"createExam"},"","#create");
   const prevSlider=document.getElementById('qcount-slider')?.value||'20';
   const body=document.getElementById('homeBody');
   body.innerHTML=`
@@ -2438,6 +2455,8 @@ async function generateSession(){
 }
 
 async function goMyExams(){
+  history.pushState({page:"myExams"},"","#exams");
+  history.pushState({page:"myExams"},"","#exams");
   const body=document.getElementById('homeBody');
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).order('updated_at',{ascending:false});
@@ -2471,6 +2490,7 @@ async function goMyExams(){
 }
 
 async function showSettings(){
+  history.pushState({page:"settings"},"","#settings");
   const body=document.getElementById('homeBody');
   body.innerHTML=`
     <div class="page-body" style="max-width:600px;margin:0 auto;padding:28px 24px 80px;">
@@ -4284,6 +4304,10 @@ document.addEventListener('keydown',function(ev){
   }
 });
 (async()=>{
+  // Show loader instead of auth page while checking session
+  const loader=document.getElementById('app-loader');
+  function hideLoader(){if(loader)loader.style.display='none';}
+
   // Try to get existing session first (handles page refreshes)
   let{data:{session}}=await sb.auth.getSession();
   // If no session found, try refreshing from stored token
@@ -4292,14 +4316,17 @@ document.addEventListener('keydown',function(ev){
   }
   if(session){
     await initApp();
-    // Restore page from URL hash after login
+    hideLoader();
+    // Restore page from URL hash after refresh
     const hash=window.location.hash.replace('#','');
     if(hash==='admin'&&CP?.is_admin){showPage('adminPage',false);loadSubjTable();}
   } else {
+    hideLoader();
     // Wait for OAuth redirect (Google sign-in) to complete
     const{data:{subscription}}=sb.auth.onAuthStateChange(async function(event,newSession){
       if(event==='SIGNED_IN'&&newSession){
         subscription.unsubscribe();
+        if(loader)loader.style.display='none';
         await initApp();
       } else if(event==='SIGNED_OUT'){
         showPage('authPage',false);showLogin();
