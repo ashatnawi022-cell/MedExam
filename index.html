@@ -3459,14 +3459,15 @@ function initDrawCanvas(){
   drawCtx=drawCanvas.getContext('2d');
 
   drawCanvas.addEventListener('pointerdown',function(ev){
-    // Accept pen and mouse; reject finger touch (forward to element below)
+    // Palm rejection: large contact area = palm, ignore it
     if(ev.pointerType==='touch'){
-      // Temporarily hide canvas so the touch hits whatever is underneath
+      var contactArea=(ev.width||1)*(ev.height||1);
+      if(contactArea>1500){return;} // palm — very large contact patch
+      // Regular finger touch: forward to element below
       drawCanvas.style.pointerEvents='none';
       var el=document.elementFromPoint(ev.clientX,ev.clientY);
       drawCanvas.style.pointerEvents='all';
       if(el&&el!==drawCanvas){
-        // Dispatch a synthetic click/pointer to the element below
         el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,clientX:ev.clientX,clientY:ev.clientY,pointerId:ev.pointerId,pointerType:ev.pointerType}));
       }
       return;
@@ -3476,6 +3477,9 @@ function initDrawCanvas(){
     ev.stopPropagation();
     isDrawing=true;
     drawCanvas.setPointerCapture(ev.pointerId);
+    // Snapshot current canvas as base before this stroke begins
+    drawStrokeImgCache=new Image();
+    drawStrokeImgCache.src=drawCanvas.toDataURL();
     // Create offscreen canvas for this stroke (prevents alpha accumulation)
     drawOffscreen=document.createElement('canvas');
     drawOffscreen.width=drawCanvas.width;
@@ -3497,14 +3501,13 @@ function initDrawCanvas(){
     applyDrawStyle(drawOffCtx);
     drawOffCtx.lineTo(p.x,p.y);
     drawOffCtx.stroke();
-    // Composite: redraw base + current stroke onto visible canvas
+    // Composite: base snapshot + current stroke onto visible canvas
     drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-    // Restore saved strokes
-    if(ES&&drawStrokes[ES.cur]){
-      var img=drawStrokeImgCache;
-      if(img&&img.complete){
-        drawCtx.drawImage(img,0,0);
-      }
+    // Always draw base first (synchronous since we set src before any async)
+    if(drawStrokeImgCache&&drawStrokeImgCache.complete&&drawStrokeImgCache.naturalWidth>0){
+      drawCtx.globalAlpha=1;
+      drawCtx.globalCompositeOperation='source-over';
+      drawCtx.drawImage(drawStrokeImgCache,0,0);
     }
     // Composite current stroke with constant alpha
     if(drawTool==='highlight'){
@@ -3528,6 +3531,11 @@ function initDrawCanvas(){
     isDrawing=false;
     // Flatten offscreen stroke into main canvas permanently
     if(drawOffscreen){
+      // Restore base first in case we're mid-clear
+      if(drawStrokeImgCache&&drawStrokeImgCache.complete&&drawStrokeImgCache.naturalWidth>0){
+        drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+        drawCtx.drawImage(drawStrokeImgCache,0,0);
+      }
       drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
       drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
       drawCtx.drawImage(drawOffscreen,0,0);
@@ -3542,6 +3550,7 @@ function initDrawCanvas(){
   drawCanvas.addEventListener('pointercancel',function(ev){
     isDrawing=false;
     drawOffscreen=null;drawOffCtx=null;
+    drawStrokeImgCache=null;
   });
 
   var main=document.getElementById('exam-main');
