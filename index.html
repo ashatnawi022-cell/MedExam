@@ -1859,11 +1859,51 @@ const LTRS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let CU=null,CP=null;
 
 //    PAGE   
-function showPage(id){
+// ── ROUTING: hash-based navigation for back/forward and refresh ──
+const PAGE_ROUTES={
+  'homePage':'home',
+  'adminPage':'admin',
+  'examPage':'exam',
+  'authPage':'auth',
+  'pendingPage':'pending'
+};
+const ROUTE_PAGES=Object.fromEntries(Object.entries(PAGE_ROUTES).map(([k,v])=>[v,k]));
+
+function showPage(id,pushHistory=true){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
-  const el=document.getElementById(id);el.classList.add('active');
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('active');
   el.style.display=id==='examPage'?'flex':'block';
+  // Update URL hash
+  const route=PAGE_ROUTES[id];
+  if(route&&pushHistory){
+    const newHash='#'+route;
+    if(window.location.hash!==newHash)history.pushState({page:id},''  ,newHash);
+  }
 }
+
+// Handle browser back/forward
+window.addEventListener('popstate',async function(ev){
+  if(!CU){showPage('authPage',false);return;}
+  const hash=window.location.hash.replace('#','');
+  const pageId=ROUTE_PAGES[hash]||'homePage';
+  // Don't navigate to auth/pending via back button if logged in
+  if(pageId==='authPage'||pageId==='pendingPage'){
+    showPage('homePage',false);renderDashboard();return;
+  }
+  if(pageId==='examPage'){
+    // Can't resume exam via back button - go home
+    showPage('homePage',false);renderDashboard();return;
+  }
+  if(pageId==='adminPage'){
+    if(CP?.is_admin){showPage('adminPage',false);loadSubjTable();}
+    else{showPage('homePage',false);renderDashboard();}
+    return;
+  }
+
+  showPage('homePage',false);renderDashboard();
+});
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 
 //    AUTH   
@@ -1939,13 +1979,13 @@ async function doRegister(){
   }
 }
 async function doLogout(){
-  await sb.auth.signOut();CU=null;CP=null;showPage('authPage');showLogin();
+  await sb.auth.signOut();CU=null;CP=null;showPage('authPage',false);showLogin();
 }
 
 //    INIT   
 async function initApp(){
   const{data:{user}}=await sb.auth.getUser();
-  if(!user){showPage('authPage');return;}
+  if(!user){showPage('authPage',false);return;}
   CU=user;
   // always hide admin button first
   document.getElementById('navAdminBadge').style.display='none';
@@ -1955,7 +1995,7 @@ async function initApp(){
   if(pErr){console.error('Profile fetch error:',pErr);showPage('homePage');renderDashboard();return;}
   const isAdmin=p?.is_admin===true;
   const isApproved=p?.status==='approved';
-  if(!isAdmin&&!isApproved){showPage('pendingPage');return;}
+  if(!isAdmin&&!isApproved){showPage('pendingPage',false);return;}
   document.getElementById('navUser').textContent=p?.full_name||user.email;
   if(isAdmin){
     document.getElementById('navAdminBadge').style.display='inline';
@@ -4244,24 +4284,30 @@ document.addEventListener('keydown',function(ev){
   }
 });
 (async()=>{
-  // Handle OAuth redirects (Google sign-in) - session arrives via URL hash
-  const{data:{session}}=await sb.auth.getSession();
+  // Try to get existing session first (handles page refreshes)
+  let{data:{session}}=await sb.auth.getSession();
+  // If no session found, try refreshing from stored token
+  if(!session){
+    try{const r=await sb.auth.refreshSession();session=r.data?.session||null;}catch(e){}
+  }
   if(session){
     await initApp();
+    // Restore page from URL hash after login
+    const hash=window.location.hash.replace('#','');
+    if(hash==='admin'&&CP?.is_admin){showPage('adminPage',false);loadSubjTable();}
   } else {
-    // Listen for auth state changes - fires when OAuth redirect completes
-    const{data:{subscription}}=sb.auth.onAuthStateChange(async function(event,session){
-      if(event==='SIGNED_IN'&&session){
+    // Wait for OAuth redirect (Google sign-in) to complete
+    const{data:{subscription}}=sb.auth.onAuthStateChange(async function(event,newSession){
+      if(event==='SIGNED_IN'&&newSession){
         subscription.unsubscribe();
         await initApp();
       } else if(event==='SIGNED_OUT'){
-        showPage('authPage');showLogin();
+        showPage('authPage',false);showLogin();
       }
     });
-    showPage('authPage');
+    showPage('authPage',false);
   }
 })();
-
 //    DISCIPLINES   
 let editDiscId=null;
 async function loadDiscTable(){
