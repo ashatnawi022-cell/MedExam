@@ -3550,6 +3550,11 @@ function removeOpt(btn){
 }
 function selCorrect(i){selCorr=i;document.querySelectorAll('.corr-btn').forEach((b,j)=>b.classList.toggle('sel',j===i));}
 
+function rteClearAll(){
+  rteSetHTML('rte-qtext','');
+  rteSetHTML('rte-exp','');
+  rteSetHTML('rte-th','');
+}
 async function openQModal(id=null){
   editQId=id;selCorr=null;
   document.getElementById('q-modal-title').textContent=id?'Edit Question':'Add Question';
