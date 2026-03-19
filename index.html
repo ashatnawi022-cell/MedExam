@@ -3430,6 +3430,10 @@ var drawOffscreen=null;
 var drawOffCtx=null;
 var isDrawing=false;
 var drawInited=false;
+var drawStartPt=null;      // first point of current stroke
+var drawLastPt=null;       // last point (for straighten)
+var drawStraightenTimer=null; // timer for hold-to-straighten
+var drawStraightened=false;   // whether current stroke was straightened
 
 // Store strokes as ImageData (raw pixels) - instant get/put, no encoding
 var drawSnapshots={}; // qIdx -> ImageData (committed strokes)
@@ -3504,9 +3508,32 @@ function initDrawCanvas(){
     drawOffscreen.height=drawCanvas.height;
     drawOffCtx=drawOffscreen.getContext('2d');
     var p=getPt(ev);
+    drawStartPt=p;
+    drawLastPt=p;
+    drawStraightened=false;
     drawOffCtx.beginPath();
     drawOffCtx.moveTo(p.x,p.y);
     applyDrawStyle(drawOffCtx);
+    // Start hold-to-straighten timer
+    clearTimeout(drawStraightenTimer);
+    drawStraightenTimer=setTimeout(function(){
+      if(!isDrawing||!drawStartPt||!drawLastPt)return;
+      // Straighten: replace offscreen stroke with a single line start→last
+      drawStraightened=true;
+      drawOffCtx.clearRect(0,0,drawOffscreen.width,drawOffscreen.height);
+      applyDrawStyle(drawOffCtx);
+      drawOffCtx.beginPath();
+      drawOffCtx.moveTo(drawStartPt.x,drawStartPt.y);
+      drawOffCtx.lineTo(drawLastPt.x,drawLastPt.y);
+      drawOffCtx.stroke();
+      // Redraw visible canvas with straightened line
+      drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+      if(drawBaseSnap){try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
+      drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
+      drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
+      drawCtx.drawImage(drawOffscreen,0,0);
+      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
+    },800);
   },{passive:false});
 
   drawCanvas.addEventListener('pointermove',function(ev){
@@ -3514,6 +3541,42 @@ function initDrawCanvas(){
     if(!drawMode||!isDrawing)return;
     ev.preventDefault();ev.stopPropagation();
     var p=getPt(ev);
+    // If already straightened, just update the endpoint live
+    if(drawStraightened){
+      drawLastPt=p;
+      drawOffCtx.clearRect(0,0,drawOffscreen.width,drawOffscreen.height);
+      applyDrawStyle(drawOffCtx);
+      drawOffCtx.beginPath();
+      drawOffCtx.moveTo(drawStartPt.x,drawStartPt.y);
+      drawOffCtx.lineTo(p.x,p.y);
+      drawOffCtx.stroke();
+      drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+      if(drawBaseSnap){try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
+      drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
+      drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
+      drawCtx.drawImage(drawOffscreen,0,0);
+      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
+      return;
+    }
+    // Normal drawing — track last point, reset straighten timer on movement
+    drawLastPt=p;
+    clearTimeout(drawStraightenTimer);
+    drawStraightenTimer=setTimeout(function(){
+      if(!isDrawing||!drawStartPt||!drawLastPt)return;
+      drawStraightened=true;
+      drawOffCtx.clearRect(0,0,drawOffscreen.width,drawOffscreen.height);
+      applyDrawStyle(drawOffCtx);
+      drawOffCtx.beginPath();
+      drawOffCtx.moveTo(drawStartPt.x,drawStartPt.y);
+      drawOffCtx.lineTo(drawLastPt.x,drawLastPt.y);
+      drawOffCtx.stroke();
+      drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+      if(drawBaseSnap){try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
+      drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
+      drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
+      drawCtx.drawImage(drawOffscreen,0,0);
+      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
+    },800);
     applyDrawStyle(drawOffCtx);
     drawOffCtx.lineTo(p.x,p.y);
     drawOffCtx.stroke();
@@ -3537,6 +3600,9 @@ function initDrawCanvas(){
     if(ev.pointerType==='touch')return;
     if(!isDrawing)return;
     isDrawing=false;
+    clearTimeout(drawStraightenTimer);
+    drawStraightened=false;
+    drawStartPt=null;drawLastPt=null;
     if(drawOffscreen){
       // Restore base then flatten stroke
       if(drawBaseSnap){
@@ -3558,6 +3624,8 @@ function initDrawCanvas(){
 
   drawCanvas.addEventListener('pointercancel',function(ev){
     isDrawing=false;
+    clearTimeout(drawStraightenTimer);
+    drawStraightened=false;drawStartPt=null;drawLastPt=null;
     drawOffscreen=null;drawOffCtx=null;drawBaseSnap=null;
   });
 
