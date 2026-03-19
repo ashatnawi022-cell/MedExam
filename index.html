@@ -1847,7 +1847,14 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SURL='https://vuiutunyhiwcritvyowe.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1aXV0dW55aGl3Y3JpdHZ5b3dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MzM1ODUsImV4cCI6MjA4OTQwOTU4NX0.1u_7oTqeym3OEnD5LYdmoeTkAeDRqqn8sgJ3tEMJZJA';
-const sb=supabase.createClient(SURL,SKEY);
+const sb=supabase.createClient(SURL,SKEY,{
+  auth:{
+    persistSession:true,
+    autoRefreshToken:true,
+    detectSessionInUrl:true,
+    storage:window.localStorage
+  }
+});
 const LTRS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let CU=null,CP=null;
 
@@ -4237,9 +4244,22 @@ document.addEventListener('keydown',function(ev){
   }
 });
 (async()=>{
+  // Handle OAuth redirects (Google sign-in) - session arrives via URL hash
   const{data:{session}}=await sb.auth.getSession();
-  if(session)await initApp();
-  else showPage('authPage');
+  if(session){
+    await initApp();
+  } else {
+    // Listen for auth state changes - fires when OAuth redirect completes
+    const{data:{subscription}}=sb.auth.onAuthStateChange(async function(event,session){
+      if(event==='SIGNED_IN'&&session){
+        subscription.unsubscribe();
+        await initApp();
+      } else if(event==='SIGNED_OUT'){
+        showPage('authPage');showLogin();
+      }
+    });
+    showPage('authPage');
+  }
 })();
 
 //    DISCIPLINES   
