@@ -472,7 +472,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
           Continue with Google
         </button>
         <div class="auth-switch">No account? <a onclick="showReg()">Create one</a></div>
-        <div style="text-align:center;margin-top:12px;"><a href="mailto:support@medexam.jo" style="font-size:12px;color:var(--gray400);">✉️ Contact Support</a></div>
+        <div style="text-align:center;margin-top:12px;"><a href="/cdn-cgi/l/email-protection#33404643435c4147735e5657564b525e1d595c" style="font-size:12px;color:var(--gray400);">✉️ Contact Support</a></div>
       </div>
 
       <!-- Forgot Password Box -->
@@ -1793,7 +1793,7 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SURL='https://vuiutunyhiwcritvyowe.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1aXV0dW55aGl3Y3JpdHZ5b3dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MzM1ODUsImV4cCI6MjA4OTQwOTU4NX0.1u_7oTqeym3OEnD5LYdmoeTkAeDRqqn8sgJ3tEMJZJA';
 const sb=supabase.createClient(SURL,SKEY);
@@ -2874,10 +2874,16 @@ async function loadSupportConv(){
       msgs.appendChild(um);
       // Admin reply if exists
       if(m.reply){
-        const am=document.createElement('div');
-        am.className='sup-msg admin';
-        am.innerHTML='<div><b style="font-size:11px;color:var(--blue);">Admin</b><br>'+escHtml(m.reply)+'</div><div class="sup-msg-time">'+fmtSupTime(m.replied_at)+'</div>';
-        msgs.appendChild(am);
+        const replies=m.reply.split('|||');
+        const times=(m.reply_times||m.replied_at||'').toString().split('|||');
+        replies.forEach(function(r,ri){
+          if(!r.trim())return;
+          const am=document.createElement('div');
+          am.className='sup-msg admin';
+          am.innerHTML='<div><b style="font-size:11px;color:var(--blue);">Admin</b><br>'+escHtml(r.trim())+'</div>'
+            +'<div class="sup-msg-time">'+(times[ri]?fmtSupTime(times[ri]):fmtSupTime(m.replied_at))+'</div>';
+          msgs.appendChild(am);
+        });
       }
     });
     // Mark as read
@@ -2949,26 +2955,43 @@ async function openSupportConv(userId, userName){
   document.getElementById('support-conv-wrap').style.display='none';
   const panel=document.getElementById('support-reply-panel');
   panel.style.display='block';
-  document.getElementById('support-reply-name').textContent=userName;
   panel.dataset.userId=userId;
   const msgsEl=document.getElementById('sup-admin-msgs');
   msgsEl.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
+
+  // Load all messages for this user (both user msgs and admin replies)
   const{data}=await sb.from('support_messages')
     .select('*')
     .eq('user_id',userId)
     .order('created_at',{ascending:true});
+
+  // Get user email from first message
+  const userEmail=data&&data.length?data[0].user_email:'';
+  const displayName=userName+(userEmail&&userEmail!==userName?' ('+userEmail+')':'');
+  document.getElementById('support-reply-name').textContent=displayName;
+
   msgsEl.innerHTML='';
   if(data){
     data.forEach(function(m){
+      // User message bubble
       const um=document.createElement('div');
       um.className='sup-msg user';
-      um.innerHTML='<div><b style="font-size:11px;">'+escHtml(m.user_name||m.user_email||'User')+'</b><br>'+escHtml(m.message)+'</div><div class="sup-msg-time">'+fmtSupTime(m.created_at)+'</div>';
+      um.innerHTML='<div><b style="font-size:11px;">'+escHtml(m.user_name||m.user_email||'User')+'</b><br>'+escHtml(m.message)+'</div>'
+        +'<div class="sup-msg-time">'+fmtSupTime(m.created_at)+'</div>';
       msgsEl.appendChild(um);
+      // Admin reply for this message (if any) - stored in reply column
       if(m.reply){
-        const am=document.createElement('div');
-        am.className='sup-msg admin';
-        am.innerHTML='<div><b style="font-size:11px;color:var(--blue);">You (Admin)</b><br>'+escHtml(m.reply)+'</div><div class="sup-msg-time">'+fmtSupTime(m.replied_at)+'</div>';
-        msgsEl.appendChild(am);
+        // Split replies by separator in case multiple were concatenated (old behavior)
+        const replies=m.reply.split('|||');
+        const times=(m.reply_times||m.replied_at||'').toString().split('|||');
+        replies.forEach(function(r,ri){
+          if(!r.trim())return;
+          const am=document.createElement('div');
+          am.className='sup-msg admin';
+          am.innerHTML='<div><b style="font-size:11px;color:var(--blue);">Admin</b><br>'+escHtml(r.trim())+'</div>'
+            +'<div class="sup-msg-time">'+(times[ri]?fmtSupTime(times[ri]):fmtSupTime(m.replied_at))+'</div>';
+          msgsEl.appendChild(am);
+        });
       }
     });
   }
@@ -2986,21 +3009,36 @@ async function sendAdminReply(){
   const reply=input.value.trim();
   if(!reply)return;
   const userId=document.getElementById('support-reply-panel').dataset.userId;
-  // Find the latest unreplied message from this user
-  const{data:msgs}=await sb.from('support_messages')
-    .select('id')
+  const now=new Date().toISOString();
+
+  // Get the latest message from this user to attach reply to
+  const{data:allMsgs}=await sb.from('support_messages')
+    .select('id,reply,reply_times,replied_at')
     .eq('user_id',userId)
-    .is('reply',null)
     .order('created_at',{ascending:false})
     .limit(1);
-  if(!msgs||!msgs.length){
-    // Reply to latest message
-    const{data:all}=await sb.from('support_messages').select('id').eq('user_id',userId).order('created_at',{ascending:false}).limit(1);
-    if(!all||!all.length){toast('No message to reply to');return;}
-    await sb.from('support_messages').update({reply,replied_at:new Date().toISOString(),is_read:false}).eq('id',all[0].id);
+
+  if(!allMsgs||!allMsgs.length){toast('No message found');return;}
+
+  const latest=allMsgs[0];
+  let newReply, newTimes;
+
+  if(latest.reply){
+    // Append to existing reply using separator
+    newReply=latest.reply+'|||'+reply;
+    const existingTimes=latest.reply_times||latest.replied_at||now;
+    newTimes=existingTimes+'|||'+now;
   } else {
-    await sb.from('support_messages').update({reply,replied_at:new Date().toISOString(),is_read:false}).eq('id',msgs[0].id);
+    newReply=reply;
+    newTimes=now;
   }
+
+  const{error}=await sb.from('support_messages')
+    .update({reply:newReply, reply_times:newTimes, replied_at:now, is_read:false})
+    .eq('id',latest.id);
+
+  if(error){toast('Error: '+error.message);return;}
+
   input.value='';
   toast('Reply sent! ✓');
   openSupportConv(userId,document.getElementById('support-reply-name').textContent);
@@ -4155,13 +4193,7 @@ function rteGetHTML(edId){
 }
 function rteSetHTML(edId,html){
     const el=document.getElementById(edId);
-  if(el)el.innerHTML=html||'';
-}
-function rteClearAll(){
-  rteSetHTML('rte-exp','');
-  rteSetHTML('rte-th','');
-  rteSetHTML('rte-qtext','');
-}
+  if(el)el.innerHTML=html;}
 </script>
 </body>
 </html>
