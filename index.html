@@ -3429,23 +3429,18 @@ var drawCanvas=null;
 var isDrawing=false;
 var drawStrokes={};
 var drawInited=false;
-var drawCanvasRect={top:0,left:0,width:0,height:0};
 
 function fitDrawCanvas(){
   if(!drawCanvas)return;
   var main=document.getElementById('exam-main');
   if(!main)return;
   var r=main.getBoundingClientRect();
-  // Position canvas exactly over exam-main
   drawCanvas.style.top=r.top+'px';
   drawCanvas.style.left=r.left+'px';
   drawCanvas.style.width=r.width+'px';
   drawCanvas.style.height=r.height+'px';
-  // Store for coordinate math
-  drawCanvasRect={top:r.top,left:r.left,width:r.width,height:r.height,scrollTop:main.scrollTop};
-  // Set pixel dimensions (only if changed, to avoid clearing)
   if(drawCanvas.width!==Math.round(r.width)||drawCanvas.height!==Math.round(r.height)){
-    var saved=drawCanvas.width>0?drawCanvas.toDataURL():null;
+    var saved=(drawCanvas.width>0&&drawCanvas.height>0)?drawCanvas.toDataURL():null;
     drawCanvas.width=Math.round(r.width);
     drawCanvas.height=Math.round(r.height);
     drawCtx=drawCanvas.getContext('2d');
@@ -3457,14 +3452,25 @@ function initDrawCanvas(){
   if(drawInited)return;
   drawCanvas=document.getElementById('draw-canvas');
   if(!drawCanvas){console.error('draw-canvas not found');return;}
-  drawCtx=drawCanvas.getContext('2d');
   fitDrawCanvas();
-  // Pointer events for pen + mouse (NOT touch - so finger scroll still works)
+  drawCtx=drawCanvas.getContext('2d');
+
   drawCanvas.addEventListener('pointerdown',function(ev){
-    // Only pen or mouse, not finger touch
-    if(ev.pointerType==='touch')return;
+    // Accept pen and mouse; reject finger touch (forward to element below)
+    if(ev.pointerType==='touch'){
+      // Temporarily hide canvas so the touch hits whatever is underneath
+      drawCanvas.style.pointerEvents='none';
+      var el=document.elementFromPoint(ev.clientX,ev.clientY);
+      drawCanvas.style.pointerEvents='all';
+      if(el&&el!==drawCanvas){
+        // Dispatch a synthetic click/pointer to the element below
+        el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,clientX:ev.clientX,clientY:ev.clientY,pointerId:ev.pointerId,pointerType:ev.pointerType}));
+      }
+      return;
+    }
     if(!drawMode)return;
     ev.preventDefault();
+    ev.stopPropagation();
     isDrawing=true;
     drawCanvas.setPointerCapture(ev.pointerId);
     var p=getPt(ev);
@@ -3472,15 +3478,20 @@ function initDrawCanvas(){
     drawCtx.moveTo(p.x,p.y);
     applyDrawStyle();
   },{passive:false});
+
   drawCanvas.addEventListener('pointermove',function(ev){
-    if(!isDrawing||!drawMode)return;
+    if(ev.pointerType==='touch')return;
+    if(!drawMode||!isDrawing)return;
     ev.preventDefault();
+    ev.stopPropagation();
     var p=getPt(ev);
     applyDrawStyle();
     drawCtx.lineTo(p.x,p.y);
     drawCtx.stroke();
   },{passive:false});
+
   drawCanvas.addEventListener('pointerup',function(ev){
+    if(ev.pointerType==='touch')return;
     if(!isDrawing)return;
     isDrawing=false;
     drawCtx.beginPath();
@@ -3488,41 +3499,46 @@ function initDrawCanvas(){
     drawCtx.globalCompositeOperation='source-over';
     if(ES)drawStrokes[ES.cur]=drawCanvas.toDataURL();
   },{passive:false});
+
   drawCanvas.addEventListener('pointercancel',function(ev){
     isDrawing=false;
+    drawCtx.beginPath();
+    drawCtx.globalAlpha=1;
+    drawCtx.globalCompositeOperation='source-over';
   });
-  // Keep canvas positioned correctly on scroll and resize
+
   var main=document.getElementById('exam-main');
-  if(main)main.addEventListener('scroll',fitDrawCanvas);
+  if(main)main.addEventListener('scroll',function(){if(drawMode)fitDrawCanvas();});
   window.addEventListener('resize',function(){if(drawMode)fitDrawCanvas();});
   drawInited=true;
+  console.log('Draw canvas ready');
 }
 
 function applyDrawStyle(){
   if(!drawCtx)return;
   if(drawTool==='erase'){
     drawCtx.globalCompositeOperation='destination-out';
-    drawCtx.lineWidth=28;drawCtx.globalAlpha=1;
+    drawCtx.lineWidth=28;
+    drawCtx.globalAlpha=1;
     drawCtx.strokeStyle='rgba(0,0,0,1)';
   } else if(drawTool==='highlight'){
     drawCtx.globalCompositeOperation='source-over';
     drawCtx.strokeStyle=drawColor;
-    drawCtx.lineWidth=14;drawCtx.globalAlpha=0.08;
+    drawCtx.lineWidth=14;
+    drawCtx.globalAlpha=0.08;
   } else {
     drawCtx.globalCompositeOperation='source-over';
     drawCtx.strokeStyle=drawColor;
-    drawCtx.lineWidth=2.5;drawCtx.globalAlpha=1;
+    drawCtx.lineWidth=2.5;
+    drawCtx.globalAlpha=1;
   }
-  drawCtx.lineCap='round';drawCtx.lineJoin='round';
+  drawCtx.lineCap='round';
+  drawCtx.lineJoin='round';
 }
 
 function getPt(ev){
-  // Coords relative to canvas (which is positioned over exam-main)
   var r=drawCanvas.getBoundingClientRect();
-  return{
-    x:ev.clientX-r.left,
-    y:ev.clientY-r.top
-  };
+  return{x:ev.clientX-r.left, y:ev.clientY-r.top};
 }
 
 function restoreDrawing(){
@@ -3552,13 +3568,16 @@ function toggleDrawMode(){
   if(drawMode){
     fitDrawCanvas();
     drawCanvas.style.display='block';
-    // pointer-events:none always — we capture events manually via pointerdown
-    // This means the canvas never blocks clicks on the page!
-    drawCanvas.style.pointerEvents='none';
+    // pointer-events:all so canvas receives pen events
+    // touch events on canvas return early so they don't block finger taps
+    drawCanvas.style.pointerEvents='all';
+    drawCanvas.style.cursor='crosshair';
     if(toolbar)toolbar.classList.add('visible');
     if(btn){btn.textContent='✋ Stop';btn.style.background='rgba(255,255,255,0.9)';btn.style.color='var(--navy2)';}
     restoreDrawing();
   } else {
+    drawCanvas.style.pointerEvents='none';
+    drawCanvas.style.cursor='default';
     drawCanvas.style.display='none';
     if(toolbar)toolbar.classList.remove('visible');
     if(btn){btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
@@ -3574,7 +3593,9 @@ function setDrawTool(tool){
 }
 function setDrawColor(color){
   drawColor=color;
-  document.querySelectorAll('.draw-color').forEach(function(el){el.classList.toggle('active',el.dataset.color===color);});
+  document.querySelectorAll('.draw-color').forEach(function(el){
+    el.classList.toggle('active',el.dataset.color===color);
+  });
   if(drawTool==='erase')setDrawTool('pen');
 }
 function showDrawBtn(){
@@ -3583,9 +3604,14 @@ function showDrawBtn(){
   initDrawCanvas();
 }
 function hideDrawBtn(){
-  drawMode=false;drawInited=false;
-  if(drawCanvas){drawCanvas.style.display='none';}
-  drawCanvas=null;drawCtx=null;
+  drawMode=false;
+  drawInited=false;
+  if(drawCanvas){
+    drawCanvas.style.display='none';
+    drawCanvas.style.pointerEvents='none';
+  }
+  drawCanvas=null;
+  drawCtx=null;
   var toolbar=document.getElementById('draw-toolbar');
   if(toolbar)toolbar.classList.remove('visible');
   var btn=document.getElementById('draw-toggle-btn');
