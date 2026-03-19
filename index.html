@@ -2972,7 +2972,9 @@ async function openSupportConv(userId, userName){
 
   msgsEl.innerHTML='';
   if(data){
+    let latestId='';
     data.forEach(function(m){
+      latestId=m.id; // last one will be the latest
       // User message bubble
       const um=document.createElement('div');
       um.className='sup-msg user';
@@ -2994,12 +2996,12 @@ async function openSupportConv(userId, userName){
         });
       }
     });
+    panel.dataset.latestMsgId=latestId;
   }
   msgsEl.scrollTop=msgsEl.scrollHeight;
 }
 
 function closeSupportReply(){
-  document.getElementById('support-reply-panel').style.display='none';
   document.getElementById('support-conv-wrap').style.display='block';
   document.getElementById('admin-reply-input').value='';
 }
@@ -3008,36 +3010,43 @@ async function sendAdminReply(){
   const input=document.getElementById('admin-reply-input');
   const reply=input.value.trim();
   if(!reply)return;
-  const userId=document.getElementById('support-reply-panel').dataset.userId;
+  const panel=document.getElementById('support-reply-panel');
+  const userId=panel.dataset.userId;
+  const latestId=panel.dataset.latestMsgId;
   const now=new Date().toISOString();
 
-  // Get the latest message from this user to attach reply to
-  const{data:allMsgs}=await sb.from('support_messages')
-    .select('id,reply,reply_times,replied_at')
-    .eq('user_id',userId)
-    .order('created_at',{ascending:false})
-    .limit(1);
+  if(!userId){toast('Error: no user selected');return;}
 
-  if(!allMsgs||!allMsgs.length){toast('No message found');return;}
+  let msgId=latestId;
+  let existingReply='';
+  let existingTimes='';
 
-  const latest=allMsgs[0];
-  let newReply, newTimes;
-
-  if(latest.reply){
-    // Append to existing reply using separator
-    newReply=latest.reply+'|||'+reply;
-    const existingTimes=latest.reply_times||latest.replied_at||now;
-    newTimes=existingTimes+'|||'+now;
+  // If we have the ID cached, use it directly; otherwise query
+  if(msgId){
+    const{data:row}=await sb.from('support_messages').select('id,reply,reply_times,replied_at').eq('id',msgId).single();
+    if(row){existingReply=row.reply||'';existingTimes=row.reply_times||row.replied_at||'';}
   } else {
-    newReply=reply;
-    newTimes=now;
+    // Fallback: query by user_id
+    const{data:rows,error:qErr}=await sb.from('support_messages')
+      .select('id,reply,reply_times,replied_at')
+      .eq('user_id',userId)
+      .order('created_at',{ascending:false})
+      .limit(1);
+    if(qErr){toast('Error: '+qErr.message);console.error('sendAdminReply query error:',qErr);return;}
+    if(!rows||!rows.length){toast('No message found — try reopening this conversation');return;}
+    msgId=rows[0].id;
+    existingReply=rows[0].reply||'';
+    existingTimes=rows[0].reply_times||rows[0].replied_at||'';
   }
 
-  const{error}=await sb.from('support_messages')
-    .update({reply:newReply, reply_times:newTimes, replied_at:now, is_read:false})
-    .eq('id',latest.id);
+  const newReply=existingReply?existingReply+'|||'+reply:reply;
+  const newTimes=existingTimes?existingTimes+'|||'+now:now;
 
-  if(error){toast('Error: '+error.message);return;}
+  const{error}=await sb.from('support_messages')
+    .update({reply:newReply,reply_times:newTimes,replied_at:now,is_read:false})
+    .eq('id',msgId);
+
+  if(error){toast('Error sending reply: '+error.message);console.error('sendAdminReply update error:',error);return;}
 
   input.value='';
   toast('Reply sent! ✓');
