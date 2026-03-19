@@ -2770,7 +2770,7 @@ function eBuildSB(){
   Q.forEach((q,i)=>{
     const r=ES.results[i];
     const st=r===null?'<span style="color:var(--gray300);font-size:14px;">○</span>':r?'<span style="color:#16a34a;font-size:13px;">✓</span>':'<span style="color:#dc2626;font-size:13px;">✕</span>';
-    const flagged=ES.flagged&&ES.flagged[i]?'<span style="font-size:10px;margin-left:2px;">🚩</span>':'';
+    const flagged=ES.flagged&&ES.flagged[i]===true?'<span style="font-size:10px;margin-left:2px;">🚩</span>':'';
     const ac=i===ES.cur?' active':'';
     html+=`<div class="esb-item${ac}" onclick="eNav(${i})" style="justify-content:space-between;"><span class="esb-num">Q${i+1}</span><span style="display:flex;align-items:center;gap:3px;">${flagged}${st}</span></div>`;
   });
@@ -2953,7 +2953,7 @@ async function eRenderQ(){
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
         ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>Submit Answer</button>`:'<div></div>'}
         <div style="display:flex;gap:6px;align-items:center;">
-          <button class="flag-btn" id="flag-btn-q" onclick="flagQ(cur)" title="Bookmark for later">🚩 Flag</button>
+          <button class="flag-btn" id="flag-btn-q" onclick="flagQ(${cur})" title="Bookmark for later">🚩 Flag</button>
           ${isAns?`<button class="flag-btn" onclick="reportQ(${cur})" title="Report an issue with this question" style="font-size:11px;">⚑ Report</button>`:''}
         </div>
       </div>
@@ -2969,7 +2969,7 @@ async function eRenderQ(){
   // Update flag button state
   const flagBtn=document.getElementById('flag-btn-q');
   if(flagBtn){
-    const isFlagged=ES.flagged&&ES.flagged[cur];
+    const isFlagged=ES.flagged&&ES.flagged[cur]===true;
     flagBtn.className='flag-btn'+(isFlagged?' flagged':'');
     flagBtn.textContent=isFlagged?'🚩 Flagged':'🚩 Flag';
   }
@@ -3117,7 +3117,7 @@ function stopTimedCountdown(){clearTimedTick();var el=document.getElementById('t
 async function flagQ(qIdx){
   if(!ES)return;
   if(!ES.flagged)ES.flagged={};
-  if(ES.flagged[qIdx]){
+  if(ES.flagged[qIdx]===true){
     ES.flagged[qIdx]=false;
     toast('Bookmark removed');
   } else {
@@ -3129,13 +3129,13 @@ async function flagQ(qIdx){
     var key='flagged_qs_'+CU.id;
     var stored=JSON.parse(localStorage.getItem(key)||'{}');
     var qId=ES.questions[qIdx].id;
-    if(ES.flagged[qIdx])stored[qId]=true;
+    if(ES.flagged[qIdx]===true)stored[qId]=true;
     else delete stored[qId];
     localStorage.setItem(key,JSON.stringify(stored));
   }catch(e){}
   eBuildSB();
   var flagBtn=document.getElementById('flag-btn-q');
-  if(flagBtn){flagBtn.className='flag-btn'+(ES.flagged[qIdx]?' flagged':'');flagBtn.textContent=ES.flagged[qIdx]?'🚩 Flagged':'🚩 Flag';}
+  if(flagBtn){flagBtn.className='flag-btn'+(ES.flagged[qIdx]===true?' flagged':'');flagBtn.textContent=ES.flagged[qIdx]===true?'🚩 Flagged':'🚩 Flag';}
 }
 // Load flagged questions from localStorage for current user
 function loadFlaggedIds(){
@@ -3150,8 +3150,10 @@ async function reportQ(qIdx){
   var q=ES.questions[qIdx];
   var reason=prompt('Report an issue with this question:\n1. Wrong answer key\n2. Typo or error in text\n3. Unclear question\n4. Other\n\nDescribe the issue:','');
   if(!reason)return;
-  var{error}=await sb.from('question_flags').upsert({question_id:q.id,user_id:CU.id,reason:reason,status:'pending'},{onConflict:'question_id,user_id'});
-  if(error){toast('Error submitting report');return;}
+  // Delete any existing report from this user for this question first, then insert fresh
+  await sb.from('question_flags').delete().eq('question_id',q.id).eq('user_id',CU.id);
+  var{error}=await sb.from('question_flags').insert({question_id:q.id,user_id:CU.id,reason:reason,status:'pending'});
+  if(error){toast('Error: '+error.message);console.error('reportQ error:',error);return;}
   toast('Report submitted! Admin will review it. ✓');
 }
 
