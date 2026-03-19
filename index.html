@@ -2896,6 +2896,9 @@ async function checkUnreadReplies(){
     .eq('is_read',false);
   const badge=document.getElementById('sup-fab-badge');
   if(badge)badge.style.display=data&&data.length?'inline-flex':'none';
+  // Also hide badge if chat is currently open
+  const modal=document.getElementById('support-modal');
+  if(modal&&modal.style.display!=='none'&&badge)badge.style.display='none';
 }
 
 async function loadSupportConv(){
@@ -2937,8 +2940,8 @@ async function loadSupportConv(){
         });
       }
     });
-    // Mark as read
-    await sb.from('support_messages').update({is_read:true}).eq('user_id',CU.id).not('reply','is',null);
+    // Mark ALL messages as read as soon as user opens the chat
+    await sb.from('support_messages').update({is_read:true}).eq('user_id',CU.id);
     checkUnreadReplies();
   }
   msgs.scrollTop=msgs.scrollHeight;
