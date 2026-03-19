@@ -434,7 +434,17 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
           <input type="password" class="form-input" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()">Sign In</button>
+        <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
+          <div style="flex:1;height:1px;background:var(--gray200);"></div>
+          <span style="font-size:12px;color:var(--gray400);white-space:nowrap;">or</span>
+          <div style="flex:1;height:1px;background:var(--gray200);"></div>
+        </div>
+        <button class="btn btn-block" onclick="doGoogleAuth()" style="background:white;color:#3c4043;border:1.5px solid var(--gray200);font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 010-3.04V5.41H1.83a8 8 0 000 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 001.83 5.4L4.5 7.49a4.77 4.77 0 014.48-3.3z"/></svg>
+          Continue with Google
+        </button>
         <div class="auth-switch">No account? <a onclick="showReg()">Create one</a></div>
+        <div style="text-align:center;margin-top:12px;"><a href="mailto:support@medexam.jo" style="font-size:12px;color:var(--gray400);">✉️ Contact Support</a></div>
       </div>
 
       <!-- Forgot Password Box -->
@@ -472,6 +482,15 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
         </div>
         <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="regPass" placeholder="Min. 6 characters" onkeydown="if(event.key==='Enter')doRegister()"></div>
         <button class="btn btn-primary btn-block btn-lg" onclick="doRegister()">Create Account</button>
+        <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
+          <div style="flex:1;height:1px;background:var(--gray200);"></div>
+          <span style="font-size:12px;color:var(--gray400);white-space:nowrap;">or</span>
+          <div style="flex:1;height:1px;background:var(--gray200);"></div>
+        </div>
+        <button class="btn btn-block" onclick="doGoogleAuth()" style="background:white;color:#3c4043;border:1.5px solid var(--gray200);font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 010-3.04V5.41H1.83a8 8 0 000 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 001.83 5.4L4.5 7.49a4.77 4.77 0 014.48-3.3z"/></svg>
+          Sign up with Google
+        </button>
         <div class="auth-switch">Have an account? <a onclick="showLogin()">Sign in</a></div>
       </div>
     </div>
@@ -499,6 +518,8 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </nav>
+  <!-- Floating contact support button -->
+  <a href="mailto:a.shatnawi022@gmail.com" title="Contact Support" style="position:fixed;bottom:20px;right:20px;background:var(--navy2);color:white;border-radius:50px;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:100;display:flex;align-items:center;gap:6px;transition:opacity 0.2s;" id="support-fab">✉️ Support</a>
   <div class="page-body" id="homeBody"><div class="spinner-wrap"><div class="spinner"></div></div></div>
 </div>
 
@@ -719,7 +740,19 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
     <div class="form-group">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <label class="form-label" style="margin:0;">Answer choices</label>
-        <button class="btn btn-sm btn-secondary" onclick="addOpt()" type="button">+ Add Choice</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="togglePasteChoices()" type="button" style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;">📋 Paste all choices</button>
+          <button class="btn btn-sm btn-secondary" onclick="addOpt()" type="button">+ Add Choice</button>
+        </div>
+      </div>
+      <!-- Paste choices panel -->
+      <div id="paste-choices-panel" style="display:none;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--gray500);margin-bottom:8px;">Paste all choices — one per line (e.g. <b>A. Aortic stenosis</b> or just <b>Aortic stenosis</b>). Percentages are stripped automatically.</div>
+        <textarea id="paste-choices-input" class="form-input" rows="6" placeholder="A. Aortic stenosis&#10;B. Mitral stenosis&#10;C. Aortic regurgitation&#10;D. Mitral regurgitation"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-primary btn-sm" onclick="doPasteChoices()" type="button">✨ Fill choices</button>
+          <button class="btn btn-secondary btn-sm" onclick="togglePasteChoices()" type="button">Cancel</button>
+        </div>
       </div>
       <div id="opts-container"></div>
     </div>
@@ -1737,6 +1770,13 @@ async function doForgot(){
 function setErr(id,m){const e=document.getElementById(id);e.textContent=m;e.classList.add('show');}
 function clrErr(id){document.getElementById(id).classList.remove('show');}
 
+async function doGoogleAuth(){
+  const{error}=await sb.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:window.location.origin+window.location.pathname}
+  });
+  if(error)toast('Google sign-in error: '+error.message);
+}
 async function doLogin(){
   clrErr('loginErr');
   const email=document.getElementById('loginEmail').value.trim();
@@ -2295,6 +2335,12 @@ async function showSettings(){
         <button class="btn btn-secondary" onclick="changePassword()">Update Password</button>
       </div>
 
+      <!-- Contact Support -->
+      <div class="settings-section">
+        <h3>✉️ Contact Support</h3>
+        <p style="font-size:13px;color:var(--gray500);margin-bottom:12px;">Need help or have a question? Reach out to the admin directly.</p>
+        <a href="mailto:a.shatnawi022@gmail.com" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">✉️ Email Support</a>
+      </div>
       <!-- Reset -->
       <div class="settings-section">
         <h3 style="color:var(--red);">   Danger Zone</h3>
@@ -2860,6 +2906,32 @@ function rebuildOA(){
       <textarea class="form-input dyn-oa" rows="2" placeholder="Why ${LTRS2[i]} is right/wrong">${vals[i]||''}</textarea>
     </div>`).join('');
 }
+function togglePasteChoices(){
+  const p=document.getElementById('paste-choices-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+  if(p.style.display==='block'){document.getElementById('paste-choices-input').value='';document.getElementById('paste-choices-input').focus();}
+}
+function doPasteChoices(){
+  const raw=document.getElementById('paste-choices-input').value.trim();
+  if(!raw){toast('Paste some choices first');return;}
+  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  // Strip option letters (A. B. A) B) (A) (B)) and percentages
+  const cleaned=lines.map(l=>{
+    l=l.replace(/^\([A-Z]\)\s*/,'');      // (A)
+    l=l.replace(/^[A-Z][.):]\s*/,'');    // A. or A) or A:
+    l=l.replace(/\(\d+%\)\s*$/,'');       // trailing (14%)
+    l=l.replace(/^\d+\.\s*/,'');          // 1. numbered
+    return l.trim();
+  }).filter(l=>l.length>0);
+  if(cleaned.length<2){toast('Need at least 2 choices');return;}
+  // Replace current choices
+  document.getElementById('opts-container').innerHTML='';
+  document.getElementById('oa-container').innerHTML='';
+  document.getElementById('corr-sel').innerHTML='';
+  cleaned.forEach(function(o){addOpt(o);});
+  togglePasteChoices();
+  toast('Filled '+cleaned.length+' choices!');
+}
 function addOpt(text='',imgUrl=''){
   const c=document.getElementById('opts-container');
   const idx=c.querySelectorAll('.opt-row').length;
@@ -3326,10 +3398,12 @@ function cleanPasteText(raw){
 }
 async function parseAndFill(){
   const rawInput=document.getElementById('parse-input').value;
-  // If pasted content looks like it has HTML tags, strip them
+  // For parsing logic: strip HTML to get clean plain text
   const raw=rawInput.includes('<')&&rawInput.includes('>')
     ?cleanPasteText(rawInput)
     :rawInput;
+  // For RTE fields: preserve HTML formatting (bold, colors, links etc)
+  const rawHtml=rawInput;
   const errEl=document.getElementById('parse-error');
   errEl.style.display='none';errEl.style.background='var(--red-light)';errEl.style.color='var(--red)';
   if(!raw.trim()){errEl.textContent='Please paste a question first.';errEl.style.display='block';return;}
@@ -3542,7 +3616,21 @@ async function parseAndFill(){
   document.getElementById('corr-sel').innerHTML='';
   options.forEach(function(o){addOpt(o);});
   if(correctIdx!==null&&correctIdx<options.length)selCorrect(correctIdx);
-  if(expHTML)rteSetHTML('rte-exp',expHTML);
+  if(expHTML){
+    // Try to extract explanation from original HTML if available
+    if(rawHtml.includes('<')&&rawHtml.includes('>')){
+      // Find explanation section in raw HTML - extract after "Explanation:" marker
+      const expMarkerIdx=rawHtml.search(/Explanation[:\s]*/i);
+      if(expMarkerIdx>-1){
+        // Get the HTML from explanation section
+        const expRaw=rawHtml.slice(expMarkerIdx).replace(/^Explanation[:\s]*/i,'');
+        // Strip choice analysis and educational objective from it
+        const expClean=expRaw.replace(/\(Choice[s]?[^)]+\)[\s\S]*$/i,'').replace(/Educational objective[\s\S]*$/i,'').trim();
+        if(expClean.length>50)rteSetHTML('rte-exp',expClean);
+        else rteSetHTML('rte-exp',expHTML);
+      } else rteSetHTML('rte-exp',expHTML);
+    } else rteSetHTML('rte-exp',expHTML);
+  }
   if(Object.keys(choiceBlocks).length){
     document.querySelectorAll('.dyn-oa').forEach(function(ta,i){
       var letter=String.fromCharCode(65+i);
