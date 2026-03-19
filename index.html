@@ -218,11 +218,14 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .qnum{font-size:11px;color:var(--gray400);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;}
 .q-t-chip{background:var(--gray100);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--gray500);display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;}
 .q-t-chip span{font-weight:700;font-family:monospace;color:var(--navy2);}
-.qtext table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;}
-.qtext table td,.qtext table th{border:1px solid var(--gray300);padding:7px 11px;}
-.qtext table th{background:var(--gray100);font-weight:700;}
+.qtext table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;table-layout:auto;}
+.qtext table td,.qtext table th{border:1px solid var(--gray300);padding:7px 11px;white-space:normal;word-break:break-word;}
+.qtext table th{background:var(--gray100);font-weight:700;white-space:nowrap;}
 .qtext img{max-width:100%;height:auto;border-radius:8px;margin:8px 0;display:block;}
 .qtext ul,.qtext ol{padding-left:22px;margin:6px 0;}
+.qtext p{margin:0 0 8px 0;}
+/* For inline table-like data rows in question text */
+.qtext .data-row{display:flex;gap:8px;margin:3px 0;font-size:14px;}
 .opts{display:flex;flex-direction:column;gap:7px;}
 .opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;}
 .opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
@@ -422,7 +425,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
         <h2>Welcome back</h2>
         <div class="auth-sub">Sign in to your MedExam account</div>
         <div class="auth-err" id="loginErr"></div>
-        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <div class="form-group">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
             <label class="form-label" style="margin:0;">Password</label>
@@ -816,6 +819,17 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
   </div>
 </div>
 
+<!-- Question Preview Modal -->
+<div class="modal-bg" id="q-preview-modal" style="display:none;">
+  <div class="modal" style="max-width:700px;width:100%;padding:0;overflow:hidden;position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--gray100);background:var(--navy2);">
+      <span style="font-size:14px;font-weight:700;color:white;">👁 Question Preview</span>
+      <button onclick="hideAModal('q-preview-modal')" style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+    <div id="q-preview-body" style="padding:20px;max-height:80vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <!-- Reset Password Modal -->
 <div class="modal-bg" id="reset-pass-modal" style="display:none;">
   <div class="modal" style="text-align:left;max-width:380px;">
@@ -1051,11 +1065,14 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .qnum{font-size:11px;color:var(--gray400);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;}
 .q-t-chip{background:var(--gray100);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--gray500);display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;}
 .q-t-chip span{font-weight:700;font-family:monospace;color:var(--navy2);}
-.qtext table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;}
-.qtext table td,.qtext table th{border:1px solid var(--gray300);padding:7px 11px;}
-.qtext table th{background:var(--gray100);font-weight:700;}
+.qtext table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;table-layout:auto;}
+.qtext table td,.qtext table th{border:1px solid var(--gray300);padding:7px 11px;white-space:normal;word-break:break-word;}
+.qtext table th{background:var(--gray100);font-weight:700;white-space:nowrap;}
 .qtext img{max-width:100%;height:auto;border-radius:8px;margin:8px 0;display:block;}
 .qtext ul,.qtext ol{padding-left:22px;margin:6px 0;}
+.qtext p{margin:0 0 8px 0;}
+/* For inline table-like data rows in question text */
+.qtext .data-row{display:flex;gap:8px;margin:3px 0;font-size:14px;}
 .opts{display:flex;flex-direction:column;gap:7px;}
 .opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;}
 .opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
@@ -1255,7 +1272,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
         <h2>Welcome back</h2>
         <div class="auth-sub">Sign in to your MedExam account</div>
         <div class="auth-err" id="loginErr"></div>
-        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <div class="form-group">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
             <label class="form-label" style="margin:0;">Password</label>
@@ -2424,18 +2441,23 @@ function eToggleHL(){
   document.querySelectorAll('mark').forEach(m=>m.style.backgroundColor=eHLMode?(m.dataset.c||HLCOLS[0]):'transparent');
 }
 function eSetSwatch(c,i){eHLC=c;document.querySelectorAll('.swatch').forEach((s,j)=>s.classList.toggle('sel',j===i));}
-document.addEventListener('mouseup',function(ev){
+function doHighlight(ev){
   if(!eHLMode)return;
   if(ev.target.closest('.swatch')||ev.target.closest('.hl-label')||ev.target.closest('.hl-dot'))return;
-  const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.toString().trim())return;
-  const r=sel.getRangeAt(0);const anc=r.commonAncestorContainer;
-  const inHl=anc.nodeType===3?anc.parentElement.closest('.hlable'):anc.closest&&anc.closest('.hlable');
-  if(!inHl)return;
-  const m=document.createElement('mark');m.dataset.c=eHLC;m.style.backgroundColor=eHLC;m.style.cursor='pointer';
-  try{r.surroundContents(m);}catch(e){sel.removeAllRanges();return;}
-  m.addEventListener('click',function(ev2){if(!eHLMode)return;ev2.stopPropagation();const p=this.parentNode;while(this.firstChild)p.insertBefore(this.firstChild,this);p.removeChild(this);p.normalize();});
-  sel.removeAllRanges();
-});
+  setTimeout(function(){
+    const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.toString().trim())return;
+    const r=sel.getRangeAt(0);const anc=r.commonAncestorContainer;
+    const inHl=anc.nodeType===3?anc.parentElement.closest('.hlable'):anc.closest&&anc.closest('.hlable');
+    if(!inHl)return;
+    const m=document.createElement('mark');m.dataset.c=eHLC;m.style.backgroundColor=eHLC;m.style.cursor='pointer';
+    try{r.surroundContents(m);}catch(e){sel.removeAllRanges();return;}
+    m.addEventListener('click',function(ev2){if(!eHLMode)return;ev2.stopPropagation();const p=this.parentNode;while(this.firstChild)p.insertBefore(this.firstChild,this);p.removeChild(this);p.normalize();});
+    m.addEventListener('touchend',function(ev2){if(!eHLMode)return;ev2.preventDefault();ev2.stopPropagation();const p=this.parentNode;while(this.firstChild)p.insertBefore(this.firstChild,this);p.removeChild(this);p.normalize();});
+    sel.removeAllRanges();
+  },10);
+}
+document.addEventListener('mouseup',doHighlight);
+document.addEventListener('touchend',doHighlight);
 
 function eTogExcl(i,ev){
   ev.stopPropagation();ev.preventDefault();
@@ -2496,12 +2518,17 @@ async function eRenderQ(){
     if(isAns){if(i===myI&&ES.results[cur])cls+=' correct';else if(i===myI&&!ES.results[cur])cls+=' wrong';if(i===q.correct_answer&&!ES.results[cur])cls+=' show-ans';}
     else{if(excl.has(i))cls+=' excl';if(myI===i)cls+=' sel-opt';}
     const imgs=q.options_images||[];
-    const imgHtml=imgs[i]?`<img src="${imgs[i]}" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;display:block;">`:'';
-    const hasImg=!!imgs[i];
-    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})" style="${hasImg?'flex-direction:column;align-items:flex-start;height:auto;':''}">
+    const imgSrc=imgs[i]||'';
+    const isAudio=imgSrc.startsWith('__audio__:');
+    const audioUrl=isAudio?imgSrc.replace('__audio__:',''):'';
+    const mediaHtml=isAudio
+      ?`<audio controls style="width:100%;margin-top:8px;height:36px;" src="${audioUrl}" onclick="event.stopPropagation()"></audio>`
+      :imgSrc?`<img src="${imgSrc}" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;display:block;">`:'';
+    const hasMedia=!!(imgSrc);
+    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
       <span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
       ${!isAns?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
-      ${imgHtml}
+      ${mediaHtml}
     </button>`;
   }).join('');
   let expHtml='';
@@ -2571,9 +2598,48 @@ async function eRenderQ(){
   });
   // render question text as HTML (supports tables and images)
   const qtEl=document.getElementById('qtext-content');
-  if(qtEl)qtEl.innerHTML=q.question_text||'';
+  if(qtEl)qtEl.innerHTML=formatQuestionText(q.question_text||'');
 }
 
+function formatQuestionText(txt){
+  if(!txt)return'';
+  // If already has HTML tags, return as-is
+  if(/<[a-z][\s\S]*>/i.test(txt))return txt;
+  // Convert plain text: detect tab-separated column lines and wrap in table
+  const lines=txt.split(/\n/);
+  const result=[];
+  let tableLines=[];
+  function flushTable(){
+    if(!tableLines.length)return;
+    if(tableLines.length<2){result.push('<p>'+tableLines.join('<br>')+'</p>');tableLines=[];return;}
+    const rows=tableLines.map(l=>l.split(/\t|  {2,}/));
+    const cols=Math.max(...rows.map(r=>r.length));
+    if(cols<2){result.push('<p>'+tableLines.join('<br>')+'</p>');tableLines=[];return;}
+    let html='<table style="border-collapse:collapse;margin:10px 0;font-size:14px;">';
+    rows.forEach((row,ri)=>{
+      html+='<tr>';
+      row.forEach(cell=>{
+        const tag=ri===0?'th':'td';
+        html+=`<${tag} style="border:1px solid var(--gray300);padding:6px 10px;${ri===0?'background:var(--gray100);font-weight:700;':''}">${cell.trim()}</${tag}>`;
+      });
+      html+='</tr>';
+    });
+    html+='</table>';
+    result.push(html);
+    tableLines=[];
+  }
+  lines.forEach(line=>{
+    const hasMultiSpace=/  {2,}/.test(line)||/\t/.test(line);
+    if(hasMultiSpace&&line.trim().length>0){
+      tableLines.push(line);
+    } else {
+      flushTable();
+      if(line.trim())result.push('<p>'+line+'</p>');
+    }
+  });
+  flushTable();
+  return result.join('');
+}
 function eGoNext(){eRun=true;document.getElementById('exam-t').className='t-val';eNav(ES.cur+1);}
 async function eFinish(){
   clearInterval(eTick);clearInterval(qTick);eRun=false;qRun=false;
@@ -2596,19 +2662,21 @@ async function eSuspend(){
 }
 function eRenderResults(){
   const Q=ES.questions;const tot=ES.results.filter(r=>r!==null).length;const pct=tot>0?Math.round(ES.score/tot*100):0;
-  let msg='',sub='',col='#16a34a';
-  if(pct===100){msg='Perfect Score!  ';sub='Absolutely flawless!';}
-  else if(pct>=85){msg='Excellent Work!';sub='Very strong.';col='#1a3a5c';}
-  else if(pct>=70){msg='Good Job!';sub='Some areas to revisit.';col='#2563eb';}
-  else{msg='Keep Going!';sub='Review missed questions.';col='#dc2626';}
-  const missed=ES.results.map((r,i)=>({r,i})).filter(x=>x.r===false);
+  let msg='',sub='',col='#16a34a',emoji='';
+  if(pct===100){msg='Perfect Score!';sub='Absolutely flawless! Keep it up!';col='#16a34a';emoji='🏆';}
+  else if(pct>=85){msg='Excellent Work!';sub='Very strong performance!';col='#1a3a5c';emoji='🌟';}
+  else if(pct>=70){msg='Good Job!';sub='Solid effort — a few areas to revisit.';col='#2563eb';emoji='👍';}
+  else if(pct>=50){msg='Keep Going!';sub='Review the missed questions below.';col='#d97706';emoji='💪';}
+  else{msg="Don't Give Up!";sub='Practice makes perfect. Review and retry!';col='#dc2626';emoji='📖';}
   const avgT=ES.qTimes.filter(t=>t>0).length>0?Math.round(ES.qTimes.filter(t=>t>0).reduce((a,b)=>a+b,0)/ES.qTimes.filter(t=>t>0).length):0;
   document.getElementById('exam-main').innerHTML=`
     <div class="res-card">
       <div class="res-top">
+        <div style="font-size:52px;margin-bottom:4px;">${emoji}</div>
         <div class="res-score" style="color:${col}">${pct}%</div>
         <div class="res-label">${ES.score} / ${tot} correct</div>
-        <div class="res-msg" style="color:${col}">${msg}</div><div class="res-sub">${sub}</div>
+        <div class="res-msg" style="color:${col}">${msg}</div>
+        <div class="res-sub">${sub}</div>
         <div class="time-row">
           <div class="tr-item"><div class="tr-val">${efmt(eSec)}</div><div class="tr-lbl">Total Time</div></div>
           <div class="tr-item"><div class="tr-val">${efmt(avgT)}</div><div class="tr-lbl">Avg / Q</div></div>
@@ -2616,11 +2684,10 @@ function eRenderResults(){
         </div>
         <div class="score-grid">${ES.results.map((r,i)=>`<div class="sdot" style="background:${r===null?'#94a3b8':r?'#16a34a':'#dc2626'}" title="Q${i+1}" onclick="eCheckAt(${i})">${i+1}</div>`).join('')}</div>
       </div>
-      ${missed.length?`<div class="rev-section"><h3>Missed Questions (${missed.length})</h3>${missed.map(({i})=>{const q=Q[i];const opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d];return`<div class="rev-item"><div class="ri-num">Q${i+1}</div><div class="ri-q">${q.question_text}</div><div class="ri-ans">  ${LTRS[q.correct_answer]}   ${opts[q.correct_answer]}</div><div class="ri-exp">${q.take_home_message||''}</div></div>`;}).join('')}</div>`:`<div style="text-align:center;padding:18px;color:#16a34a;font-weight:700;">All correct!  </div>`}
       <div class="res-btns">
-        <button class="btn btn-secondary" onclick="eGoHome()">  Home</button>
-        <button class="btn btn-primary" onclick="eRetake()">  Retake</button>
-        <button class="btn btn-secondary" onclick="eStartCheck()">  Check Answers</button>
+        <button class="btn btn-secondary" onclick="eGoHome()">🏠 Home</button>
+        <button class="btn btn-primary" onclick="eRetake()">🔁 Retake</button>
+        <button class="btn btn-secondary" onclick="eStartCheck()">📋 Review Answers</button>
       </div>
     </div>`;
 }
@@ -2765,6 +2832,7 @@ async function loadQTable(){
       <td><span style="background:#eff6ff;padding:2px 8px;border-radius:6px;font-size:12px;color:var(--blue);">${q.disciplines?.name||'—'}</span></td>
       <td><b>${LTRS2[q.correct_answer]}</b></td>
       <td class="tbl-actions">
+        <button class="btn btn-sm" onclick="previewQ('${q.id}')" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac;">👁 View</button>
         <button class="btn btn-sm btn-secondary" onclick="openQModal('${q.id}')">Edit</button>
         <button class="btn btn-sm btn-danger" onclick="delQ('${q.id}')">Delete</button>
       </td>
@@ -2801,8 +2869,10 @@ function addOpt(text='',imgUrl=''){
     <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
       <div style="display:flex;gap:6px;">
         <input type="text" class="form-input dyn-opt" placeholder="Option ${LTRS2[idx]} (or paste image here)" value="${text}" style="flex:1;" oninput="rebuildCorrSel();rebuildOA()" onpaste="handleOptPaste(event,this)">
-        <button type="button" title="Upload image for this option" onclick="triggerOptImg(this)" style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap;">🖼</button>
+        <button type="button" title="Upload image" onclick="triggerOptImg(this)" style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap;">🖼</button>
         <input type="file" accept="image/*" style="display:none;" onchange="uploadOptImg(this)">
+        <button type="button" title="Upload audio" onclick="triggerOptAudio(this)" style="background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap;">🔊</button>
+        <input type="file" accept="audio/*" style="display:none;" onchange="uploadOptAudio(this)">
         <button type="button" onclick="removeOpt(this)" style="background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:13px;">✕</button>
       </div>
       <div class="opt-img-wrap" style="${imgUrl?'':'display:none;'}">
@@ -2816,6 +2886,28 @@ function addOpt(text='',imgUrl=''){
 }
 function triggerOptImg(btn){
   btn.nextElementSibling.click();
+}
+function triggerOptAudio(btn){
+  btn.nextElementSibling.click();
+}
+async function uploadOptAudio(input){
+  const file=input.files[0];if(!file)return;
+  const wrap=input.closest('.opt-row').querySelector('.opt-img-wrap');
+  wrap.innerHTML='<span style="font-size:12px;color:var(--gray400);">Uploading audio...</span>';
+  wrap.style.display='block';
+  const ext=file.name.split('.').pop();
+  const path='opt-audio-'+Date.now()+'.'+ext;
+  const{data,error}=await sb.storage.from('question-images').upload(path,file,{upsert:true});
+  if(error){wrap.innerHTML='<span style="color:var(--red);font-size:12px;">Upload failed: '+error.message+'</span>';return;}
+  const{data:pub}=sb.storage.from('question-images').getPublicUrl(path);
+  const url=pub.publicUrl;
+  wrap.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;">
+    <span style="font-size:18px;">🔊</span>
+    <audio controls style="height:32px;flex:1;" src="${url}" data-audio-url="${url}"></audio>
+    <button type="button" onclick="removeOptImg(this)" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0;">✕</button>
+  </div>`;
+  // store url in a hidden input for saving
+  wrap.dataset.audioUrl=url;
 }
 async function handleOptPaste(event,input){
   const items=event.clipboardData?.items;
@@ -2917,7 +3009,12 @@ async function saveQ(){
   const opts=Array.from(document.querySelectorAll('.dyn-opt')).map(i=>i.value.trim());
   const optsImgs=Array.from(document.querySelectorAll('.opt-row')).map(r=>{
     const img=r.querySelector('.opt-img-preview');
-    return img?img.dataset.url:'';
+    if(img)return img.dataset.url;
+    const wrap=r.querySelector('.opt-img-wrap');
+    if(wrap&&wrap.dataset.audioUrl)return'__audio__:'+wrap.dataset.audioUrl;
+    const audio=r.querySelector('audio');
+    if(audio)return'__audio__:'+audio.src;
+    return'';
   });
   const oa=Array.from(document.querySelectorAll('.dyn-oa')).map(i=>i.value.trim());
   if(!cat_id){toast('Please select a category');return;}
@@ -2944,6 +3041,39 @@ async function saveQ(){
   else{const r=await sb.from('questions').insert(payload);err=r.error;}
   if(err){toast('Error: '+err.message);console.error('saveQ error:',err);return;}
   hideAModal('q-modal');toast('Question saved!  ');loadQTable();
+}
+async function previewQ(id){
+  const{data:q}=await sb.from('questions').select('*').eq('id',id).single();
+  if(!q){toast('Could not load question');return;}
+  const opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d].filter(Boolean);
+  const imgs=q.options_images||[];
+  const oa=q.options_analysis&&q.options_analysis.length?q.options_analysis:[];
+  const optsHtml=opts.map((o,i)=>{
+    const isCorrect=i===q.correct_answer;
+    const imgSrc=imgs[i]||'';
+    const isAudio=imgSrc.startsWith('__audio__:');
+    const mediaHtml=isAudio
+      ?`<audio controls style="width:100%;margin-top:6px;height:34px;" src="${imgSrc.replace('__audio__:','')}"></audio>`
+      :imgSrc?`<img src="${imgSrc}" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:6px;display:block;">`:'';
+    return `<div style="display:flex;flex-direction:column;padding:10px 14px;border-radius:8px;border:1.5px solid ${isCorrect?'#16a34a':'var(--gray200)'};background:${isCorrect?'#f0fdf4':'white'};margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-weight:700;min-width:20px;color:${isCorrect?'#16a34a':'var(--navy2)'};">${LTRS2[i]}</span>
+        <span style="flex:1;font-size:14px;">${o}</span>
+        ${isCorrect?'<span style="font-size:12px;font-weight:700;color:#16a34a;">✓ Correct</span>':''}
+      </div>
+      ${mediaHtml}
+      ${oa[i]?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--gray100);font-size:13px;color:var(--gray500);">${oa[i]}</div>`:''}
+    </div>`;
+  }).join('');
+  const body=document.getElementById('q-preview-body');
+  body.innerHTML=`
+    <div style="font-size:12px;color:var(--gray400);margin-bottom:8px;font-weight:600;">${q.custom_id?'ID: '+q.custom_id+' · ':''} Q Preview</div>
+    <div style="font-size:15px;line-height:1.75;margin-bottom:18px;color:var(--gray800);">${q.question_text||''}</div>
+    <div style="margin-bottom:18px;">${optsHtml}</div>
+    ${q.explanation?`<div style="background:#eff6ff;border-radius:8px;padding:14px;margin-bottom:12px;"><div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Explanation</div><div style="font-size:14px;line-height:1.75;color:var(--gray700);">${q.explanation}</div></div>`:''}
+    ${q.take_home_message?`<div style="background:#f0fdf4;border-radius:8px;padding:14px;border-left:3px solid #16a34a;"><div style="font-size:11px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Take-home Message</div><div style="font-size:14px;line-height:1.75;color:var(--gray700);">${q.take_home_message}</div></div>`:''}
+  `;
+  showAModal('q-preview-modal');
 }
 async function delQ(id){if(!confirm('Delete this question?'))return;await sb.from('questions').delete().eq('id',id);toast('Deleted');loadQTable();}
 
@@ -3187,8 +3317,19 @@ function toggleParsePanel(){
   }
 }
 
+function cleanPasteText(raw){
+  const tmp=document.createElement('div');
+  tmp.innerHTML=raw;
+  tmp.querySelectorAll('br').forEach(function(b){b.replaceWith('\n');});
+  tmp.querySelectorAll('p,div,li,tr').forEach(function(b){b.insertAdjacentText('afterend','\n');});
+  return tmp.textContent||tmp.innerText||raw;
+}
 async function parseAndFill(){
-  const raw=document.getElementById('parse-input').value;
+  const rawInput=document.getElementById('parse-input').value;
+  // If pasted content looks like it has HTML tags, strip them
+  const raw=rawInput.includes('<')&&rawInput.includes('>')
+    ?cleanPasteText(rawInput)
+    :rawInput;
   const errEl=document.getElementById('parse-error');
   errEl.style.display='none';errEl.style.background='var(--red-light)';errEl.style.color='var(--red)';
   if(!raw.trim()){errEl.textContent='Please paste a question first.';errEl.style.display='block';return;}
@@ -3277,12 +3418,19 @@ async function parseAndFill(){
       // - starts with "Educational objective"
       // - starts with "(Choice"
       // - contains percentage like "63%" or "44%" standalone
-      if(ln.length>80)break;
+      // Stop if line clearly belongs to explanation/metadata
+      if(ln.length>60)break;
       if(/^[Cc]orrect[:\s]/i.test(ln))break;
       if(/^[Ii]ncorrect/i.test(ln))break;
       if(/^[Ee]ducational\s+objective/i.test(ln))break;
       if(/^\(Choice/i.test(ln))break;
+      if(/^This patient/i.test(ln))break;
+      if(/^The patient/i.test(ln))break;
+      if(/^In (this|the|acute|chronic|patients)/i.test(ln))break;
+      if(/^FREE$/i.test(ln))break;
       if(/^\d+%\s*(Correct|Pathology|Physiology|Pharmacology|Anatomy|Biochemistry|Microbiology|Immunology|Histology|Embryology|Genetics|Biostatistics|Behavioral)/i.test(ln))break;
+      if(/^(Pathology|Physiology|Pharmacology|Anatomy|Biochemistry|Microbiology|Immunology|Histology|Embryology|Genetics|Biostatistics|Behavioral science)$/i.test(ln))break;
+      if(/^Cardiovascular|^Nervous|^Pulmonary|^Renal|^Endocrine|^Gastrointestinal|^Hematology/i.test(ln))break;
       if(!optText)optText=ln;
       else optText+=' '+ln;
       j++;
@@ -3468,8 +3616,20 @@ async function parseAndFill(){
   toggleParsePanel();
 }
 // ADMIN MODALS
-function showAModal(id){document.getElementById(id).style.display='flex';}
-function hideAModal(id){document.getElementById(id).style.display='none';}
+let _openModal=null;
+function showAModal(id){
+  document.getElementById(id).style.display='flex';
+  _openModal=id;
+}
+function hideAModal(id){
+  document.getElementById(id).style.display='none';
+  if(_openModal===id)_openModal=null;
+}
+document.addEventListener('keydown',function(ev){
+  if(ev.key==='Escape'){
+    if(_openModal)hideAModal(_openModal);
+  }
+});
 (async()=>{
   const{data:{session}}=await sb.auth.getSession();
   if(session)await initApp();
