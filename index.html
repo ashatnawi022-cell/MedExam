@@ -727,7 +727,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <div class="exam-main" id="exam-main"></div>
     </div>
     <!-- Canvas is fixed-position overlay, outside any clipping container -->
-    <canvas id="draw-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:300;touch-action:none;display:none;"></canvas>
+    <canvas id="draw-canvas" style="position:fixed;pointer-events:none;z-index:150;touch-action:none;display:none;"></canvas>
   </div>
   <!-- Drawing toolbar -->
   <div class="draw-toolbar" id="draw-toolbar">
@@ -3429,80 +3429,105 @@ var drawCanvas=null;
 var isDrawing=false;
 var drawStrokes={};
 var drawInited=false;
+var drawCanvasRect={top:0,left:0,width:0,height:0};
+
+function fitDrawCanvas(){
+  if(!drawCanvas)return;
+  var main=document.getElementById('exam-main');
+  if(!main)return;
+  var r=main.getBoundingClientRect();
+  // Position canvas exactly over exam-main
+  drawCanvas.style.top=r.top+'px';
+  drawCanvas.style.left=r.left+'px';
+  drawCanvas.style.width=r.width+'px';
+  drawCanvas.style.height=r.height+'px';
+  // Store for coordinate math
+  drawCanvasRect={top:r.top,left:r.left,width:r.width,height:r.height,scrollTop:main.scrollTop};
+  // Set pixel dimensions (only if changed, to avoid clearing)
+  if(drawCanvas.width!==Math.round(r.width)||drawCanvas.height!==Math.round(r.height)){
+    var saved=drawCanvas.width>0?drawCanvas.toDataURL():null;
+    drawCanvas.width=Math.round(r.width);
+    drawCanvas.height=Math.round(r.height);
+    drawCtx=drawCanvas.getContext('2d');
+    if(saved){var im=new Image();im.onload=function(){drawCtx&&drawCtx.drawImage(im,0,0);};im.src=saved;}
+  }
+}
 
 function initDrawCanvas(){
   if(drawInited)return;
   drawCanvas=document.getElementById('draw-canvas');
-  if(!drawCanvas){console.error('draw-canvas element not found');return;}
-  // Canvas is fixed 100vw x 100vh - just set pixel dimensions
-  drawCanvas.width=window.innerWidth;
-  drawCanvas.height=window.innerHeight;
+  if(!drawCanvas){console.error('draw-canvas not found');return;}
   drawCtx=drawCanvas.getContext('2d');
-  // Pointer events (covers mouse, touch, Apple Pencil)
-  drawCanvas.addEventListener('pointerdown',drawStart,{passive:false});
-  drawCanvas.addEventListener('pointermove',drawMove,{passive:false});
-  drawCanvas.addEventListener('pointerup',drawEnd,{passive:false});
-  drawCanvas.addEventListener('pointerleave',drawEnd,{passive:false});
-  drawCanvas.addEventListener('pointercancel',drawEnd,{passive:false});
-  window.addEventListener('resize',function(){
-    if(!drawCanvas)return;
-    var img=drawCanvas.toDataURL();
-    drawCanvas.width=window.innerWidth;
-    drawCanvas.height=window.innerHeight;
-    drawCtx=drawCanvas.getContext('2d');
-    var im=new Image();im.onload=function(){drawCtx.drawImage(im,0,0);};im.src=img;
+  fitDrawCanvas();
+  // Pointer events for pen + mouse (NOT touch - so finger scroll still works)
+  drawCanvas.addEventListener('pointerdown',function(ev){
+    // Only pen or mouse, not finger touch
+    if(ev.pointerType==='touch')return;
+    if(!drawMode)return;
+    ev.preventDefault();
+    isDrawing=true;
+    drawCanvas.setPointerCapture(ev.pointerId);
+    var p=getPt(ev);
+    drawCtx.beginPath();
+    drawCtx.moveTo(p.x,p.y);
+    applyDrawStyle();
+  },{passive:false});
+  drawCanvas.addEventListener('pointermove',function(ev){
+    if(!isDrawing||!drawMode)return;
+    ev.preventDefault();
+    var p=getPt(ev);
+    applyDrawStyle();
+    drawCtx.lineTo(p.x,p.y);
+    drawCtx.stroke();
+  },{passive:false});
+  drawCanvas.addEventListener('pointerup',function(ev){
+    if(!isDrawing)return;
+    isDrawing=false;
+    drawCtx.beginPath();
+    drawCtx.globalAlpha=1;
+    drawCtx.globalCompositeOperation='source-over';
+    if(ES)drawStrokes[ES.cur]=drawCanvas.toDataURL();
+  },{passive:false});
+  drawCanvas.addEventListener('pointercancel',function(ev){
+    isDrawing=false;
   });
+  // Keep canvas positioned correctly on scroll and resize
+  var main=document.getElementById('exam-main');
+  if(main)main.addEventListener('scroll',fitDrawCanvas);
+  window.addEventListener('resize',function(){if(drawMode)fitDrawCanvas();});
   drawInited=true;
-  console.log('Draw canvas ready:',drawCanvas.width,'x',drawCanvas.height);
 }
 
-function drawStart(ev){
-  ev.preventDefault();
-  isDrawing=true;
-  var p=getPt(ev);
-  drawCtx.beginPath();
-  drawCtx.moveTo(p.x,p.y);
-  applyDrawStyle();
-}
-function drawMove(ev){
-  if(!isDrawing)return;
-  ev.preventDefault();
-  var p=getPt(ev);
-  applyDrawStyle();
-  drawCtx.lineTo(p.x,p.y);
-  drawCtx.stroke();
-}
-function drawEnd(ev){
-  if(!isDrawing)return;
-  isDrawing=false;
-  drawCtx.beginPath();
-  drawCtx.globalAlpha=1;
-  drawCtx.globalCompositeOperation='source-over';
-  // Save this question's drawing
-  if(ES)drawStrokes[ES.cur]=drawCanvas.toDataURL();
-}
 function applyDrawStyle(){
   if(!drawCtx)return;
   if(drawTool==='erase'){
     drawCtx.globalCompositeOperation='destination-out';
-    drawCtx.lineWidth=30;drawCtx.globalAlpha=1;
+    drawCtx.lineWidth=28;drawCtx.globalAlpha=1;
+    drawCtx.strokeStyle='rgba(0,0,0,1)';
   } else if(drawTool==='highlight'){
     drawCtx.globalCompositeOperation='source-over';
     drawCtx.strokeStyle=drawColor;
-    drawCtx.lineWidth=16;drawCtx.globalAlpha=0.12;
+    drawCtx.lineWidth=14;drawCtx.globalAlpha=0.08;
   } else {
     drawCtx.globalCompositeOperation='source-over';
     drawCtx.strokeStyle=drawColor;
-    drawCtx.lineWidth=3;drawCtx.globalAlpha=1;
+    drawCtx.lineWidth=2.5;drawCtx.globalAlpha=1;
   }
   drawCtx.lineCap='round';drawCtx.lineJoin='round';
 }
+
 function getPt(ev){
-  // Fixed canvas = client coords directly
-  return{x:ev.clientX,y:ev.clientY};
+  // Coords relative to canvas (which is positioned over exam-main)
+  var r=drawCanvas.getBoundingClientRect();
+  return{
+    x:ev.clientX-r.left,
+    y:ev.clientY-r.top
+  };
 }
+
 function restoreDrawing(){
   if(!drawCtx||!drawCanvas)return;
+  fitDrawCanvas();
   drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
   if(ES&&drawStrokes[ES.cur]){
     var img=new Image();
@@ -3525,22 +3550,22 @@ function toggleDrawMode(){
   var btn=document.getElementById('draw-toggle-btn');
   var toolbar=document.getElementById('draw-toolbar');
   if(drawMode){
-    // Show canvas and enable pointer events
+    fitDrawCanvas();
     drawCanvas.style.display='block';
-    drawCanvas.style.pointerEvents='all';
-    drawCanvas.style.cursor='crosshair';
+    // pointer-events:none always — we capture events manually via pointerdown
+    // This means the canvas never blocks clicks on the page!
+    drawCanvas.style.pointerEvents='none';
     if(toolbar)toolbar.classList.add('visible');
-    if(btn){btn.textContent='✋ Done';btn.style.background='rgba(255,255,255,0.9)';btn.style.color='var(--navy2)';}
+    if(btn){btn.textContent='✋ Stop';btn.style.background='rgba(255,255,255,0.9)';btn.style.color='var(--navy2)';}
     restoreDrawing();
   } else {
-    drawCanvas.style.pointerEvents='none';
-    drawCanvas.style.cursor='default';
+    drawCanvas.style.display='none';
     if(toolbar)toolbar.classList.remove('visible');
     if(btn){btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
-    // Keep canvas visible so drawings stay visible
-    if(ES)drawStrokes[ES.cur]=drawCanvas.toDataURL();
+    if(ES&&drawCtx)drawStrokes[ES.cur]=drawCanvas.toDataURL();
   }
 }
+
 function setDrawTool(tool){
   drawTool=tool;
   document.querySelectorAll('.draw-tool-btn').forEach(function(b){b.classList.remove('active');});
@@ -3555,17 +3580,12 @@ function setDrawColor(color){
 function showDrawBtn(){
   var btn=document.getElementById('draw-toggle-btn');
   if(btn)btn.style.display='';
-  // Pre-init canvas
   initDrawCanvas();
 }
 function hideDrawBtn(){
   drawMode=false;drawInited=false;
-  if(drawCanvas){
-    drawCanvas.style.display='none';
-    drawCanvas.style.pointerEvents='none';
-    // Detach events by replacing canvas (clean slate)
-    drawCanvas=null;drawCtx=null;
-  }
+  if(drawCanvas){drawCanvas.style.display='none';}
+  drawCanvas=null;drawCtx=null;
   var toolbar=document.getElementById('draw-toolbar');
   if(toolbar)toolbar.classList.remove('visible');
   var btn=document.getElementById('draw-toggle-btn');
