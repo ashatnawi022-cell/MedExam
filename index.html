@@ -2182,17 +2182,20 @@ function updateSliderLabel(){
   if(slider&&val)val.textContent=slider.value;
 }
 
-function updateCountDisplay(all,nw,wr){
+function updateCountDisplay(all,nw,wr,fl){
   const allEl=document.getElementById('cnt-all');
   const newEl=document.getElementById('cnt-new');
   const wrEl=document.getElementById('cnt-wrong');
+  const flEl=document.getElementById('cnt-flagged');
   if(allEl)allEl.textContent=`${all} questions`;
   if(newEl)newEl.textContent=`${nw} unanswered`;
   if(wrEl)wrEl.textContent=`${wr} wrong`;
+  if(flEl)flEl.textContent=`${fl||0} flagged`;
   const btns=document.querySelectorAll('.filter-btn');
   if(btns[1])btns[1].disabled=nw===0;
   if(btns[2])btns[2].disabled=wr===0;
-  const avail=qFilter==='all'?all:qFilter==='new'?nw:wr;
+  if(btns[3])btns[3].disabled=(fl||0)===0;
+  const avail=qFilter==='all'?all:qFilter==='new'?nw:qFilter==='flagged'?(fl||0):wr;
   const slider=document.getElementById('qcount-slider');
   const maxEl=document.getElementById('qcount-max');
   const genBtn=document.getElementById('gen-btn');
@@ -2323,6 +2326,9 @@ function renderCreateExamHTML(){
           <button class="filter-btn${qFilter==='wrong'?' active':''}" onclick="setFilter('wrong')">
             <div class="fb-label">Wrong Only</div><div class="fb-count" id="cnt-wrong">Loading </div>
           </button>
+          <button class="filter-btn${qFilter==='flagged'?' active':''}" onclick="setFilter('flagged')" style="${qFilter==='flagged'?'border-color:#fca5a5;background:#fff5f5;color:#dc2626;':''}">
+            <div class="fb-label">🚩 Flagged</div><div class="fb-count" id="cnt-flagged">Loading </div>
+          </button>
         </div>
       </div>
 
@@ -2335,6 +2341,14 @@ function renderCreateExamHTML(){
           <span class="qcount-max" id="qcount-max"></span>
         </div>
         <div id="gen-warning" style="display:none;background:var(--amber-light);color:var(--amber);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:14px;"></div>
+        <!-- Exam-level timer -->
+        <div style="background:var(--gray50);border:1.5px solid var(--gray200);border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--gray700);margin-bottom:10px;">⏰ Exam Time Limit <span style="font-weight:400;color:var(--gray400);">(optional)</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${[0,30,60,90,120,180].map(m=>`<button type="button" onclick="setExamTimeLimit(${m})" class="btn btn-sm${examTimeLimit===m?' btn-primary':' btn-secondary'}" style="min-width:52px;">${m===0?'None':m+'min'}</button>`).join('')}
+          </div>
+          ${examTimeLimit>0?`<div style="font-size:12px;color:var(--amber);margin-top:8px;">⚠️ Exam will auto-submit when ${examTimeLimit} minutes are up.</div>`:''}
+        </div>
         <button class="btn btn-primary btn-lg" id="gen-btn" onclick="generateSession()" disabled>Generate Session  </button>
       </div>
     </div>
@@ -2382,7 +2396,9 @@ function deselectAllSystems(){
 let allDiscsSelected=true; // true = all on, false = use selDisciplines (empty = none)
 let randomMode=false;
 let timedMode=false;
-let timedPerQ=60; // seconds per question in timed mode // true = ignore all filters, pull from all questions
+let timedPerQ=60; // seconds per question in timed mode
+let examTimeLimit=0; // exam-level time limit in minutes (0=none)
+let examTimerTick=null; // true = ignore all filters, pull from all questions
 
 function toggleDisc(id){
   if(allDiscsSelected){
@@ -2482,8 +2498,10 @@ async function refreshCounts(){
     });
     const newCount=allQIds.filter(id=>answeredMap[id]===undefined).length;
     const wrongCount=allQIds.filter(id=>answeredMap[id]===false).length;
-    qCounts={all:allQIds.length,new:newCount,wrong:wrongCount};
-    updateCountDisplay(allQIds.length,newCount,wrongCount);
+    var flaggedIds=Object.keys(loadFlaggedIds());
+    var flaggedCount=allQIds.filter(function(id){return flaggedIds.includes(id);}).length;
+    qCounts={all:allQIds.length,new:newCount,wrong:wrongCount,flagged:flaggedCount};
+    updateCountDisplay(allQIds.length,newCount,wrongCount,flaggedCount);
     console.log('refreshCounts done:',allQIds.length,'questions');
   }catch(err){
     console.error('refreshCounts exception:',err);
@@ -2519,12 +2537,15 @@ async function generateSession(){
     });
     if(qFilter==='new')pool=pool.filter(q=>answeredMap[q.id]===undefined);
     else if(qFilter==='wrong')pool=pool.filter(q=>answeredMap[q.id]===false);
+    else if(qFilter==='flagged'){var fIds=Object.keys(loadFlaggedIds());pool=pool.filter(q=>fIds.includes(q.id));}
   }
   if(!pool.length){toast('No questions match your selection. Try a different filter.');return;}
   pool=pool.sort(()=>Math.random()-0.5).slice(0,qcount);
   const title=randomMode?'Random Session':
-    `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')} · ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':'Wrong Qs'}`;
+    `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')} · ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':qFilter==='flagged'?'Flagged Qs':'Wrong Qs'}`;
+  var savedLimit=examTimeLimit;examTimeLimit=0;
   await launchSession(pool,title);
+  if(savedLimit)ES.examLimit=savedLimit*60;
 }
 
 async function goMyExams(){
@@ -2696,7 +2717,7 @@ async function launchSession(questions,title,existingAtt=null){
     mySelections:Array(questions.length).fill(null),
     qTimes:att.question_times||Array(questions.length).fill(0),
     excluded:Array(questions.length).fill(null).map(()=>new Set()),
-    examSec:att.exam_seconds||0,title,timed:timedMode,flagged:{}};
+    examSec:att.exam_seconds||0,title,timed:timedMode,flagged:{},examLimit:examTimeLimit*60};
   eSec=ES.examSec;qSec=ES.qTimes[ES.cur]||0;
   document.getElementById('tb-title').textContent=title;
   document.getElementById('exam-t').textContent=efmt(eSec);
@@ -2707,8 +2728,29 @@ async function launchSession(questions,title,existingAtt=null){
   document.getElementById('end-fab').style.display='inline-block';
   const isAns=ES.results[ES.cur]!==null;
   eRun=!isAns;qRun=!isAns;
-  eTick=setInterval(()=>{if(eRun){eSec++;document.getElementById('exam-t').textContent=efmt(eSec);}},1000);
+  var examLimitSecs=ES.examLimit||0;
+  eTick=setInterval(()=>{
+    if(eRun){
+      eSec++;
+      document.getElementById('exam-t').textContent=efmt(eSec);
+      // Exam time limit countdown
+      if(examLimitSecs>0){
+        var remaining=examLimitSecs-eSec;
+        var tEl=document.getElementById('exam-t');
+        if(remaining<=300&&tEl)tEl.style.color='#d97706'; // amber at 5min
+        if(remaining<=60&&tEl)tEl.style.color='#dc2626';  // red at 1min
+        if(remaining<=0){
+          tEl&&(tEl.style.color='#dc2626');
+          eForceEnd();
+          toast('Time is up! Exam submitted. ⏰',4000);
+        }
+      }
+    }
+  },1000);
   qTick=setInterval(()=>{if(qRun){qSec++;document.getElementById('q-t').textContent=efmt(qSec);const el=document.getElementById('qtinline');if(el)el.textContent=efmt(qSec);}},1000);
+  // Load user's bookmarked question IDs and mark in ES
+  var storedFlags=loadFlaggedIds();
+  ES.questions.forEach(function(q,i){if(storedFlags[q.id])ES.flagged[i]=true;});
   showPage('examPage');eRenderQ();
   // Hide support chat during exam so it doesn't cover buttons
   const supFab=document.getElementById('support-fab');
@@ -2726,8 +2768,11 @@ function toggleESB(){eSBOpen=!eSBOpen;document.getElementById('exam-sb').classLi
 function eBuildSB(){
   const Q=ES.questions;let html='';
   Q.forEach((q,i)=>{
-    const r=ES.results[i];const st=r===null?'⭕':r?'✅':'❌';const ac=i===ES.cur?' active':'';
-    html+=`<div class="esb-item${ac}" onclick="eNav(${i})"><span class="esb-num">${i+1}</span><span class="esb-txt">${q.question_text.slice(0,36)} </span><span class="esb-st">${st}</span></div>`;
+    const r=ES.results[i];
+    const st=r===null?'<span style="color:var(--gray300);font-size:14px;">○</span>':r?'<span style="color:#16a34a;font-size:13px;">✓</span>':'<span style="color:#dc2626;font-size:13px;">✕</span>';
+    const flagged=ES.flagged&&ES.flagged[i]?'<span style="font-size:10px;margin-left:2px;">🚩</span>':'';
+    const ac=i===ES.cur?' active':'';
+    html+=`<div class="esb-item${ac}" onclick="eNav(${i})" style="justify-content:space-between;"><span class="esb-num">Q${i+1}</span><span style="display:flex;align-items:center;gap:3px;">${flagged}${st}</span></div>`;
   });
   document.getElementById('esb-list').innerHTML=html;
 }
@@ -2907,7 +2952,10 @@ async function eRenderQ(){
       <div class="opts">${optsHtml}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
         ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>Submit Answer</button>`:'<div></div>'}
-        <button class="flag-btn" id="flag-btn-q" onclick="flagQ(cur)" title="Flag this question for review">🚩 Flag</button>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="flag-btn" id="flag-btn-q" onclick="flagQ(cur)" title="Bookmark for later">🚩 Flag</button>
+          ${isAns?`<button class="flag-btn" onclick="reportQ(${cur})" title="Report an issue with this question" style="font-size:11px;">⚑ Report</button>`:''}
+        </div>
       </div>
       ${expHtml}
     </div>`;
@@ -3038,6 +3086,7 @@ function eGoHome(){
 var timedTick=null;
 var timedSecsLeft=0;
 function toggleTimedMode(){timedMode=!timedMode;showCreateExam();}
+function setExamTimeLimit(mins){examTimeLimit=mins;showCreateExam();}
 function clearTimedTick(){if(timedTick){clearInterval(timedTick);timedTick=null;}}
 function startTimedCountdown(){
   clearTimedTick();
@@ -3067,22 +3116,43 @@ function stopTimedCountdown(){clearTimedTick();var el=document.getElementById('t
 // ── FLAGGING ──
 async function flagQ(qIdx){
   if(!ES)return;
-  var q=ES.questions[qIdx];
   if(!ES.flagged)ES.flagged={};
   if(ES.flagged[qIdx]){
-    // Unflag
     ES.flagged[qIdx]=false;
-    await sb.from('question_flags').delete().eq('question_id',q.id).eq('user_id',CU.id);
-    toast('Flag removed');
+    toast('Bookmark removed');
   } else {
-    // Show flag reason picker
-    var reason=prompt('Why are you flagging this question?\n1. Wrong answer\n2. Typo/error in text\n3. Unclear question\n4. Other\n\nType your reason:','');
-    if(!reason)return;
     ES.flagged[qIdx]=true;
-    await sb.from('question_flags').upsert({question_id:q.id,user_id:CU.id,reason:reason,status:'pending'},{onConflict:'question_id,user_id'});
-    toast('Question flagged! Admin will review it. 🚩');
+    toast('Bookmarked! 🚩 Review it later from Flagged filter.');
   }
-  eRenderQ();
+  // Save flagged IDs to localStorage for persistence across sessions
+  try{
+    var key='flagged_qs_'+CU.id;
+    var stored=JSON.parse(localStorage.getItem(key)||'{}');
+    var qId=ES.questions[qIdx].id;
+    if(ES.flagged[qIdx])stored[qId]=true;
+    else delete stored[qId];
+    localStorage.setItem(key,JSON.stringify(stored));
+  }catch(e){}
+  eBuildSB();
+  var flagBtn=document.getElementById('flag-btn-q');
+  if(flagBtn){flagBtn.className='flag-btn'+(ES.flagged[qIdx]?' flagged':'');flagBtn.textContent=ES.flagged[qIdx]?'🚩 Flagged':'🚩 Flag';}
+}
+// Load flagged questions from localStorage for current user
+function loadFlaggedIds(){
+  try{
+    var key='flagged_qs_'+CU.id;
+    return JSON.parse(localStorage.getItem(key)||'{}');
+  }catch(e){return{};}
+}
+// Report a question error (separate from personal flag)
+async function reportQ(qIdx){
+  if(!ES)return;
+  var q=ES.questions[qIdx];
+  var reason=prompt('Report an issue with this question:\n1. Wrong answer key\n2. Typo or error in text\n3. Unclear question\n4. Other\n\nDescribe the issue:','');
+  if(!reason)return;
+  var{error}=await sb.from('question_flags').upsert({question_id:q.id,user_id:CU.id,reason:reason,status:'pending'},{onConflict:'question_id,user_id'});
+  if(error){toast('Error submitting report');return;}
+  toast('Report submitted! Admin will review it. ✓');
 }
 
 // ── ANALYTICS ──
