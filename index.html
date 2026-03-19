@@ -731,8 +731,8 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   </div>
   <!-- Drawing toolbar -->
   <div class="draw-toolbar" id="draw-toolbar">
-    <button class="draw-tool-btn active" id="draw-pen-btn" onclick="setDrawTool('pen')" title="Pen">✏️</button>
-    <button class="draw-tool-btn" id="draw-hl-btn" onclick="setDrawTool('highlight')" title="Highlighter">🖊</button>
+    <button class="draw-tool-btn active" id="draw-pen-btn" onclick="setDrawTool('pen')" title="Pen">🖊️</button>
+    <button class="draw-tool-btn" id="draw-hl-btn" onclick="setDrawTool('highlight')" title="Highlighter">🖍️</button>
     <button class="draw-tool-btn" id="draw-erase-btn" onclick="setDrawTool('erase')" title="Eraser">⊘</button>
     <div class="draw-sep"></div>
     <div class="draw-color active" style="background:#1e293b;" onclick="setDrawColor('#1e293b')" data-color="#1e293b"></div>
@@ -3489,7 +3489,7 @@ function applyDrawStyle(){
   } else if(drawTool==='highlight'){
     drawCtx.globalCompositeOperation='source-over';
     drawCtx.strokeStyle=drawColor;
-    drawCtx.lineWidth=22;drawCtx.globalAlpha=0.28;
+    drawCtx.lineWidth=16;drawCtx.globalAlpha=0.12;
   } else {
     drawCtx.globalCompositeOperation='source-over';
     drawCtx.strokeStyle=drawColor;
