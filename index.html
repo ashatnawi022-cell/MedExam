@@ -2895,7 +2895,13 @@ async function initSupportFab(){
   if(!CU)return;
   const fab=document.getElementById('support-fab');
   if(fab)fab.style.display='flex';
-  // Check for unread admin replies
+  // On first load, mark all messages without a reply as already-read
+  // to avoid false "unread" notifications from old/default data
+  await sb.from('support_messages')
+    .update({is_read:true})
+    .eq('user_id',CU.id)
+    .is('reply',null)
+    .eq('is_read',false);
   checkUnreadReplies();
 }
 
@@ -2995,6 +3001,8 @@ function fmtSupTime(ts){if(!ts)return'';const d=new Date(ts);return d.toLocaleDa
 async function loadSupportTable(){
   const wrap=document.getElementById('support-conv-wrap');
   wrap.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
+  // Mark any legacy messages (conv_read=NULL) as read so they don't trigger false alerts
+  await sb.from('support_messages').update({conv_read:true}).is('conv_read',null);
   const{data}=await sb.from('support_messages')
     .select('*, profiles(full_name,email)')
     .order('created_at',{ascending:false});
@@ -3168,7 +3176,7 @@ function updateAdminSupportBadge(count){
   const badge=document.getElementById('admin-sup-badge');
   if(!badge)return;
   if(count===undefined){
-    // Count distinct users with unread messages
+    // Only count messages where conv_read is explicitly false (not null/undefined)
     sb.from('support_messages').select('user_id').eq('conv_read',false).then(function(r){
       const uniqueUsers=new Set((r.data||[]).map(function(m){return m.user_id;}));
       const n=uniqueUsers.size;
