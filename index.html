@@ -376,7 +376,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 
 /* -- DRAWING CANVAS -- */
 #draw-canvas.active{pointer-events:all !important;cursor:crosshair;}
-#draw-canvas{touch-action:auto !important;} /* browser handles touch, pen captured by JS */
+#draw-canvas{touch-action:none !important;} /* prevent pen/stylus from scrolling */
 .draw-toolbar{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:400;background:white;border:1px solid var(--gray200);border-radius:14px;padding:10px 8px;box-shadow:0 4px 20px rgba(0,0,0,0.12);}
 .draw-toolbar.visible{display:flex;}
 .draw-color{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s;flex-shrink:0;}
@@ -3432,28 +3432,21 @@ var drawOffscreen=null;
 var drawOffCtx=null;
 var isDrawing=false;
 var drawInited=false;
-var drawStartPt=null;      // first point of current stroke
-var drawLastPt=null;       // last point (for straighten)
-var drawStraightenTimer=null; // timer for hold-to-straighten
-var drawStraightened=false;   // whether current stroke was straightened
+var drawStartPt=null;
+var drawLastPt=null;
+var drawStraightenTimer=null;
+var drawStraightened=false;
+var drawSnapshots={};
+var drawBaseSnap=null;
 
-// Store strokes as ImageData (raw pixels) - instant get/put, no encoding
-var drawSnapshots={}; // qIdx -> ImageData (committed strokes)
-var drawBaseSnap=null; // ImageData snapshot taken at pointerdown
-
-// Save/restore use ImageData not toDataURL
 function saveSnapshot(){
   if(!drawCtx||!drawCanvas||!ES)return;
-  try{
-    drawSnapshots[ES.cur]=drawCtx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
-  }catch(e){}
+  try{drawSnapshots[ES.cur]=drawCtx.getImageData(0,0,drawCanvas.width,drawCanvas.height);}catch(e){}
 }
 function restoreSnapshot(){
   if(!drawCtx||!drawCanvas||!ES)return;
   drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-  if(drawSnapshots[ES.cur]){
-    try{drawCtx.putImageData(drawSnapshots[ES.cur],0,0);}catch(e){}
-  }
+  if(drawSnapshots[ES.cur]){try{drawCtx.putImageData(drawSnapshots[ES.cur],0,0);}catch(e){}}
 }
 
 function fitDrawCanvas(){
@@ -3481,126 +3474,66 @@ function initDrawCanvas(){
   fitDrawCanvas();
   drawCtx=drawCanvas.getContext('2d');
 
-  drawCanvas.addEventListener('pointerdown',function(ev){
-    // Touch (finger/palm) always ignored on canvas — passes through via CSS touch-action
-    if(ev.pointerType==='touch')return;
+  // KEY: Listen on the EXAM-MAIN element, not the canvas.
+  // Canvas stays pointer-events:none always so finger touch hits page naturally.
+  // Only pen/mouse events are handled — touch always returns early.
+  var target=document.getElementById('exam-main');
+  if(!target)target=document.getElementById('examPage');
+
+  target.addEventListener('pointerdown',function(ev){
+    if(ev.pointerType==='touch')return; // finger — let browser handle scroll/tap
     if(!drawMode)return;
-    ev.preventDefault();ev.stopPropagation();
+    ev.preventDefault();
     isDrawing=true;
-    drawCanvas.setPointerCapture(ev.pointerId);
-    // Snapshot current canvas instantly using ImageData (no encoding)
-    try{
-      drawBaseSnap=drawCtx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
-    }catch(e){drawBaseSnap=null;}
-    // Offscreen canvas for this stroke
+    target.setPointerCapture(ev.pointerId);
+    try{drawBaseSnap=drawCtx.getImageData(0,0,drawCanvas.width,drawCanvas.height);}catch(e){drawBaseSnap=null;}
     drawOffscreen=document.createElement('canvas');
     drawOffscreen.width=drawCanvas.width;
     drawOffscreen.height=drawCanvas.height;
     drawOffCtx=drawOffscreen.getContext('2d');
     var p=getPt(ev);
-    drawStartPt=p;
-    drawLastPt=p;
-    drawStraightened=false;
+    drawStartPt=p;drawLastPt=p;drawStraightened=false;
     drawOffCtx.beginPath();
     drawOffCtx.moveTo(p.x,p.y);
     applyDrawStyle(drawOffCtx);
-    // Start hold-to-straighten timer
     clearTimeout(drawStraightenTimer);
-    drawStraightenTimer=setTimeout(function(){
-      if(!isDrawing||!drawStartPt||!drawLastPt)return;
-      // Straighten: replace offscreen stroke with a single line start→last
-      drawStraightened=true;
-      drawOffCtx.clearRect(0,0,drawOffscreen.width,drawOffscreen.height);
-      applyDrawStyle(drawOffCtx);
-      drawOffCtx.beginPath();
-      drawOffCtx.moveTo(drawStartPt.x,drawStartPt.y);
-      drawOffCtx.lineTo(drawLastPt.x,drawLastPt.y);
-      drawOffCtx.stroke();
-      // Redraw visible canvas with straightened line
-      drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-      if(drawBaseSnap){try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
-      drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
-      drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
-      drawCtx.drawImage(drawOffscreen,0,0);
-      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
-    },400);
+    drawStraightenTimer=setTimeout(function(){straightenStroke();},400);
   },{passive:false});
 
-  drawCanvas.addEventListener('pointermove',function(ev){
+  target.addEventListener('pointermove',function(ev){
     if(ev.pointerType==='touch')return;
     if(!drawMode||!isDrawing)return;
-    ev.preventDefault();ev.stopPropagation();
+    ev.preventDefault();
     var p=getPt(ev);
-    // If already straightened, just update the endpoint live
+    drawLastPt=p;
     if(drawStraightened){
-      drawLastPt=p;
+      // Drag endpoint of straight line
       drawOffCtx.clearRect(0,0,drawOffscreen.width,drawOffscreen.height);
       applyDrawStyle(drawOffCtx);
       drawOffCtx.beginPath();
       drawOffCtx.moveTo(drawStartPt.x,drawStartPt.y);
       drawOffCtx.lineTo(p.x,p.y);
       drawOffCtx.stroke();
-      drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-      if(drawBaseSnap){try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
-      drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
-      drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
-      drawCtx.drawImage(drawOffscreen,0,0);
-      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
+      redrawWithOffscreen();
       return;
     }
-    // Normal drawing — track last point, reset straighten timer on movement
-    drawLastPt=p;
+    // Normal freehand
     clearTimeout(drawStraightenTimer);
-    drawStraightenTimer=setTimeout(function(){
-      if(!isDrawing||!drawStartPt||!drawLastPt)return;
-      drawStraightened=true;
-      drawOffCtx.clearRect(0,0,drawOffscreen.width,drawOffscreen.height);
-      applyDrawStyle(drawOffCtx);
-      drawOffCtx.beginPath();
-      drawOffCtx.moveTo(drawStartPt.x,drawStartPt.y);
-      drawOffCtx.lineTo(drawLastPt.x,drawLastPt.y);
-      drawOffCtx.stroke();
-      drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-      if(drawBaseSnap){try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
-      drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
-      drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
-      drawCtx.drawImage(drawOffscreen,0,0);
-      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
-    },400);
+    drawStraightenTimer=setTimeout(function(){straightenStroke();},400);
     applyDrawStyle(drawOffCtx);
     drawOffCtx.lineTo(p.x,p.y);
     drawOffCtx.stroke();
-    // Restore base instantly then composite current stroke
-    drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-    if(drawBaseSnap){
-      try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}
-    }
-    if(drawTool==='highlight'){
-      drawCtx.globalAlpha=0.25;drawCtx.globalCompositeOperation='source-over';
-    } else if(drawTool==='erase'){
-      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='destination-out';
-    } else {
-      drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
-    }
-    drawCtx.drawImage(drawOffscreen,0,0);
-    drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
+    redrawWithOffscreen();
   },{passive:false});
 
-  drawCanvas.addEventListener('pointerup',function(ev){
+  target.addEventListener('pointerup',function(ev){
     if(ev.pointerType==='touch')return;
     if(!isDrawing)return;
     isDrawing=false;
     clearTimeout(drawStraightenTimer);
-    drawStraightened=false;
-    drawStartPt=null;drawLastPt=null;
+    drawStraightened=false;drawStartPt=null;drawLastPt=null;
     if(drawOffscreen){
-      // Restore base then flatten stroke
-      if(drawBaseSnap){
-        try{
-          drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-          drawCtx.putImageData(drawBaseSnap,0,0);
-        }catch(e){}
-      }
+      if(drawBaseSnap){try{drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
       drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
       drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
       drawCtx.drawImage(drawOffscreen,0,0);
@@ -3608,11 +3541,11 @@ function initDrawCanvas(){
       drawOffscreen=null;drawOffCtx=null;
     }
     drawBaseSnap=null;
-    // Save snapshot instantly (ImageData, no encoding delay)
     saveSnapshot();
   },{passive:false});
 
-  drawCanvas.addEventListener('pointercancel',function(ev){
+  target.addEventListener('pointercancel',function(ev){
+    if(ev.pointerType==='touch')return;
     isDrawing=false;
     clearTimeout(drawStraightenTimer);
     drawStraightened=false;drawStartPt=null;drawLastPt=null;
@@ -3625,20 +3558,38 @@ function initDrawCanvas(){
   drawInited=true;
 }
 
+function straightenStroke(){
+  if(!isDrawing||!drawStartPt||!drawLastPt||!drawOffCtx)return;
+  drawStraightened=true;
+  drawOffCtx.clearRect(0,0,drawOffscreen.width,drawOffscreen.height);
+  applyDrawStyle(drawOffCtx);
+  drawOffCtx.beginPath();
+  drawOffCtx.moveTo(drawStartPt.x,drawStartPt.y);
+  drawOffCtx.lineTo(drawLastPt.x,drawLastPt.y);
+  drawOffCtx.stroke();
+  redrawWithOffscreen();
+}
+
+function redrawWithOffscreen(){
+  drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+  if(drawBaseSnap){try{drawCtx.putImageData(drawBaseSnap,0,0);}catch(e){}}
+  drawCtx.globalAlpha=drawTool==='highlight'?0.25:1;
+  drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
+  drawCtx.drawImage(drawOffscreen,0,0);
+  drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
+}
+
 function applyDrawStyle(ctx){
   if(!ctx)return;
   if(drawTool==='erase'){
     ctx.globalCompositeOperation='destination-out';
-    ctx.lineWidth=28;ctx.globalAlpha=1;
-    ctx.strokeStyle='rgba(0,0,0,1)';
+    ctx.lineWidth=28;ctx.globalAlpha=1;ctx.strokeStyle='rgba(0,0,0,1)';
   } else if(drawTool==='highlight'){
     ctx.globalCompositeOperation='source-over';
-    ctx.strokeStyle=drawColor;
-    ctx.lineWidth=14;ctx.globalAlpha=1;
+    ctx.strokeStyle=drawColor;ctx.lineWidth=14;ctx.globalAlpha=1;
   } else {
     ctx.globalCompositeOperation='source-over';
-    ctx.strokeStyle=drawColor;
-    ctx.lineWidth=2.5;ctx.globalAlpha=1;
+    ctx.strokeStyle=drawColor;ctx.lineWidth=2.5;ctx.globalAlpha=1;
   }
   ctx.lineCap='round';ctx.lineJoin='round';
 }
@@ -3652,9 +3603,7 @@ function restoreDrawing(){
   if(!drawCtx||!drawCanvas||!ES)return;
   fitDrawCanvas();
   drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-  if(drawSnapshots[ES.cur]){
-    try{drawCtx.putImageData(drawSnapshots[ES.cur],0,0);}catch(e){}
-  }
+  if(drawSnapshots[ES.cur]){try{drawCtx.putImageData(drawSnapshots[ES.cur],0,0);}catch(e){}}
 }
 function clearDrawing(){
   if(!drawCtx||!drawCanvas)return;
@@ -3670,28 +3619,22 @@ function toggleDrawMode(){
   drawMode=!drawMode;
   var btn=document.getElementById('draw-toggle-btn');
   var toolbar=document.getElementById('draw-toolbar');
+  var examMain=document.getElementById('exam-main');
   if(drawMode){
     fitDrawCanvas();
     drawCanvas.style.display='block';
-    // pointer-events:all lets pen through; touch returns early in handler
-    drawCanvas.style.pointerEvents='all';
-    drawCanvas.style.cursor='crosshair';
-    drawCanvas.style.touchAction='auto'; // let browser handle touch natively
+    // Canvas always pointer-events:none — pen events caught on exam-main instead
+    drawCanvas.style.pointerEvents='none';
+    if(examMain)examMain.classList.add('drawing');
     if(toolbar)toolbar.classList.add('visible');
     if(btn){btn.textContent='✋ Stop';btn.style.background='rgba(255,255,255,0.9)';btn.style.color='var(--navy2)';}
-    // Prevent accidental text selection while drawing
-    var examMain=document.getElementById('exam-main');
-    if(examMain)examMain.classList.add('drawing');
     restoreDrawing();
   } else {
     saveSnapshot();
-    drawCanvas.style.pointerEvents='none';
-    drawCanvas.style.cursor='default';
     drawCanvas.style.display='none';
+    if(examMain)examMain.classList.remove('drawing');
     if(toolbar)toolbar.classList.remove('visible');
     if(btn){btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
-    var examMain=document.getElementById('exam-main');
-    if(examMain)examMain.classList.remove('drawing');
   }
 }
 function setDrawTool(tool){
@@ -3712,12 +3655,14 @@ function showDrawBtn(){
 }
 function hideDrawBtn(){
   drawMode=false;drawInited=false;
-  if(drawCanvas){drawCanvas.style.display='none';drawCanvas.style.pointerEvents='none';}
+  if(drawCanvas){drawCanvas.style.display='none';}
   drawCanvas=null;drawCtx=null;
   var toolbar=document.getElementById('draw-toolbar');
   if(toolbar)toolbar.classList.remove('visible');
   var btn=document.getElementById('draw-toggle-btn');
   if(btn){btn.style.display='none';btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
+  var examMain=document.getElementById('exam-main');
+  if(examMain)examMain.classList.remove('drawing');
 }
 // ── END DRAWING CANVAS ──
 
