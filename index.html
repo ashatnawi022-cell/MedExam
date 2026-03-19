@@ -623,7 +623,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="admin-nav" onclick="aNav('questions',event)">❓ Questions</button>
       <div class="admin-sb-title" style="margin-top:16px;">Data</div>
       <button class="admin-nav" onclick="aNav('users',event)">👥 Users</button>
-      <button class="admin-nav" onclick="aNav('flags',event)" id="admin-flags-btn">🚩 Flags <span id="admin-flags-badge" style="display:none;background:#ef4444;color:white;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;align-items:center;justify-content:center;margin-left:4px;padding:0 3px;"></span></button>
+      <button class="admin-nav" onclick="aNav('flags',event)" id="admin-flags-btn">📋 Qs Reported <span id="admin-flags-badge" style="display:none;background:#ef4444;color:white;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;align-items:center;justify-content:center;margin-left:4px;padding:0 3px;"></span></button>
       <button class="admin-nav" onclick="aNav('support',event)" id="admin-support-btn">💬 Support <span id="admin-sup-badge" style="display:none;background:#ef4444;color:white;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;align-items:center;justify-content:center;margin-left:4px;padding:0 3px;">!</span></button>
     </div>
     <div class="admin-content">
@@ -662,7 +662,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
         <div id="users-wrap"><div class="spinner-wrap"><div class="spinner"></div></div></div>
       </div>
       <div class="admin-sec" id="asec-flags">
-        <div class="admin-toolbar"><h2>🚩 Flagged Questions</h2></div>
+        <div class="admin-toolbar"><h2>📋 Questions Reported by Users</h2></div>
         <div id="flags-wrap"><div class="empty-state"><div class="esi">🚩</div><p>No flagged questions.</p></div></div>
       </div>
       <div class="admin-sec" id="asec-support">
@@ -2537,7 +2537,7 @@ async function generateSession(){
     });
     if(qFilter==='new')pool=pool.filter(q=>answeredMap[q.id]===undefined);
     else if(qFilter==='wrong')pool=pool.filter(q=>answeredMap[q.id]===false);
-    else if(qFilter==='flagged'){var fIds=Object.keys(loadFlaggedIds());pool=pool.filter(q=>fIds.includes(q.id));}
+    else if(qFilter==='flagged'){var fIds=Object.keys(loadFlaggedIds());pool=pool.filter(function(q){return fIds.includes(q.id);});}
   }
   if(!pool.length){toast('No questions match your selection. Try a different filter.');return;}
   pool=pool.sort(()=>Math.random()-0.5).slice(0,qcount);
@@ -2682,10 +2682,50 @@ async function resumeSession(attId){
   const qIds=att.question_ids||[];
   if(!qIds.length){toast('No questions in this session.');return;}
   const{data:qs}=await sb.from('questions').select('*').in('id',qIds);
-  // preserve original order
   const qMap={};(qs||[]).forEach(q=>qMap[q.id]=q);
   const ordered=qIds.map(id=>qMap[id]).filter(Boolean);
-  await launchSession(ordered,att.filter_type||'Session',att);
+  if(att.status==='done'){
+    // Load in review/check mode so user sees all their answers
+    await launchSessionReview(ordered,att);
+  } else {
+    await launchSession(ordered,att.filter_type||'Session',att);
+  }
+}
+
+async function launchSessionReview(questions,att){
+  // Load a completed exam for review - show all answers, navigate freely
+  clearInterval(eTick);clearInterval(qTick);clearTimedTick();
+  eCheckMode=true;eHLMode=false;eHLC=HLCOLS[0];eSBOpen=false;
+  eAttId=att.id;
+  const answers=(att.answers||[]).map(function(a){return a===null?null:a===true?true:false;});
+  ES={
+    questions,cur:0,
+    score:att.score||answers.filter(function(a){return a===true;}).length,
+    results:answers,
+    mySelections:Array(questions.length).fill(null),
+    qTimes:att.question_times||Array(questions.length).fill(0),
+    excluded:Array(questions.length).fill(null).map(function(){return new Set();}),
+    examSec:att.exam_seconds||0,
+    title:att.filter_type||'Session',
+    timed:false,flagged:{},examLimit:0
+  };
+  // Load flagged IDs
+  var storedFlags=loadFlaggedIds();
+  ES.questions.forEach(function(q,i){if(storedFlags[q.id])ES.flagged[i]=true;});
+  eSec=ES.examSec;qSec=0;
+  document.getElementById('tb-title').textContent=(att.filter_type||'Session')+' — Review';
+  document.getElementById('exam-t').textContent=efmt(eSec);
+  document.getElementById('q-t').textContent='--:--';
+  document.getElementById('exam-bb').style.display='flex';
+  document.getElementById('home-fab').style.display='inline-block';
+  document.getElementById('sus-fab').style.display='none';
+  document.getElementById('end-fab').style.display='none';
+  eRun=false;qRun=false;
+  // No ticking timers in review mode
+  eTick=null;qTick=null;
+  showPage('examPage');eRenderQ();
+  const supFab=document.getElementById('support-fab');
+  if(supFab)supFab.style.display='none';
 }
 
 //    EXAM ENGINE   
@@ -3124,7 +3164,7 @@ async function flagQ(qIdx){
     ES.flagged[qIdx]=true;
     toast('Bookmarked! 🚩 Review it later from Flagged filter.');
   }
-  // Save flagged IDs to localStorage for persistence across sessions
+  // Save to localStorage
   try{
     var key='flagged_qs_'+CU.id;
     var stored=JSON.parse(localStorage.getItem(key)||'{}');
@@ -3133,6 +3173,13 @@ async function flagQ(qIdx){
     else delete stored[qId];
     localStorage.setItem(key,JSON.stringify(stored));
   }catch(e){}
+  // Save to DB for cross-device sync
+  var qId2=ES.questions[qIdx].id;
+  if(ES.flagged[qIdx]===true){
+    sb.from('question_flags').insert({question_id:qId2,user_id:CU.id,reason:'__bookmark__',status:'bookmark'}).then(function(){});
+  } else {
+    sb.from('question_flags').delete().eq('question_id',qId2).eq('user_id',CU.id).eq('reason','__bookmark__').then(function(){});
+  }
   eBuildSB();
   var flagBtn=document.getElementById('flag-btn-q');
   if(flagBtn){flagBtn.className='flag-btn'+(ES.flagged[qIdx]===true?' flagged':'');flagBtn.textContent=ES.flagged[qIdx]===true?'🚩 Flagged':'🚩 Flag';}
@@ -3143,6 +3190,17 @@ function loadFlaggedIds(){
     var key='flagged_qs_'+CU.id;
     return JSON.parse(localStorage.getItem(key)||'{}');
   }catch(e){return{};}
+}
+async function loadFlaggedIdsFromDB(){
+  // Load bookmarks from DB (syncs across devices)
+  var{data}=await sb.from('question_flags').select('question_id').eq('user_id',CU.id).eq('reason','__bookmark__');
+  if(!data||!data.length)return;
+  try{
+    var key='flagged_qs_'+CU.id;
+    var stored=JSON.parse(localStorage.getItem(key)||'{}');
+    data.forEach(function(r){stored[r.question_id]=true;});
+    localStorage.setItem(key,JSON.stringify(stored));
+  }catch(e){}
 }
 // Report a question error (separate from personal flag)
 async function reportQ(qIdx){
@@ -3324,6 +3382,7 @@ async function loadFlagsTable(){
   wrap.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   const{data:flags}=await sb.from('question_flags')
     .select('*,questions(id,question_text,custom_id),profiles(full_name,email)')
+    .neq('reason','__bookmark__')
     .order('created_at',{ascending:false});
   const badge=document.getElementById('admin-flags-badge');
   const pending=(flags||[]).filter(function(f){return f.status==='pending';});
@@ -3375,6 +3434,8 @@ async function initSupportFab(){
   if(!CU)return;
   const fab=document.getElementById('support-fab');
   if(fab)fab.style.display='flex';
+  // Load bookmarked questions from DB for cross-device sync
+  loadFlaggedIdsFromDB();
   // On first load, mark all messages without a reply as already-read
   // to avoid false "unread" notifications from old/default data
   await sb.from('support_messages')
