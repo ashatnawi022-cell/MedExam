@@ -3584,26 +3584,36 @@ async function loadUsersTable(){
   if(!u?.length){w.innerHTML='<div class="empty-state"><p>No users.</p></div>';return;}
   const pending=u.filter(x=>x.status==='pending'||!x.status);
   const approved=u.filter(x=>x.status==='approved');
+  const iAmSuperAdmin=CP?.is_super_admin===true;
   const renderRow=x=>{
     const isPending=x.status==='pending'||!x.status;
+    const isSuperAdmin=x.is_super_admin===true;
+    // Regular admins cannot touch super admins
+    const isProtected=isSuperAdmin&&!iAmSuperAdmin;
     const statusBadge=isPending
-      ?`<span style="background:var(--amber-light);color:var(--amber);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">  Pending</span>`
-      :`<span style="background:var(--green-light);color:var(--green);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">  Approved</span>`;
-    return `<tr>
-      <td><b>${x.full_name||' '}</b></td>
-      <td>${x.email||' '}</td>
-      <td>${x.university||' '}</td>
-      <td>${x.year_of_study||' '}</td>
+      ?`<span style="background:var(--amber-light);color:var(--amber);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">⏳ Pending</span>`
+      :`<span style="background:var(--green-light);color:var(--green);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;">✓ Approved</span>`;
+    const adminBadge=isSuperAdmin
+      ?'<span title="Super Admin" style="font-size:14px;">👑</span>'
+      :x.is_admin?'✅':'—';
+    return `<tr${isSuperAdmin?' style="background:#fefce8;"':''}>
+      <td><b>${x.full_name||'—'}</b>${isSuperAdmin?'<span style="font-size:10px;color:#b45309;font-weight:700;margin-left:6px;background:#fef9c3;padding:1px 6px;border-radius:4px;">SUPER ADMIN</span>':''}</td>
+      <td>${x.email||'—'}</td>
+      <td>${x.university||'—'}</td>
+      <td>${x.year_of_study||'—'}</td>
       <td>${statusBadge}</td>
-      <td>${x.is_admin?'✅':'—'}</td>
+      <td>${adminBadge}</td>
       <td class="tbl-actions">
-        ${isPending
-          ?`<button class="btn btn-sm btn-success" onclick="approveUser('${x.id}')">  Approve</button>
-             <button class="btn btn-sm btn-danger" onclick="rejectUser('${x.id}','${x.email||''}')">  Reject</button>`
-          :`<button class="btn btn-sm btn-danger" onclick="revokeUser('${x.id}')">Revoke</button>`}
-        <button class="btn btn-sm btn-secondary" onclick="toggleAdmin('${x.id}',${x.is_admin})">${x.is_admin?'Remove Admin':'Make Admin'}</button>
-        <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">🔑 Reset Pass</button>
-        <button class="btn btn-sm" onclick="openEditUserModal('${x.id}')" style="background:#eff6ff;color:var(--blue);border:1px solid #93c5fd;">✏️ Edit</button>
+        ${isProtected
+          ?'<span style="font-size:12px;color:var(--gray400);font-style:italic;">Protected</span>'
+          :`${isPending
+            ?`<button class="btn btn-sm btn-success" onclick="approveUser('${x.id}')">✓ Approve</button>
+               <button class="btn btn-sm btn-danger" onclick="rejectUser('${x.id}','${x.email||''}')">✕ Reject</button>`
+            :`<button class="btn btn-sm btn-danger" onclick="revokeUser('${x.id}')">Revoke</button>`}
+          <button class="btn btn-sm btn-secondary" onclick="toggleAdmin('${x.id}',${x.is_admin})">${x.is_admin?'Remove Admin':'Make Admin'}</button>
+          <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">🔑 Reset Pass</button>
+          <button class="btn btn-sm" onclick="openEditUserModal('${x.id}')" style="background:#eff6ff;color:var(--blue);border:1px solid #93c5fd;">✏️ Edit</button>`
+        }
       </td>
     </tr>`;
   };
@@ -3624,6 +3634,10 @@ async function approveUser(id){
   toast('User approved!  ');loadUsersTable();
 }
 async function revokeUser(id){
+  if(!CP?.is_super_admin){
+    const{data:t}=await sb.from('profiles').select('is_super_admin').eq('id',id).single();
+    if(t?.is_super_admin){toast('Cannot revoke a super admin');return;}
+  }
   if(!confirm('Revoke this user\'s access? They will see the pending screen again.'))return;
   const{error}=await sb.from('profiles').update({status:'pending'}).eq('id',id);
   if(error){toast('Error: '+error.message);console.error('revokeUser error:',error);return;}
@@ -3635,11 +3649,22 @@ async function rejectUser(id,email){
   if(error){toast('Error: '+error.message);console.error('rejectUser error:',error);return;}
   toast('User rejected and removed');loadUsersTable();
 }
-async function toggleAdmin(id,is){await sb.from('profiles').update({is_admin:!is}).eq('id',id);toast(is?'Admin removed':'Admin granted');loadUsersTable();}
+async function toggleAdmin(id,is){
+  if(!CP?.is_super_admin){
+    const{data:t}=await sb.from('profiles').select('is_super_admin').eq('id',id).single();
+    if(t?.is_super_admin){toast('Cannot change super admin privileges');return;}
+  }
+  await sb.from('profiles').update({is_admin:!is}).eq('id',id);
+  toast(is?'Admin removed':'Admin granted');loadUsersTable();
+}
 
 // ── EDIT USER (ADMIN) ──
 let editUserId=null;
 async function openEditUserModal(id){
+  if(!CP?.is_super_admin){
+    const{data:t}=await sb.from('profiles').select('is_super_admin').eq('id',id).single();
+    if(t?.is_super_admin){toast('Cannot edit a super admin');return;}
+  }
   editUserId=id;
   const{data:u}=await sb.from('profiles').select('*').eq('id',id).single();
   if(!u){toast('Could not load user');return;}
@@ -3679,7 +3704,11 @@ async function adminResetUserProgress(){
 
 //    RESET PASSWORD   
 let resetPassUserId=null;
-function openResetPassModal(userId,name){
+async function openResetPassModal(userId,name){
+  if(!CP?.is_super_admin){
+    const{data:t}=await sb.from('profiles').select('is_super_admin').eq('id',userId).single();
+    if(t?.is_super_admin){toast('Cannot reset super admin password');return;}
+  }
   resetPassUserId=userId;
   document.getElementById('reset-pass-name').textContent=name;
   document.getElementById('reset-pass-input').value='';
