@@ -726,10 +726,13 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   <div class="modal qmodal">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
       <h2 id="q-modal-title" style="margin:0;">Add Question</h2>
-      <button type="button" class="btn btn-sm" onclick="toggleParsePanel()" id="parse-toggle-btn"
-        style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;gap:5px;">
-        📋 Paste Full Question
-      </button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="draft-indicator" style="display:none;font-size:11px;color:var(--gray400);font-style:italic;">💾 Draft saved</span>
+        <button type="button" class="btn btn-sm" onclick="toggleParsePanel()" id="parse-toggle-btn"
+          style="background:#eff6ff;color:var(--blue);border:1.5px solid #93c5fd;font-weight:700;gap:5px;">
+          📋 Paste Full Question
+        </button>
+      </div>
     </div>
 
     <!-- Parse Panel (hidden by default) -->
@@ -760,7 +763,22 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
     </div>
     <div class="qform-grid">
       <div class="form-group"><label class="form-label">System</label><select class="form-input form-select" id="qm-subj" onchange="loadQModalCats()"></select></div>
-      <div class="form-group"><label class="form-label">Topic</label><select class="form-input form-select" id="qm-cat"></select></div>
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label class="form-label" style="margin:0;">Topic</label>
+          <button type="button" onclick="quickAddTopic()" class="btn btn-sm" style="background:#eff6ff;color:var(--blue);border:1px solid #93c5fd;font-size:11px;padding:3px 9px;">+ New topic</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <select class="form-input form-select" id="qm-cat" style="flex:1;"></select>
+        </div>
+        <div id="quick-topic-box" style="display:none;margin-top:8px;display:none;">
+          <input type="text" class="form-input" id="quick-topic-input" placeholder="New topic name..." style="margin-bottom:6px;">
+          <div style="display:flex;gap:6px;">
+            <button type="button" onclick="confirmQuickAddTopic()" class="btn btn-primary btn-sm">Add</button>
+            <button type="button" onclick="cancelQuickAddTopic()" class="btn btn-secondary btn-sm">Cancel</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="qform-grid">
       <div class="form-group"><label class="form-label">Subject <span style="color:var(--gray400);font-weight:400;">(e.g. Pathology, Physiology)</span></label><select class="form-input form-select" id="qm-disc"><option value="">— None —</option></select></div>
@@ -3395,6 +3413,7 @@ async function loadQTable(){
       <td class="tbl-actions">
         <button class="btn btn-sm" onclick="previewQ('${q.id}')" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac;">👁 View</button>
         <button class="btn btn-sm btn-secondary" onclick="openQModal('${q.id}')">Edit</button>
+        <button class="btn btn-sm" onclick="duplicateQ('${q.id}')" style="background:#fef9c3;color:#b45309;border:1px solid #fde68a;">⧉ Dupe</button>
         <button class="btn btn-sm btn-danger" onclick="delQ('${q.id}')">Delete</button>
       </td>
     </tr>`;}).join('')}</tbody></table>`;
@@ -3555,11 +3574,111 @@ function rteClearAll(){
   rteSetHTML('rte-exp','');
   rteSetHTML('rte-th','');
 }
+
+// ── AUTO-SAVE DRAFT ──
+var draftSaveTimer=null;
+function qDraftKey(){return'qmodal_draft_v1';}
+function saveDraft(){
+  try{
+    var draft={
+      qtext:rteGetHTML('rte-qtext'),
+      exp:rteGetHTML('rte-exp'),
+      th:rteGetHTML('rte-th'),
+      opts:Array.from(document.querySelectorAll('.dyn-opt')).map(function(i){return i.value;}),
+      oas:Array.from(document.querySelectorAll('.dyn-oa')).map(function(i){return i.value;}),
+      correct:selCorr,
+      subj:document.getElementById('qm-subj')?.value||'',
+      cat:document.getElementById('qm-cat')?.value||'',
+      disc:document.getElementById('qm-disc')?.value||'',
+      cid:document.getElementById('qm-cid')?.value||'',
+      editId:editQId,
+      ts:Date.now()
+    };
+    localStorage.setItem(qDraftKey(),JSON.stringify(draft));
+    var ind=document.getElementById('draft-indicator');
+    if(ind){ind.style.display='inline';setTimeout(function(){ind.style.display='none';},2000);}
+  }catch(e){}
+}
+function clearDraft(){try{localStorage.removeItem(qDraftKey());}catch(e){}}
+function startDraftAutosave(){
+  if(draftSaveTimer)clearInterval(draftSaveTimer);
+  draftSaveTimer=setInterval(saveDraft,3000);
+}
+function stopDraftAutosave(){
+  if(draftSaveTimer){clearInterval(draftSaveTimer);draftSaveTimer=null;}
+}
+async function restoreDraftIfExists(){
+  try{
+    var raw=localStorage.getItem(qDraftKey());
+    if(!raw)return false;
+    var d=JSON.parse(raw);
+    // Only restore if draft is recent (< 24h) and we're adding a NEW question (not editing)
+    if(!d||Date.now()-d.ts>86400000||d.editId)return false;
+    var age=Math.round((Date.now()-d.ts)/60000);
+    var restore=confirm('You have an unsaved draft from '+age+' minute'+(age!==1?'s':'')+' ago. Restore it?');
+    if(!restore){clearDraft();return false;}
+    // Restore content
+    if(d.qtext)rteSetHTML('rte-qtext',d.qtext);
+    if(d.exp)rteSetHTML('rte-exp',d.exp);
+    if(d.th)rteSetHTML('rte-th',d.th);
+    if(d.opts&&d.opts.length){
+      document.getElementById('opts-container').innerHTML='';
+      document.getElementById('oa-container').innerHTML='';
+      document.getElementById('corr-sel').innerHTML='';
+      d.opts.forEach(function(o){addOpt(o);});
+      if(d.oas)document.querySelectorAll('.dyn-oa').forEach(function(ta,i){ta.value=d.oas[i]||'';});
+      if(d.correct!==null&&d.correct!==undefined)selCorrect(d.correct);
+    }
+    if(d.subj){document.getElementById('qm-subj').value=d.subj;await loadQModalCats();}
+    if(d.cat)document.getElementById('qm-cat').value=d.cat;
+    if(d.disc)document.getElementById('qm-disc').value=d.disc;
+    if(d.cid)document.getElementById('qm-cid').value=d.cid;
+    return true;
+  }catch(e){return false;}
+}
+
+// ── DUPLICATE QUESTION ──
+async function duplicateQ(id){
+  const{data:q}=await sb.from('questions').select('*').eq('id',id).single();
+  if(!q){toast('Could not load question');return;}
+  var copy=Object.assign({},q);
+  delete copy.id;
+  delete copy.created_at;
+  copy.custom_id=copy.custom_id?copy.custom_id+'-copy':'';
+  const{error}=await sb.from('questions').insert(copy);
+  if(error){toast('Error: '+error.message);return;}
+  toast('Question duplicated! ✓');loadQTable();
+}
+
+// ── TOPIC QUICK-ADD ──
+function quickAddTopic(){
+  var box=document.getElementById('quick-topic-box');
+  box.style.display='block';
+  document.getElementById('quick-topic-input').value='';
+  document.getElementById('quick-topic-input').focus();
+}
+function cancelQuickAddTopic(){
+  document.getElementById('quick-topic-box').style.display='none';
+}
+async function confirmQuickAddTopic(){
+  var name=document.getElementById('quick-topic-input').value.trim();
+  if(!name){toast('Enter a topic name');return;}
+  var sid=document.getElementById('qm-subj').value;
+  if(!sid){toast('Select a system first');return;}
+  const{data,error}=await sb.from('categories').insert({name:name,subject_id:sid}).select().single();
+  if(error){toast('Error: '+error.message);return;}
+  await loadQModalCats();
+  document.getElementById('qm-cat').value=data.id;
+  cancelQuickAddTopic();
+  toast('Topic "'+name+'" added! ✓');
+}
+
 async function openQModal(id=null){
   editQId=id;selCorr=null;
   document.getElementById('q-modal-title').textContent=id?'Edit Question':'Add Question';
   document.getElementById('qm-cid').value='';
   rteClearAll();
+  cancelQuickAddTopic();
   document.getElementById('opts-container').innerHTML='';document.getElementById('oa-container').innerHTML='';document.getElementById('corr-sel').innerHTML='';
   // populate subject/cat selects
   const{data:s}=await sb.from('subjects').select('id,name').order('name');
@@ -3589,8 +3708,14 @@ async function openQModal(id=null){
       document.querySelectorAll('.dyn-oa').forEach((ta,i)=>{ta.value=oa[i]||'';});
       selCorrect(q.correct_answer);
     }
-  } else {addOpt();addOpt();addOpt();addOpt();addOpt();}
+  } else {
+    // Check for unsaved draft (only for new questions)
+    var restored=await restoreDraftIfExists();
+    if(!restored){addOpt();addOpt();addOpt();addOpt();addOpt();}
+  }
   showAModal('q-modal');
+  // Start auto-saving draft every 3 seconds
+  if(!id)startDraftAutosave();
 }
 async function saveQ(){
   const cat_id=document.getElementById('qm-cat').value;
@@ -3632,7 +3757,8 @@ async function saveQ(){
   if(editQId){const r=await sb.from('questions').update(payload).eq('id',editQId);err=r.error;}
   else{const r=await sb.from('questions').insert(payload);err=r.error;}
   if(err){toast('Error: '+err.message);console.error('saveQ error:',err);return;}
-  hideAModal('q-modal');toast('Question saved!  ');loadQTable();
+  stopDraftAutosave();clearDraft();
+  hideAModal('q-modal');toast('Question saved! ✓');loadQTable();
 }
 async function previewQ(id){
   const{data:q}=await sb.from('questions').select('*').eq('id',id).single();
@@ -4304,6 +4430,7 @@ function showAModal(id){
 function hideAModal(id){
   document.getElementById(id).style.display='none';
   if(_openModal===id)_openModal=null;
+  if(id==='q-modal')stopDraftAutosave();
 }
 document.addEventListener('keydown',function(ev){
   if(ev.key==='Escape'){
