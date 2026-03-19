@@ -1971,6 +1971,7 @@ async function goHome(){
   const nh=document.getElementById('nav-home');if(nh)nh.classList.add('active');
   showPage('homePage');
   await renderDashboard();
+  initSupportFab();
 }
 
 async function loadHome(){
@@ -2831,6 +2832,7 @@ async function eSuspend(){
   hideEModal('sus-modal');await sb.from('attempts').update({status:'suspended',updated_at:new Date().toISOString()}).eq('id',eAttId);
   await eSave();clearInterval(eTick);clearInterval(qTick);
   ES=null;eAttId=null;eCheckMode=false;showPage('homePage');renderDashboard();
+  initSupportFab();
 }
 function eRenderResults(){
   // Restore support fab now that exam is over
