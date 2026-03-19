@@ -3610,7 +3610,7 @@ async function loadUsersTable(){
             ?`<button class="btn btn-sm btn-success" onclick="approveUser('${x.id}')">✓ Approve</button>
                <button class="btn btn-sm btn-danger" onclick="rejectUser('${x.id}','${x.email||''}')">✕ Reject</button>`
             :`<button class="btn btn-sm btn-danger" onclick="revokeUser('${x.id}')">Revoke</button>`}
-          <button class="btn btn-sm btn-secondary" onclick="toggleAdmin('${x.id}',${x.is_admin})">${x.is_admin?'Remove Admin':'Make Admin'}</button>
+          ${iAmSuperAdmin?`<button class="btn btn-sm btn-secondary" onclick="toggleAdmin('${x.id}',${x.is_admin})">${x.is_admin?'Remove Admin':'Make Admin'}</button>`:''}
           <button class="btn btn-sm btn-amber" onclick="openResetPassModal('${x.id}','${(x.full_name||x.email||'').replace(/'/g,"\\'")}')">🔑 Reset Pass</button>
           <button class="btn btn-sm" onclick="openEditUserModal('${x.id}')" style="background:#eff6ff;color:var(--blue);border:1px solid #93c5fd;">✏️ Edit</button>`
         }
@@ -3635,8 +3635,9 @@ async function approveUser(id){
 }
 async function revokeUser(id){
   if(!CP?.is_super_admin){
-    const{data:t}=await sb.from('profiles').select('is_super_admin').eq('id',id).single();
+    const{data:t}=await sb.from('profiles').select('is_admin,is_super_admin').eq('id',id).single();
     if(t?.is_super_admin){toast('Cannot revoke a super admin');return;}
+    if(t?.is_admin){toast('Only the super admin can revoke other admins');return;}
   }
   if(!confirm('Revoke this user\'s access? They will see the pending screen again.'))return;
   const{error}=await sb.from('profiles').update({status:'pending'}).eq('id',id);
@@ -3651,8 +3652,7 @@ async function rejectUser(id,email){
 }
 async function toggleAdmin(id,is){
   if(!CP?.is_super_admin){
-    const{data:t}=await sb.from('profiles').select('is_super_admin').eq('id',id).single();
-    if(t?.is_super_admin){toast('Cannot change super admin privileges');return;}
+    toast('Only the super admin can grant or remove admin privileges');return;
   }
   await sb.from('profiles').update({is_admin:!is}).eq('id',id);
   toast(is?'Admin removed':'Admin granted');loadUsersTable();
