@@ -2905,7 +2905,8 @@ async function sendSupportMsg(){
     user_email:CU.email,
     user_name:CP?.full_name||CU.email,
     message:txt,
-    is_read:false
+    is_read:false,
+    conv_read:false
   });
   input.disabled=false;
   if(error){toast('Error sending message');input.value=txt;return;}
@@ -2933,20 +2934,53 @@ async function loadSupportTable(){
     .order('created_at',{ascending:false});
   if(!data||!data.length){
     wrap.innerHTML='<div class="empty-state"><div class="esi">💬</div><p>No support messages yet.</p></div>';
+    updateAdminSupportBadge(0);
     return;
   }
-  const unread=data.filter(function(m){return!m.reply&&!m.is_read;});
-  updateAdminSupportBadge(unread.length);
-  wrap.innerHTML='<div class="sup-conv-list">'+data.map(function(m){
-    const name=m.profiles?.full_name||m.user_name||m.user_email||'Unknown';
-    const isUnread=!m.reply;
-    return '<div class="sup-conv-item'+(isUnread?' unread':'')+'" onclick="openSupportConv(\''+m.user_id+'\',\''+escHtml(name)+'\')">'
+
+  // Group by user_id - one conversation card per user
+  const convMap={};
+  data.forEach(function(m){
+    if(!convMap[m.user_id]){
+      convMap[m.user_id]={
+        userId:m.user_id,
+        name:m.profiles?.full_name||m.user_name||m.user_email||'Unknown',
+        email:m.user_email||'',
+        messages:[],
+        lastTime:m.created_at,
+        conv_read:m.conv_read  // use the most recent message's conv_read
+      };
+    }
+    convMap[m.user_id].messages.push(m);
+  });
+
+  // A conversation is "unread" if conv_read is false on ANY message by this user
+  // that was sent after the last admin reply (i.e. new messages since last read)
+  const convs=Object.values(convMap);
+  const unreadConvs=convs.filter(function(c){
+    return c.messages.some(function(m){return m.conv_read===false;});
+  });
+  updateAdminSupportBadge(unreadConvs.length);
+
+  wrap.innerHTML='<div class="sup-conv-list">'+convs.map(function(c){
+    const latest=c.messages[0]; // already sorted desc
+    const msgCount=c.messages.length;
+    const unreadCount=c.messages.filter(function(m){return m.conv_read===false;}).length;
+    const isUnread=unreadCount>0;
+    const hasReply=c.messages.some(function(m){return m.reply;});
+    return '<div class="sup-conv-item'+(isUnread?' unread':'')+'" onclick="openSupportConv(\''+c.userId+'\',\''+escHtml(c.name)+'\')">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;">'
-      +'<span class="sup-conv-name">'+escHtml(name)+'</span>'
-      +(isUnread?'<span style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">New</span>':'')
+      +'<div>'
+      +'<span class="sup-conv-name">'+escHtml(c.name)+'</span>'
+      +(c.email?'<span style="font-size:11px;color:var(--gray400);margin-left:8px;">'+escHtml(c.email)+'</span>':'')
       +'</div>'
-      +'<div class="sup-conv-preview">'+escHtml(m.message)+'</div>'
-      +'<div class="sup-conv-meta">'+fmtSupTime(m.created_at)+(m.reply?' · <span style="color:#16a34a;">Replied</span>':' · <span style="color:#ef4444;">Awaiting reply</span>')+'</div>'
+      +(isUnread?'<span style="background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;">'+unreadCount+' new</span>':'')
+      +'</div>'
+      +'<div class="sup-conv-preview">'+escHtml(latest.message)+'</div>'
+      +'<div class="sup-conv-meta">'
+      +msgCount+' message'+(msgCount!==1?'s':'')+' · '+fmtSupTime(latest.created_at)
+      +(hasReply?' · <span style="color:#16a34a;">Replied</span>':' · <span style="color:#ef4444;">Awaiting reply</span>')
+      +'</div>'
       +'</div>';
   }).join('')+'</div>';
 }
@@ -2956,6 +2990,12 @@ async function openSupportConv(userId, userName){
   const panel=document.getElementById('support-reply-panel');
   panel.style.display='block';
   panel.dataset.userId=userId;
+  // Mark all messages from this user as read when admin opens conversation
+  await sb.from('support_messages')
+    .update({conv_read:true})
+    .eq('user_id',userId);
+  updateAdminSupportBadge();
+
   const msgsEl=document.getElementById('sup-admin-msgs');
   msgsEl.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
 
@@ -3062,14 +3102,16 @@ function updateAdminSupportBadge(count){
   const badge=document.getElementById('admin-sup-badge');
   if(!badge)return;
   if(count===undefined){
-    sb.from('support_messages').select('id').is('reply',null).then(function(r){
-      const n=r.data?r.data.length:0;
+    // Count distinct users with unread messages
+    sb.from('support_messages').select('user_id').eq('conv_read',false).then(function(r){
+      const uniqueUsers=new Set((r.data||[]).map(function(m){return m.user_id;}));
+      const n=uniqueUsers.size;
       badge.style.display=n>0?'inline-flex':'none';
-      badge.textContent=n>0?n:'!';
+      badge.textContent=n>0?String(n):'!';
     });
   } else {
     badge.style.display=count>0?'inline-flex':'none';
-    badge.textContent=count>0?count:'!';
+    badge.textContent=count>0?String(count):'!';
   }
 }
 
