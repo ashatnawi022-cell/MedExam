@@ -227,7 +227,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 /* For inline table-like data rows in question text */
 .qtext .data-row{display:flex;gap:8px;margin:3px 0;font-size:14px;}
 .opts{display:flex;flex-direction:column;gap:7px;}
-.opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
 .opt .L{font-weight:700;min-width:18px;color:var(--navy2);flex-shrink:0;}
 .opt-txt{flex:1;}
@@ -245,7 +245,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt:hover:not([disabled]) .excl-btn{display:flex;background:var(--red-light);color:var(--red);}
 .opt.excl .excl-btn{display:flex!important;background:var(--green-light);color:var(--green);}
 .opt[disabled] .excl-btn{display:none!important;}
-.sub-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;}
+.sub-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .sub-btn:disabled{background:var(--gray300);cursor:default;}
 .sub-btn:hover:not(:disabled){background:var(--navy);}
 .exp-box{margin-top:14px;border-radius:10px;border:1px solid var(--gray200);overflow:hidden;}
@@ -373,6 +373,18 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .ans-stat-count{color:var(--gray400);min-width:60px;}
 .ans-stats-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray400);margin-bottom:4px;}
 
+/* -- DRAWING CANVAS -- */
+#draw-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;touch-action:none;}
+#draw-canvas.active{pointer-events:all;cursor:crosshair;}
+.draw-toolbar{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:400;background:white;border:1px solid var(--gray200);border-radius:14px;padding:10px 8px;box-shadow:0 4px 20px rgba(0,0,0,0.12);}
+.draw-toolbar.visible{display:flex;}
+.draw-color{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s;flex-shrink:0;}
+.draw-color.active{border-color:var(--navy2);transform:scale(1.2);}
+.draw-tool-btn{width:32px;height:32px;border:1.5px solid var(--gray200);border-radius:8px;background:white;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.draw-tool-btn.active{background:var(--navy2);color:white;border-color:var(--navy2);}
+.draw-size{width:28px;height:28px;border-radius:50%;background:var(--gray700);cursor:pointer;display:flex;align-items:center;justify-content:center;border:none;transition:all 0.15s;}
+.draw-sep{height:1px;background:var(--gray200);margin:2px 0;}
+/* -- END DRAWING CANVAS -- */
 /* -- ANALYTICS -- */
 .analytics-wrap{max-width:900px;margin:0 auto;padding:28px 24px 80px;}
 .analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
@@ -706,11 +718,31 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <span class="nav-lbl" id="enav-lbl">Q 1 / ?</span>
       <button class="nav-ebtn" id="next-btn" onclick="eNav(ES.cur+1)">Next →</button>
     </div>
-    <div class="nav-right"></div>
+    <div class="nav-right">
+      <button class="sb-tog" id="draw-toggle-btn" onclick="toggleDrawMode()" title="Toggle drawing mode" style="display:none;">🖊 Draw</button>
+    </div>
   </div>
   <div class="exam-layout">
     <div class="exam-sb hidden" id="exam-sb"><div class="esb-inner"><div class="esb-title">Questions</div><div id="esb-list"></div></div></div>
-    <div class="exam-main" id="exam-main"></div>
+    <div class="exam-main" id="exam-main" style="position:relative;">
+      <canvas id="draw-canvas"></canvas>
+    </div>
+  </div>
+  <!-- Drawing toolbar -->
+  <div class="draw-toolbar" id="draw-toolbar">
+    <button class="draw-tool-btn active" id="draw-pen-btn" onclick="setDrawTool('pen')" title="Pen">✏️</button>
+    <button class="draw-tool-btn" id="draw-hl-btn" onclick="setDrawTool('highlight')" title="Highlighter">🖊</button>
+    <button class="draw-tool-btn" id="draw-erase-btn" onclick="setDrawTool('erase')" title="Eraser">⊘</button>
+    <div class="draw-sep"></div>
+    <div class="draw-color active" style="background:#1e293b;" onclick="setDrawColor('#1e293b')" data-color="#1e293b"></div>
+    <div class="draw-color" style="background:#dc2626;" onclick="setDrawColor('#dc2626')" data-color="#dc2626"></div>
+    <div class="draw-color" style="background:#2563eb;" onclick="setDrawColor('#2563eb')" data-color="#2563eb"></div>
+    <div class="draw-color" style="background:#16a34a;" onclick="setDrawColor('#16a34a')" data-color="#16a34a"></div>
+    <div class="draw-color" style="background:#d97706;" onclick="setDrawColor('#d97706')" data-color="#d97706"></div>
+    <div class="draw-color" style="background:#9333ea;" onclick="setDrawColor('#9333ea')" data-color="#9333ea"></div>
+    <div class="draw-sep"></div>
+    <button class="draw-tool-btn" onclick="clearDrawing()" title="Clear all">🗑</button>
+    <button class="draw-tool-btn" onclick="undoDrawing()" title="Undo">↩</button>
   </div>
   <div class="bottom-bar" id="exam-bb">
     <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">🏠 Home</button>
@@ -1285,7 +1317,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 /* For inline table-like data rows in question text */
 .qtext .data-row{display:flex;gap:8px;margin:3px 0;font-size:14px;}
 .opts{display:flex;flex-direction:column;gap:7px;}
-.opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:14px;line-height:1.5;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
 .opt .L{font-weight:700;min-width:18px;color:var(--navy2);flex-shrink:0;}
 .opt-txt{flex:1;}
@@ -1303,7 +1335,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt:hover:not([disabled]) .excl-btn{display:flex;background:var(--red-light);color:var(--red);}
 .opt.excl .excl-btn{display:flex!important;background:var(--green-light);color:var(--green);}
 .opt[disabled] .excl-btn{display:none!important;}
-.sub-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;}
+.sub-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .sub-btn:disabled{background:var(--gray300);cursor:default;}
 .sub-btn:hover:not(:disabled){background:var(--navy);}
 .exp-box{margin-top:14px;border-radius:10px;border:1px solid var(--gray200);overflow:hidden;}
@@ -2726,6 +2758,8 @@ async function launchSessionReview(questions,att){
   showPage('examPage');eRenderQ();
   const supFab=document.getElementById('support-fab');
   if(supFab)supFab.style.display='none';
+  clearAllDrawings();
+  setTimeout(function(){initDrawCanvas();showDrawBtn();},100);
 }
 
 //    EXAM ENGINE   
@@ -2795,6 +2829,9 @@ async function launchSession(questions,title,existingAtt=null){
   // Hide support chat during exam so it doesn't cover buttons
   const supFab=document.getElementById('support-fab');
   if(supFab)supFab.style.display='none';
+  // Init drawing canvas and show draw button
+  clearAllDrawings();
+  setTimeout(function(){initDrawCanvas();showDrawBtn();},100);
 }
 
 async function eSave(){
@@ -2866,12 +2903,19 @@ function eTogExcl(i,ev){
     if(ES.mySelections[ES.cur]===i){ES.mySelections[ES.cur]=null;opt.classList.remove('sel-opt');const sb=document.getElementById('esubBtn');if(sb)sb.disabled=true;}}
 }
 
-function ePickOpt(i){
+function ePickOpt(i,ev){
   if(ES.results[ES.cur]!==null)return;
   const excl=ES.excluded[ES.cur];if(excl.has(i))return;
   ES.mySelections[ES.cur]=i;
   document.querySelectorAll('.opt').forEach((el,idx)=>{if(!excl.has(idx))el.classList.toggle('sel-opt',idx===i);});
-  const sb=document.getElementById('esubBtn');if(sb)sb.disabled=false;
+  const subBtn=document.getElementById('esubBtn');
+  if(subBtn){
+    subBtn.disabled=false;
+    subBtn.removeAttribute('disabled');
+    // Force iOS Safari repaint so button becomes tappable
+    subBtn.style.opacity='0.99';
+    requestAnimationFrame(function(){subBtn.style.opacity='';});
+  }
 }
 
 async function eSubmit(autoSubmit=false){
@@ -2923,7 +2967,7 @@ async function eRenderQ(){
       ?`<audio controls style="width:100%;margin-top:8px;height:36px;" src="${audioUrl}" onclick="event.stopPropagation()"></audio>`
       :imgSrc?`<img src="${imgSrc}" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;display:block;">`:'';
     const hasMedia=!!(imgSrc);
-    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i})" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
+    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i},event)" ontouchend="if(!this.disabled)ePickOpt(${i},event)" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
       <span class="L">${LTRS[i]}</span><span class="opt-txt">${o}</span>
       ${!isAns?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
       ${mediaHtml}
@@ -3118,6 +3162,7 @@ async function eRetake(){eCheckMode=false;if(eAttId){const{data:att}=await sb.fr
 function eGoHome(){
   clearInterval(eTick);clearInterval(qTick);clearTimedTick();
   ES=null;eAttId=null;eCheckMode=false;
+  hideDrawBtn();clearAllDrawings();
   showPage('homePage');renderDashboard();
   initSupportFab();
 }
@@ -3374,7 +3419,160 @@ async function exportWrongAnswers(){
   toast('PDF ready — use your browser\'s print dialog to save as PDF 📄');
 }
 
-// ── TIMED MODE INTEGRATION WITH EXAM ──
+// ── DRAWING CANVAS ──
+var drawMode=false;
+var drawTool='pen';
+var drawColor='#1e293b';
+var drawCtx=null;
+var drawCanvas=null;
+var isDrawing=false;
+var lastX=0,lastY=0;
+var drawStrokes={}; // per question: {qIdx: imageData}
+var drawUndoStack={};
+var isPencilEvent=false;
+
+function initDrawCanvas(){
+  drawCanvas=document.getElementById('draw-canvas');
+  if(!drawCanvas)return;
+  const main=document.getElementById('exam-main');
+  if(!main)return;
+  // Size canvas to match exam-main
+  function resizeCanvas(){
+    if(!drawCanvas||!main)return;
+    var rect=main.getBoundingClientRect();
+    var scrollH=main.scrollHeight;
+    drawCanvas.width=rect.width;
+    drawCanvas.height=Math.max(scrollH,rect.height);
+    drawCanvas.style.height=drawCanvas.height+'px';
+    drawCtx=drawCanvas.getContext('2d');
+    restoreDrawing();
+  }
+  resizeCanvas();
+  window.addEventListener('resize',resizeCanvas);
+  main.addEventListener('scroll',function(){
+    if(drawMode)resizeCanvas();
+  });
+
+  // Touch/pointer events for Apple Pencil + touch
+  drawCanvas.addEventListener('pointerdown',onDrawStart,{passive:false});
+  drawCanvas.addEventListener('pointermove',onDrawMove,{passive:false});
+  drawCanvas.addEventListener('pointerup',onDrawEnd,{passive:false});
+  drawCanvas.addEventListener('pointercancel',onDrawEnd,{passive:false});
+}
+
+function onDrawStart(ev){
+  if(!drawMode)return;
+  ev.preventDefault();
+  isPencilEvent=ev.pointerType==='pen'||ev.pointerType==='mouse';
+  if(ev.pointerType==='touch'&&!isPencilEvent)return; // ignore finger touch
+  isDrawing=true;
+  var pos=getCanvasPos(ev);
+  lastX=pos.x;lastY=pos.y;
+  if(!drawCtx)return;
+  drawCtx.beginPath();
+  drawCtx.moveTo(lastX,lastY);
+}
+function onDrawMove(ev){
+  if(!drawMode||!isDrawing)return;
+  ev.preventDefault();
+  if(ev.pointerType==='touch'&&!isPencilEvent)return;
+  var pos=getCanvasPos(ev);
+  if(!drawCtx)return;
+  drawCtx.lineWidth=drawTool==='highlight'?18:drawTool==='erase'?24:2.5;
+  drawCtx.globalAlpha=drawTool==='highlight'?0.35:1.0;
+  drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
+  drawCtx.strokeStyle=drawColor;
+  drawCtx.lineCap='round';
+  drawCtx.lineJoin='round';
+  drawCtx.lineTo(pos.x,pos.y);
+  drawCtx.stroke();
+  lastX=pos.x;lastY=pos.y;
+}
+function onDrawEnd(ev){
+  if(!isDrawing)return;
+  isDrawing=false;
+  if(!drawCtx)return;
+  drawCtx.globalAlpha=1.0;
+  drawCtx.globalCompositeOperation='source-over';
+  drawCtx.beginPath();
+  saveDrawing();
+}
+function getCanvasPos(ev){
+  var rect=drawCanvas.getBoundingClientRect();
+  var main=document.getElementById('exam-main');
+  var scrollTop=main?main.scrollTop:0;
+  return{x:ev.clientX-rect.left,y:ev.clientY-rect.top+scrollTop};
+}
+function saveDrawing(){
+  if(!ES||!drawCtx||!drawCanvas)return;
+  var qIdx=ES.cur;
+  if(!drawStrokes[qIdx])drawStrokes[qIdx]=[];
+  // Save as data URL
+  drawStrokes[qIdx]=drawCanvas.toDataURL();
+}
+function restoreDrawing(){
+  if(!ES||!drawCtx||!drawCanvas)return;
+  drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+  var qIdx=ES.cur;
+  if(drawStrokes[qIdx]){
+    var img=new Image();
+    img.onload=function(){drawCtx.drawImage(img,0,0);};
+    img.src=drawStrokes[qIdx];
+  }
+}
+function clearDrawing(){
+  if(!drawCtx||!drawCanvas)return;
+  drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+  if(ES)delete drawStrokes[ES.cur];
+}
+function undoDrawing(){
+  // Simple undo: clear current question drawing
+  clearDrawing();
+}
+function toggleDrawMode(){
+  drawMode=!drawMode;
+  if(!drawCanvas)initDrawCanvas();
+  if(!drawCanvas)return;
+  drawCanvas.classList.toggle('active',drawMode);
+  var toolbar=document.getElementById('draw-toolbar');
+  if(toolbar)toolbar.classList.toggle('visible',drawMode);
+  var btn=document.getElementById('draw-toggle-btn');
+  if(btn){btn.textContent=drawMode?'✋ Done':'🖊 Draw';btn.style.background=drawMode?'rgba(255,255,255,0.9)':'';btn.style.color=drawMode?'var(--navy2)':'';}
+  // In draw mode, disable exam interactions
+  document.getElementById('exam-main').style.userSelect=drawMode?'none':'';
+}
+function setDrawTool(tool){
+  drawTool=tool;
+  document.querySelectorAll('.draw-tool-btn').forEach(function(b){b.classList.remove('active');});
+  var btn=document.getElementById('draw-'+tool+'-btn');
+  if(btn)btn.classList.add('active');
+}
+function setDrawColor(color){
+  drawColor=color;
+  document.querySelectorAll('.draw-color').forEach(function(el){
+    el.classList.toggle('active',el.dataset.color===color);
+  });
+  if(drawTool==='erase')setDrawTool('pen');
+}
+
+// Show/hide draw button during exam
+function showDrawBtn(){
+  var btn=document.getElementById('draw-toggle-btn');
+  if(btn)btn.style.display='';
+}
+function hideDrawBtn(){
+  drawMode=false;
+  var canvas=document.getElementById('draw-canvas');
+  if(canvas)canvas.classList.remove('active');
+  var toolbar=document.getElementById('draw-toolbar');
+  if(toolbar)toolbar.classList.remove('visible');
+  var btn=document.getElementById('draw-toggle-btn');
+  if(btn){btn.style.display='none';btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
+}
+// Clear all drawings when exam ends
+function clearAllDrawings(){drawStrokes={};drawUndoStack={};}
+
+// ── END DRAWING CANVAS ──
 
 // ── ADMIN FLAGS ──
 async function loadFlagsTable(){
