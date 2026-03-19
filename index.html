@@ -374,8 +374,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .ans-stats-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray400);margin-bottom:4px;}
 
 /* -- DRAWING CANVAS -- */
-#draw-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;touch-action:none;}
-#draw-canvas.active{pointer-events:all;cursor:crosshair;}
+#draw-canvas.active{pointer-events:all !important;cursor:crosshair;}
 .draw-toolbar{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:400;background:white;border:1px solid var(--gray200);border-radius:14px;padding:10px 8px;box-shadow:0 4px 20px rgba(0,0,0,0.12);}
 .draw-toolbar.visible{display:flex;}
 .draw-color{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s;flex-shrink:0;}
@@ -724,9 +723,11 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   </div>
   <div class="exam-layout">
     <div class="exam-sb hidden" id="exam-sb"><div class="esb-inner"><div class="esb-title">Questions</div><div id="esb-list"></div></div></div>
-    <div class="exam-main" id="exam-main" style="position:relative;">
-      <canvas id="draw-canvas"></canvas>
+    <div style="flex:1;overflow:hidden;">
+      <div class="exam-main" id="exam-main"></div>
     </div>
+    <!-- Canvas is fixed-position overlay, outside any clipping container -->
+    <canvas id="draw-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:300;touch-action:none;display:none;"></canvas>
   </div>
   <!-- Drawing toolbar -->
   <div class="draw-toolbar" id="draw-toolbar">
@@ -3426,98 +3427,87 @@ var drawColor='#1e293b';
 var drawCtx=null;
 var drawCanvas=null;
 var isDrawing=false;
-var lastX=0,lastY=0;
-var drawStrokes={}; // per question: {qIdx: imageData}
-var drawUndoStack={};
-var isPencilEvent=false;
+var drawStrokes={};
+var drawInited=false;
 
 function initDrawCanvas(){
+  if(drawInited)return;
   drawCanvas=document.getElementById('draw-canvas');
-  if(!drawCanvas)return;
-  const main=document.getElementById('exam-main');
-  if(!main)return;
-  // Size canvas to match exam-main
-  function resizeCanvas(){
-    if(!drawCanvas||!main)return;
-    var rect=main.getBoundingClientRect();
-    var scrollH=main.scrollHeight;
-    drawCanvas.width=rect.width;
-    drawCanvas.height=Math.max(scrollH,rect.height);
-    drawCanvas.style.height=drawCanvas.height+'px';
+  if(!drawCanvas){console.error('draw-canvas element not found');return;}
+  // Canvas is fixed 100vw x 100vh - just set pixel dimensions
+  drawCanvas.width=window.innerWidth;
+  drawCanvas.height=window.innerHeight;
+  drawCtx=drawCanvas.getContext('2d');
+  // Pointer events (covers mouse, touch, Apple Pencil)
+  drawCanvas.addEventListener('pointerdown',drawStart,{passive:false});
+  drawCanvas.addEventListener('pointermove',drawMove,{passive:false});
+  drawCanvas.addEventListener('pointerup',drawEnd,{passive:false});
+  drawCanvas.addEventListener('pointerleave',drawEnd,{passive:false});
+  drawCanvas.addEventListener('pointercancel',drawEnd,{passive:false});
+  window.addEventListener('resize',function(){
+    if(!drawCanvas)return;
+    var img=drawCanvas.toDataURL();
+    drawCanvas.width=window.innerWidth;
+    drawCanvas.height=window.innerHeight;
     drawCtx=drawCanvas.getContext('2d');
-    restoreDrawing();
-  }
-  resizeCanvas();
-  window.addEventListener('resize',resizeCanvas);
-  main.addEventListener('scroll',function(){
-    if(drawMode)resizeCanvas();
+    var im=new Image();im.onload=function(){drawCtx.drawImage(im,0,0);};im.src=img;
   });
-
-  // Touch/pointer events for Apple Pencil + touch
-  drawCanvas.addEventListener('pointerdown',onDrawStart,{passive:false});
-  drawCanvas.addEventListener('pointermove',onDrawMove,{passive:false});
-  drawCanvas.addEventListener('pointerup',onDrawEnd,{passive:false});
-  drawCanvas.addEventListener('pointercancel',onDrawEnd,{passive:false});
+  drawInited=true;
+  console.log('Draw canvas ready:',drawCanvas.width,'x',drawCanvas.height);
 }
 
-function onDrawStart(ev){
-  if(!drawMode)return;
+function drawStart(ev){
   ev.preventDefault();
-  isPencilEvent=ev.pointerType==='pen'||ev.pointerType==='mouse';
-  if(ev.pointerType==='touch'&&!isPencilEvent)return; // ignore finger touch
   isDrawing=true;
-  var pos=getCanvasPos(ev);
-  lastX=pos.x;lastY=pos.y;
-  if(!drawCtx)return;
+  var p=getPt(ev);
   drawCtx.beginPath();
-  drawCtx.moveTo(lastX,lastY);
+  drawCtx.moveTo(p.x,p.y);
+  applyDrawStyle();
 }
-function onDrawMove(ev){
-  if(!drawMode||!isDrawing)return;
+function drawMove(ev){
+  if(!isDrawing)return;
   ev.preventDefault();
-  if(ev.pointerType==='touch'&&!isPencilEvent)return;
-  var pos=getCanvasPos(ev);
-  if(!drawCtx)return;
-  drawCtx.lineWidth=drawTool==='highlight'?18:drawTool==='erase'?24:2.5;
-  drawCtx.globalAlpha=drawTool==='highlight'?0.35:1.0;
-  drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
-  drawCtx.strokeStyle=drawColor;
-  drawCtx.lineCap='round';
-  drawCtx.lineJoin='round';
-  drawCtx.lineTo(pos.x,pos.y);
+  var p=getPt(ev);
+  applyDrawStyle();
+  drawCtx.lineTo(p.x,p.y);
   drawCtx.stroke();
-  lastX=pos.x;lastY=pos.y;
 }
-function onDrawEnd(ev){
+function drawEnd(ev){
   if(!isDrawing)return;
   isDrawing=false;
-  if(!drawCtx)return;
-  drawCtx.globalAlpha=1.0;
-  drawCtx.globalCompositeOperation='source-over';
   drawCtx.beginPath();
-  saveDrawing();
+  drawCtx.globalAlpha=1;
+  drawCtx.globalCompositeOperation='source-over';
+  // Save this question's drawing
+  if(ES)drawStrokes[ES.cur]=drawCanvas.toDataURL();
 }
-function getCanvasPos(ev){
-  var rect=drawCanvas.getBoundingClientRect();
-  var main=document.getElementById('exam-main');
-  var scrollTop=main?main.scrollTop:0;
-  return{x:ev.clientX-rect.left,y:ev.clientY-rect.top+scrollTop};
+function applyDrawStyle(){
+  if(!drawCtx)return;
+  if(drawTool==='erase'){
+    drawCtx.globalCompositeOperation='destination-out';
+    drawCtx.lineWidth=30;drawCtx.globalAlpha=1;
+  } else if(drawTool==='highlight'){
+    drawCtx.globalCompositeOperation='source-over';
+    drawCtx.strokeStyle=drawColor;
+    drawCtx.lineWidth=22;drawCtx.globalAlpha=0.28;
+  } else {
+    drawCtx.globalCompositeOperation='source-over';
+    drawCtx.strokeStyle=drawColor;
+    drawCtx.lineWidth=3;drawCtx.globalAlpha=1;
+  }
+  drawCtx.lineCap='round';drawCtx.lineJoin='round';
 }
-function saveDrawing(){
-  if(!ES||!drawCtx||!drawCanvas)return;
-  var qIdx=ES.cur;
-  if(!drawStrokes[qIdx])drawStrokes[qIdx]=[];
-  // Save as data URL
-  drawStrokes[qIdx]=drawCanvas.toDataURL();
+function getPt(ev){
+  // Fixed canvas = client coords directly
+  return{x:ev.clientX,y:ev.clientY};
 }
 function restoreDrawing(){
-  if(!ES||!drawCtx||!drawCanvas)return;
+  if(!drawCtx||!drawCanvas)return;
   drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-  var qIdx=ES.cur;
-  if(drawStrokes[qIdx]){
+  if(ES&&drawStrokes[ES.cur]){
     var img=new Image();
-    img.onload=function(){drawCtx.drawImage(img,0,0);};
-    img.src=drawStrokes[qIdx];
+    img.onload=function(){drawCtx&&drawCtx.drawImage(img,0,0);};
+    img.src=drawStrokes[ES.cur];
   }
 }
 function clearDrawing(){
@@ -3525,53 +3515,62 @@ function clearDrawing(){
   drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
   if(ES)delete drawStrokes[ES.cur];
 }
-function undoDrawing(){
-  // Simple undo: clear current question drawing
-  clearDrawing();
-}
+function undoDrawing(){clearDrawing();}
+function clearAllDrawings(){drawStrokes={};}
+
 function toggleDrawMode(){
-  drawMode=!drawMode;
-  if(!drawCanvas)initDrawCanvas();
+  initDrawCanvas();
   if(!drawCanvas)return;
-  drawCanvas.classList.toggle('active',drawMode);
-  var toolbar=document.getElementById('draw-toolbar');
-  if(toolbar)toolbar.classList.toggle('visible',drawMode);
+  drawMode=!drawMode;
   var btn=document.getElementById('draw-toggle-btn');
-  if(btn){btn.textContent=drawMode?'✋ Done':'🖊 Draw';btn.style.background=drawMode?'rgba(255,255,255,0.9)':'';btn.style.color=drawMode?'var(--navy2)':'';}
-  // In draw mode, disable exam interactions
-  document.getElementById('exam-main').style.userSelect=drawMode?'none':'';
+  var toolbar=document.getElementById('draw-toolbar');
+  if(drawMode){
+    // Show canvas and enable pointer events
+    drawCanvas.style.display='block';
+    drawCanvas.style.pointerEvents='all';
+    drawCanvas.style.cursor='crosshair';
+    if(toolbar)toolbar.classList.add('visible');
+    if(btn){btn.textContent='✋ Done';btn.style.background='rgba(255,255,255,0.9)';btn.style.color='var(--navy2)';}
+    restoreDrawing();
+  } else {
+    drawCanvas.style.pointerEvents='none';
+    drawCanvas.style.cursor='default';
+    if(toolbar)toolbar.classList.remove('visible');
+    if(btn){btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
+    // Keep canvas visible so drawings stay visible
+    if(ES)drawStrokes[ES.cur]=drawCanvas.toDataURL();
+  }
 }
 function setDrawTool(tool){
   drawTool=tool;
   document.querySelectorAll('.draw-tool-btn').forEach(function(b){b.classList.remove('active');});
-  var btn=document.getElementById('draw-'+tool+'-btn');
-  if(btn)btn.classList.add('active');
+  var b=document.getElementById('draw-'+tool+'-btn');
+  if(b)b.classList.add('active');
 }
 function setDrawColor(color){
   drawColor=color;
-  document.querySelectorAll('.draw-color').forEach(function(el){
-    el.classList.toggle('active',el.dataset.color===color);
-  });
+  document.querySelectorAll('.draw-color').forEach(function(el){el.classList.toggle('active',el.dataset.color===color);});
   if(drawTool==='erase')setDrawTool('pen');
 }
-
-// Show/hide draw button during exam
 function showDrawBtn(){
   var btn=document.getElementById('draw-toggle-btn');
   if(btn)btn.style.display='';
+  // Pre-init canvas
+  initDrawCanvas();
 }
 function hideDrawBtn(){
-  drawMode=false;
-  var canvas=document.getElementById('draw-canvas');
-  if(canvas)canvas.classList.remove('active');
+  drawMode=false;drawInited=false;
+  if(drawCanvas){
+    drawCanvas.style.display='none';
+    drawCanvas.style.pointerEvents='none';
+    // Detach events by replacing canvas (clean slate)
+    drawCanvas=null;drawCtx=null;
+  }
   var toolbar=document.getElementById('draw-toolbar');
   if(toolbar)toolbar.classList.remove('visible');
   var btn=document.getElementById('draw-toggle-btn');
   if(btn){btn.style.display='none';btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
 }
-// Clear all drawings when exam ends
-function clearAllDrawings(){drawStrokes={};drawUndoStack={};}
-
 // ── END DRAWING CANVAS ──
 
 // ── ADMIN FLAGS ──
