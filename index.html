@@ -198,6 +198,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .esb-st{font-size:12px;flex-shrink:0;}
 .exam-main{flex:1;overflow-y:auto;padding:16px 20px 90px;}
+.exam-main.drawing{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
 .toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
 .sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
 .bc0{background:#eff6ff;color:#1d4ed8;}.bc1{background:#fdf2f8;color:#9d174d;}.bc2{background:#f0fdf4;color:#15803d;}
@@ -375,6 +376,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 
 /* -- DRAWING CANVAS -- */
 #draw-canvas.active{pointer-events:all !important;cursor:crosshair;}
+#draw-canvas{touch-action:auto !important;} /* browser handles touch, pen captured by JS */
 .draw-toolbar{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:400;background:white;border:1px solid var(--gray200);border-radius:14px;padding:10px 8px;box-shadow:0 4px 20px rgba(0,0,0,0.12);}
 .draw-toolbar.visible{display:flex;}
 .draw-color{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s;flex-shrink:0;}
@@ -3480,20 +3482,8 @@ function initDrawCanvas(){
   drawCtx=drawCanvas.getContext('2d');
 
   drawCanvas.addEventListener('pointerdown',function(ev){
-    if(ev.pointerType==='touch'){
-      // Palm rejection — large contact = palm, drop it completely
-      var w=ev.width||1,h=ev.height||1;
-      if(w>30||h>30||w*h>600)return; // palm has large contact ellipse
-      // Small finger touch — pass through to element below
-      drawCanvas.style.pointerEvents='none';
-      var below=document.elementFromPoint(ev.clientX,ev.clientY);
-      drawCanvas.style.pointerEvents='all';
-      if(below&&below!==drawCanvas){
-        below.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,
-          clientX:ev.clientX,clientY:ev.clientY,pointerId:ev.pointerId,pointerType:'touch'}));
-      }
-      return;
-    }
+    // Touch (finger/palm) always ignored on canvas — passes through via CSS touch-action
+    if(ev.pointerType==='touch')return;
     if(!drawMode)return;
     ev.preventDefault();ev.stopPropagation();
     isDrawing=true;
@@ -3533,7 +3523,7 @@ function initDrawCanvas(){
       drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
       drawCtx.drawImage(drawOffscreen,0,0);
       drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
-    },800);
+    },400);
   },{passive:false});
 
   drawCanvas.addEventListener('pointermove',function(ev){
@@ -3576,7 +3566,7 @@ function initDrawCanvas(){
       drawCtx.globalCompositeOperation=drawTool==='erase'?'destination-out':'source-over';
       drawCtx.drawImage(drawOffscreen,0,0);
       drawCtx.globalAlpha=1;drawCtx.globalCompositeOperation='source-over';
-    },800);
+    },400);
     applyDrawStyle(drawOffCtx);
     drawOffCtx.lineTo(p.x,p.y);
     drawOffCtx.stroke();
@@ -3683,10 +3673,15 @@ function toggleDrawMode(){
   if(drawMode){
     fitDrawCanvas();
     drawCanvas.style.display='block';
+    // pointer-events:all lets pen through; touch returns early in handler
     drawCanvas.style.pointerEvents='all';
     drawCanvas.style.cursor='crosshair';
+    drawCanvas.style.touchAction='auto'; // let browser handle touch natively
     if(toolbar)toolbar.classList.add('visible');
     if(btn){btn.textContent='✋ Stop';btn.style.background='rgba(255,255,255,0.9)';btn.style.color='var(--navy2)';}
+    // Prevent accidental text selection while drawing
+    var examMain=document.getElementById('exam-main');
+    if(examMain)examMain.classList.add('drawing');
     restoreDrawing();
   } else {
     saveSnapshot();
@@ -3695,6 +3690,8 @@ function toggleDrawMode(){
     drawCanvas.style.display='none';
     if(toolbar)toolbar.classList.remove('visible');
     if(btn){btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
+    var examMain=document.getElementById('exam-main');
+    if(examMain)examMain.classList.remove('drawing');
   }
 }
 function setDrawTool(tool){
