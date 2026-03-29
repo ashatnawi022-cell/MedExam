@@ -4,254 +4,350 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study Room — MedExam</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-/* ═══════════════════════════════════════════
-   STUDY ROOM — Complete Styles
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   STUDY ROOM v2 — Production Grade
+═══════════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F7F8FA;--surface:#fff;--border:#E2E6EA;--border-light:#EEF0F3;
-  --text:#1A202C;--muted:#718096;--accent:#2563EB;--accent-light:#EFF6FF;
-  --danger:#E53E3E;--success:#38A169;--warn:#D69E2E;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.10);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.14);--radius:10px;--tb-h:56px;
-  --font:'DM Sans',system-ui,sans-serif;
+  --bg:#F4F6F9;--surface:#fff;--border:#DDE1E7;--border-light:#EAECF0;
+  --text:#111827;--muted:#6B7280;--accent:#2563EB;--accent-light:#EFF6FF;
+  --danger:#DC2626;--success:#16A34A;--warn:#D97706;--purple:#7C3AED;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.1);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
+  --shadow-xl:0 20px 25px rgba(0,0,0,.1),0 10px 10px rgba(0,0,0,.04);
+  --radius:10px;--tb-h:54px;--font:'DM Sans',system-ui,sans-serif;
 }
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-button{font-family:var(--font);cursor:pointer}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button{font-family:var(--font);cursor:pointer;border:none;background:none}
 input,textarea,select{font-family:var(--font)}
 
-/* ── Auth ───────────────────────────────── */
-#auth-wall{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#EFF6FF 0%,#F7F8FA 100%)}
-.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;box-shadow:var(--shadow-lg);max-width:360px;width:100%}
-.auth-icon{font-size:52px;margin-bottom:16px}
-.auth-card h2{font-size:24px;font-weight:800;margin:0 0 8px;letter-spacing:-.4px}
-.auth-card p{color:var(--muted);margin:0 0 28px;font-size:14px}
-.auth-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 28px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;transition:opacity .15s}
-.auth-btn:hover{opacity:.88}
-.auth-btn svg{width:18px;height:18px}
+/* ──────────────────────────────────────────
+   AUTH
+────────────────────────────────────────── */
+#auth-wall{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#EFF6FF 0%,#F0FDF4 100%)}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:52px 44px;text-align:center;box-shadow:var(--shadow-xl);max-width:380px;width:100%}
+.auth-icon{font-size:56px;margin-bottom:18px;display:block}
+.auth-card h2{font-size:26px;font-weight:800;margin:0 0 8px;letter-spacing:-.5px}
+.auth-card p{color:var(--muted);margin:0 0 32px;font-size:14px;line-height:1.6}
+.auth-google-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 28px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font-size:15px;font-weight:600;box-shadow:var(--shadow-sm);transition:box-shadow .15s,transform .1s}
+.auth-google-btn:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.auth-google-btn svg{width:20px;height:20px;flex-shrink:0}
 
-/* ── Library ────────────────────────────── */
-#library{max-width:1200px;margin:0 auto;padding:28px 24px 80px;min-height:100vh}
-.lib-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:12px;flex-wrap:wrap}
-.lib-logo{display:flex;align-items:center;gap:14px}
-.lib-logo-icon{font-size:38px}
-.lib-logo h1{font-size:22px;font-weight:800;letter-spacing:-.4px;margin:0}
-.lib-logo p{font-size:12px;color:var(--muted);margin:2px 0 0}
+/* ──────────────────────────────────────────
+   LIBRARY
+────────────────────────────────────────── */
+#library{max-width:1280px;margin:0 auto;padding:32px 28px 80px;min-height:100vh}
+.lib-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
+.lib-brand{display:flex;align-items:center;gap:14px}
+.lib-brand-icon{font-size:40px}
+.lib-brand h1{font-size:23px;font-weight:800;letter-spacing:-.4px;margin:0}
+.lib-brand p{font-size:12px;color:var(--muted);margin:3px 0 0}
 .lib-header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.search-wrap{position:relative;display:flex;align-items:center}
-.search-icon{position:absolute;left:10px;font-size:13px;pointer-events:none;opacity:.5}
-.search-input{padding:8px 14px 8px 30px;border:1px solid var(--border);border-radius:8px;font-size:14px;width:210px;outline:none;background:var(--surface);transition:border-color .15s}
-.search-input:focus{border-color:var(--accent)}
-.upload-btn{display:flex;align-items:center;gap:6px;padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;white-space:nowrap;transition:opacity .15s}
-.upload-btn:hover{opacity:.88}
-.user-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:20px;font-size:13px;background:var(--surface)}
-.user-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.signout-btn{background:none;border:none;font-size:12px;color:var(--muted);padding:4px 8px;border-radius:5px;transition:background .12s}
-.signout-btn:hover{background:var(--border-light)}
+.search-wrap{position:relative}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;opacity:.45}
+.search-input{padding:9px 14px 9px 32px;border:1px solid var(--border);border-radius:9px;font-size:13.5px;width:220px;outline:none;background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.upload-btn{display:flex;align-items:center;gap:7px;padding:9px 20px;background:var(--accent);color:#fff;border-radius:9px;font-size:14px;font-weight:600;transition:opacity .15s,transform .1s;white-space:nowrap}
+.upload-btn:hover{opacity:.9;transform:translateY(-1px)}
+.user-pill{display:flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid var(--border);border-radius:24px;font-size:13px;background:var(--surface)}
+.user-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.signout-btn{font-size:12px;color:var(--muted);padding:3px 8px;border-radius:5px;transition:background .12s}
+.signout-btn:hover{background:var(--border-light);color:var(--text)}
+.back-btn{font-size:13px;color:var(--muted);padding:6px 12px;border:1px solid var(--border);border-radius:8px;transition:background .12s;text-decoration:none;display:inline-block}
+.back-btn:hover{background:var(--bg)}
 
 /* Drop zone */
-.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:30px 24px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:20px;background:var(--surface)}
-.dropzone:hover,.dropzone.active{border-color:var(--accent);background:var(--accent-light)}
-.drop-icon{font-size:32px;margin-bottom:8px}
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:32px 24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:22px;background:var(--surface)}
+.dropzone:hover,.dropzone.active{border-color:var(--accent);background:var(--accent-light);transform:scale(1.005)}
+.drop-icon{font-size:34px;margin-bottom:10px}
 .drop-text{font-size:15px;color:var(--muted);margin:0 0 4px}
 .drop-text span{color:var(--accent);font-weight:600}
 .drop-sub{font-size:12px;color:var(--muted);margin:0}
 .upload-progress-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
-.upload-bar{width:280px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.upload-bar{width:300px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
 .upload-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
 .upload-progress-wrap p{font-size:13px;color:var(--muted);margin:0}
 
-/* Stats */
-.lib-stats{font-size:13px;color:var(--muted);margin-bottom:14px}
-
 /* Grid */
-.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
-.lec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:box-shadow .15s,transform .1s;position:relative}
-.lec-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-.lec-thumb{height:115px;background:#EEF2F7;display:flex;align-items:center;justify-content:center;position:relative}
-.lec-thumb-icon{font-size:38px}
-.lec-badge{position:absolute;bottom:6px;right:6px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.lib-stats{font-size:13px;color:var(--muted);margin-bottom:14px}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:16px}
+.lec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:box-shadow .15s,transform .12s;position:relative}
+.lec-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.lec-thumb{height:118px;background:linear-gradient(145deg,#EEF2F7,#E2E8F0);display:flex;align-items:center;justify-content:center;position:relative}
+.lec-thumb-icon{font-size:40px}
+.lec-badge{position:absolute;bottom:6px;right:6px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
 .lec-body{padding:10px 12px 6px}
-.lec-name{font-size:13px;font-weight:600;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lec-name{font-size:13px;font-weight:600;margin:0 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lec-date{font-size:11px;color:var(--muted);margin:0}
-.lec-actions{display:flex;gap:4px;padding:5px 8px 8px;justify-content:flex-end}
-.lec-action{background:none;border:none;font-size:14px;padding:4px 6px;border-radius:5px;opacity:.55;transition:opacity .12s,background .12s}
+.lec-actions{display:flex;gap:3px;padding:5px 8px 8px;justify-content:flex-end}
+.lec-action{font-size:14px;padding:4px 7px;border-radius:5px;opacity:.5;transition:opacity .12s,background .12s}
 .lec-action:hover{opacity:1;background:var(--bg)}
-.lec-action.del:hover{background:#FFF5F5}
+.lec-action.del:hover{background:#FFF2F2;color:var(--danger)}
 .rename-input{width:100%;border:1px solid var(--accent);border-radius:4px;padding:2px 6px;font-size:13px;font-weight:600;outline:none}
-
-/* Skeleton */
-.lec-skeleton{height:185px;background:linear-gradient(90deg,#F0F2F5 25%,#E8EAED 50%,#F0F2F5 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--radius)}
+.lec-skeleton{height:188px;background:linear-gradient(90deg,#EEF0F3 25%,#E4E7EB 50%,#EEF0F3 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--radius)}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* Empty */
-.lib-empty{grid-column:1/-1;text-align:center;padding:60px 24px;color:var(--muted)}
-.lib-empty-icon{font-size:48px;margin-bottom:12px}
+.lib-empty{grid-column:1/-1;text-align:center;padding:70px 24px;color:var(--muted)}
+.lib-empty-icon{font-size:52px;margin-bottom:14px}
 .lib-empty h3{font-size:18px;margin:0 0 6px;color:var(--text)}
-.lib-empty p{font-size:14px;margin:0}
+.lib-empty p{font-size:14px}
 
-/* ── Viewer ─────────────────────────────── */
-#viewer{display:none;flex-direction:column;height:100vh;background:#4A5568;overflow:hidden}
+/* ──────────────────────────────────────────
+   VIEWER SHELL
+────────────────────────────────────────── */
+#viewer{display:none;flex-direction:column;height:100vh;overflow:hidden}
 #viewer.active{display:flex}
 
-/* Toolbar */
-#toolbar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px;gap:6px;box-shadow:var(--shadow-sm);flex-shrink:0;overflow-x:auto;z-index:100}
+/* ──────────────────────────────────────────
+   TOOLBAR
+────────────────────────────────────────── */
+#toolbar{height:var(--tb-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px;box-shadow:var(--shadow-sm);flex-shrink:0;z-index:200;overflow:visible}
 .tb-left{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.tb-back{display:flex;align-items:center;gap:4px;background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--text);transition:background .12s;white-space:nowrap}
+.tb-back{display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:7px;padding:5px 13px;font-size:13px;font-weight:600;color:var(--text);transition:background .12s;white-space:nowrap}
 .tb-back:hover{background:var(--bg)}
-.tb-title-wrap{display:flex;flex-direction:column;gap:1px}
-.tb-lec-name{font-size:13px;font-weight:700;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
-.tb-save{font-size:11px;font-weight:500}
+.tb-title-wrap{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tb-lec-name{font-size:13px;font-weight:700;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.tb-save{font-size:10.5px;font-weight:500;white-space:nowrap}
 .tb-save.saved{color:var(--success)}.tb-save.saving{color:var(--warn)}.tb-save.unsaved{color:var(--danger)}
+.tb-divider{width:1px;height:30px;background:var(--border);flex-shrink:0;margin:0 2px}
 
-.tb-center{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;position:relative}
-.tb-tools{display:flex;gap:1px;background:var(--bg);border-radius:8px;padding:3px;flex-wrap:nowrap}
-.tb-tool{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 7px;border:none;border-radius:6px;background:none;transition:background .12s;min-width:40px;color:var(--text)}
+/* Tool groups */
+.tb-center{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;position:relative;min-width:0}
+.tool-group{display:flex;gap:1px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:3px}
+.tb-tool{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 8px;border-radius:6px;transition:background .12s,color .12s;min-width:42px;color:var(--text)}
 .tb-tool:hover{background:var(--border-light)}
-.tb-tool.active{background:var(--accent-light)}
-.tb-tool.active .tool-icon,.tb-tool.active .tool-label{color:var(--accent)}
-.tool-icon{font-size:15px;line-height:1}
-.tool-label{font-size:9px;color:var(--muted);font-weight:500;white-space:nowrap}
-.tb-sep{width:1px;height:28px;background:var(--border);margin:0 3px;flex-shrink:0}
-.tb-clear{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:12px;color:var(--danger);white-space:nowrap;transition:background .12s;flex-shrink:0}
-.tb-clear:hover{background:#FFF5F5}
+.tb-tool.active{background:var(--accent-light);color:var(--accent)}
+.tb-tool.active .tool-label{color:var(--accent)}
+.tool-icon{font-size:15px;line-height:1;display:block}
+.tool-label{font-size:9px;color:var(--muted);font-weight:500;white-space:nowrap;display:block}
+.tb-tool.active .tool-icon{filter:none}
 
-/* Color picker popup */
-.color-popup{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow-md);z-index:300;display:none;flex-direction:column;gap:8px;min-width:220px}
-.color-popup.open{display:flex}
-.color-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.color-dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;transition:transform .1s;padding:0;flex-shrink:0}
-.color-dot:hover{transform:scale(1.2)}
-.color-dot.active{border-color:var(--text) !important;transform:scale(1.15)}
-input[type=color].custom-color{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);padding:0;cursor:pointer;overflow:hidden}
-.size-row{display:flex;align-items:center;gap:8px}
-.size-label{font-size:12px;color:var(--muted)}
-input[type=range].size-slider{width:100px;accent-color:var(--accent)}
-.size-val{font-size:12px;font-weight:600;min-width:28px}
+/* Sub-panel (color/size picker) */
+.sub-panel{position:absolute;top:calc(100% + 8px);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-lg);z-index:500;display:none;flex-direction:column;gap:10px;min-width:240px}
+.sub-panel.open{display:flex}
+.sub-panel-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.color-swatches{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.swatch{width:24px;height:24px;border-radius:50%;border:2.5px solid transparent;transition:transform .12s,border-color .12s;flex-shrink:0;position:relative}
+.swatch:hover{transform:scale(1.18)}
+.swatch.active::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.5)}
+.swatch.active{border-color:var(--text);transform:scale(1.12)}
+input[type=color].custom-swatch{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);padding:0;cursor:pointer}
+.panel-row{display:flex;align-items:center;gap:10px}
+.panel-label{font-size:12px;color:var(--muted);min-width:36px}
+input[type=range].panel-slider{flex:1;accent-color:var(--accent);height:4px}
+.panel-val{font-size:12px;font-weight:700;min-width:30px;text-align:right}
+
+/* Eraser mode selector */
+.eraser-modes{display:flex;gap:5px}
+.emode-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);font-size:12px;font-weight:500;transition:all .12s;background:var(--surface)}
+.emode-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 .tb-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto}
-.tb-sidebar-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:14px;transition:background .12s}
-.tb-sidebar-btn:hover{background:var(--bg)}
+.tb-icon-btn{border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:14px;transition:background .12s;color:var(--text)}
+.tb-icon-btn:hover{background:var(--bg)}
 .zoom-group{display:flex;align-items:center;gap:3px}
 .zoom-btn{background:var(--bg);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .12s}
 .zoom-btn:hover{background:var(--border)}
-.zoom-val{font-size:12px;font-weight:600;min-width:42px;text-align:center}
-.zoom-fit{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:11px;font-weight:600;transition:background .12s}
+.zoom-val{font-size:12px;font-weight:700;min-width:44px;text-align:center;cursor:default}
+.zoom-fit{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:11px;font-weight:600;transition:background .12s}
 .zoom-fit:hover{background:var(--border)}
 .page-group{display:flex;align-items:center;gap:3px}
-.page-btn{background:var(--bg);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;font-size:16px;display:flex;align-items:center;justify-content:center}
-.page-btn:disabled{opacity:.35;cursor:not-allowed}
+.page-btn{background:var(--bg);border:1px solid var(--border);border-radius:5px;width:27px;height:27px;font-size:17px;display:flex;align-items:center;justify-content:center;transition:background .12s}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
 .page-btn:not(:disabled):hover{background:var(--border)}
-.page-input{width:38px;text-align:center;border:1px solid var(--border);border-radius:5px;padding:3px;font-size:13px;font-weight:600;outline:none}
+.page-input{width:40px;text-align:center;border:1px solid var(--border);border-radius:5px;padding:3px;font-size:13px;font-weight:700;outline:none;transition:border-color .15s}
 .page-input:focus{border-color:var(--accent)}
 .page-total{font-size:12px;color:var(--muted);white-space:nowrap}
+.tb-clear{border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:12px;color:var(--danger);transition:background .12s;white-space:nowrap;flex-shrink:0}
+.tb-clear:hover{background:#FFF2F2}
 
-/* Viewer body */
+/* ──────────────────────────────────────────
+   VIEWER BODY
+────────────────────────────────────────── */
 #viewer-body{flex:1;display:flex;overflow:hidden}
 
-/* Sidebar */
-#thumb-sidebar{width:128px;flex-shrink:0;background:#E2E8F0;border-right:1px solid #CBD5E0;overflow-y:auto;padding:8px 6px;display:flex;flex-direction:column;gap:6px;transition:width .2s}
+/* Thumbnail sidebar */
+#thumb-sidebar{width:132px;flex-shrink:0;background:#DDE3EC;border-right:1px solid #C8D0DC;overflow-y:auto;padding:10px 7px;display:flex;flex-direction:column;gap:7px;transition:width .2s,padding .2s}
 #thumb-sidebar.hidden{width:0;padding:0;overflow:hidden}
-.thumb-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-radius:6px;padding:4px;border:2px solid transparent;transition:border-color .12s}
+.thumb-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-radius:7px;padding:4px;border:2px solid transparent;transition:all .12s}
 .thumb-item:hover{border-color:#94A3B8;background:rgba(255,255,255,.4)}
-.thumb-item.active{border-color:var(--accent) !important;background:#fff}
+.thumb-item.active{border-color:var(--accent);background:#fff;box-shadow:var(--shadow-sm)}
 .thumb-img{width:100%;border-radius:3px;display:block}
-.thumb-placeholder{width:100%;height:58px;background:#CBD5E0;border-radius:3px}
-.thumb-num{font-size:10px;color:var(--muted);font-weight:600}
+.thumb-placeholder{width:100%;height:60px;background:#B8C4D4;border-radius:3px;animation:shimmer 1.4s infinite;background-size:200% 100%;background-image:linear-gradient(90deg,#B8C4D4 25%,#C8D4E4 50%,#B8C4D4 75%)}
+.thumb-num{font-size:10px;color:#64748B;font-weight:600}
 
 /* Main scroll area */
-#viewer-main{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:24px}
-#page-wrap{position:relative;display:inline-block;line-height:0;box-shadow:0 4px 28px rgba(0,0,0,.4)}
+#viewer-main{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:28px;background:#525A6B}
+#page-wrap{position:relative;display:inline-block;line-height:0;box-shadow:0 6px 32px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3)}
 #pdf-canvas{display:block;background:#fff;max-width:none}
-.render-overlay{position:absolute;inset:0;background:rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;pointer-events:none}
-.spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+
+/* Render overlay */
+.render-overlay{position:absolute;inset:0;background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:50}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Annotation canvas */
-#ann-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+/* ──────────────────────────────────────────
+   PDF.JS TEXT LAYER (for DOM highlighting)
+────────────────────────────────────────── */
+#text-layer{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  overflow:hidden;line-height:1;pointer-events:none;z-index:2;
+  opacity:1;
+}
+#text-layer span{
+  color:transparent;position:absolute;white-space:pre;
+  cursor:text;transform-origin:0% 0%;
+}
+#text-layer.highlight-mode span{pointer-events:all;cursor:text;user-select:text}
+#text-layer ::selection{background:rgba(255,235,59,.55)}
 
-/* Sticky notes */
-#notes-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.sticky-note{position:absolute;min-height:90px;border-radius:6px;box-shadow:2px 3px 10px rgba(0,0,0,.18);display:flex;flex-direction:column;pointer-events:all;z-index:10;font-size:12px;min-width:140px}
-.note-handle{display:flex;align-items:center;gap:4px;padding:5px 6px 4px;cursor:grab;border-radius:6px 6px 0 0;background:rgba(0,0,0,.08);user-select:none}
+/* Rendered highlight marks */
+.hl-mark{
+  position:absolute;border-radius:2px;pointer-events:all;cursor:pointer;
+  mix-blend-mode:multiply;transition:opacity .15s;z-index:3;
+}
+.hl-mark:hover{opacity:.7}
+.hl-mark:hover::after{content:'×';position:absolute;top:-8px;right:-6px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700}
+
+/* Drawing canvas */
+#ann-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:4}
+
+/* ──────────────────────────────────────────
+   STICKY NOTES
+────────────────────────────────────────── */
+#notes-layer{position:absolute;inset:0;z-index:6;pointer-events:none}
+.note-emoji{
+  position:absolute;font-size:26px;cursor:pointer;z-index:7;
+  pointer-events:all;transition:transform .15s;line-height:1;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.25));
+  user-select:none;
+}
+.note-emoji:hover{transform:scale(1.2)}
+.sticky-note{
+  position:absolute;min-width:180px;max-width:280px;border-radius:8px;
+  box-shadow:var(--shadow-lg),0 0 0 1px rgba(0,0,0,.06);
+  display:flex;flex-direction:column;pointer-events:all;z-index:8;
+  animation:noteIn .15s ease;
+}
+@keyframes noteIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.note-handle{display:flex;align-items:center;gap:5px;padding:6px 7px 4px;cursor:grab;border-radius:8px 8px 0 0;background:rgba(0,0,0,.1);user-select:none}
 .note-handle:active{cursor:grabbing}
-.note-dots{font-size:13px;opacity:.5}
+.note-grip{font-size:14px;opacity:.5}
 .note-colors{display:flex;gap:3px;flex:1}
-.note-color{width:11px;height:11px;border-radius:50%;border:1px solid rgba(0,0,0,.2);padding:0}
-.note-del{background:none;border:none;font-size:14px;opacity:.5;padding:0 2px;line-height:1;transition:opacity .1s}
-.note-del:hover{opacity:1;color:var(--danger)}
-.note-body{flex:1;background:none;border:none;outline:none;resize:none;padding:6px 8px;font-size:12px;line-height:1.4;font-family:var(--font);color:#2D3748;min-height:60px}
+.note-col-btn{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(0,0,0,.15);padding:0;transition:transform .1s}
+.note-col-btn:hover{transform:scale(1.3)}
+.note-min-btn{font-size:13px;opacity:.55;padding:0 3px;transition:opacity .1s;color:#333}
+.note-min-btn:hover{opacity:1}
+.note-del-btn{font-size:14px;opacity:.5;padding:0 2px;color:#333;transition:opacity .1s}
+.note-del-btn:hover{opacity:1;color:var(--danger)}
+.note-body{flex:1;background:none;border:none;outline:none;resize:none;padding:8px 10px;font-size:13px;line-height:1.5;font-family:var(--font);color:#2D3748;min-height:80px;border-radius:0 0 8px 8px}
 
-/* Text annotations */
-#texts-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.text-ann{position:absolute;pointer-events:all;z-index:11;max-width:280px}
-.text-edit-wrap{background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-md);overflow:hidden}
-.text-mini-tb{display:flex;align-items:center;gap:4px;padding:4px 6px;background:var(--bg);border-bottom:1px solid var(--border)}
-input[type=color].text-color{width:20px;height:20px;border:none;padding:0;border-radius:4px;cursor:pointer}
-.text-size{font-size:12px;border:1px solid var(--border);border-radius:4px;padding:1px 4px;outline:none}
-.text-bold{font-weight:700;font-size:13px;background:none;border:1px solid var(--border);border-radius:4px;padding:1px 6px}
-.text-bold.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
-.text-del-btn{margin-left:auto;background:none;border:none;font-size:16px;opacity:.5;color:var(--danger)}
-.text-textarea{width:200px;min-height:55px;max-width:260px;border:none;outline:none;resize:both;padding:6px 8px;font-family:var(--font);line-height:1.4;background:#fff}
-.text-display{display:inline-block;padding:2px 4px;line-height:1.3;white-space:pre-wrap;word-break:break-word;text-shadow:0 0 4px rgba(255,255,255,.8);pointer-events:all}
+/* ──────────────────────────────────────────
+   TEXT ANNOTATIONS
+────────────────────────────────────────── */
+#texts-layer{position:absolute;inset:0;z-index:5;pointer-events:none}
+.text-ann{position:absolute;pointer-events:all;z-index:6;max-width:320px;min-width:60px}
+.text-display{
+  display:inline-block;padding:3px 5px;line-height:1.35;
+  white-space:pre-wrap;word-break:break-word;
+  cursor:default;border-radius:3px;position:relative;
+}
+.text-display:hover{outline:1.5px dashed var(--accent);outline-offset:2px}
+.text-display:hover .text-del-x{display:flex}
+.text-del-x{
+  display:none;position:absolute;top:-10px;right:-10px;
+  width:18px;height:18px;background:var(--danger);color:#fff;
+  border-radius:50%;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;cursor:pointer;z-index:10;
+  box-shadow:var(--shadow-sm);
+}
+.text-editor-wrap{background:#fff;border:1.5px solid var(--accent);border-radius:8px;box-shadow:var(--shadow-lg);overflow:hidden;min-width:220px}
+.text-mini-tb{display:flex;align-items:center;gap:5px;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--border);flex-wrap:wrap}
+input[type=color].text-color-pick{width:22px;height:22px;border:1.5px solid var(--border);padding:0;border-radius:5px;cursor:pointer}
+.text-size-sel{font-size:12px;border:1px solid var(--border);border-radius:5px;padding:2px 5px;outline:none;background:#fff}
+.text-bold-btn{font-weight:800;font-size:13px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:#fff;transition:all .12s}
+.text-bold-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.text-italic-btn{font-style:italic;font-size:13px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:#fff;transition:all .12s}
+.text-italic-btn.on{background:var(--purple);color:#fff;border-color:var(--purple)}
+.text-close-btn{margin-left:auto;font-size:16px;opacity:.5;color:var(--danger);padding:0 3px;transition:opacity .12s}
+.text-close-btn:hover{opacity:1}
+.text-textarea{width:100%;min-height:70px;border:none;outline:none;resize:both;padding:8px 10px;font-family:var(--font);line-height:1.5;background:#fff;font-size:14px}
 
-/* Toast */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1A202C;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;transition:transform .25s;pointer-events:none}
+/* ──────────────────────────────────────────
+   TOAST
+────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);
+  background:#111827;color:#fff;padding:10px 22px;border-radius:9px;
+  font-size:13px;font-weight:500;box-shadow:var(--shadow-xl);z-index:9999;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1);pointer-events:none;
+  white-space:nowrap;
+}
 #toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ──────────────────────────────────────────
+   CONTEXT MENU
+────────────────────────────────────────── */
+#ctx-menu{
+  position:fixed;background:var(--surface);border:1px solid var(--border);
+  border-radius:9px;box-shadow:var(--shadow-lg);z-index:9000;display:none;
+  padding:5px;min-width:160px;
+}
+#ctx-menu.open{display:block}
+.ctx-item{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:13px;border-radius:6px;cursor:pointer;transition:background .1s;width:100%;text-align:left}
+.ctx-item:hover{background:var(--bg)}
+.ctx-item.danger{color:var(--danger)}
+.ctx-item.danger:hover{background:#FFF2F2}
 </style>
 </head>
 <body>
 
-<!-- ═══ AUTH WALL ═══════════════════════════════════ -->
+<!-- ═══ AUTH ═══════════════════════════════════════════ -->
 <div id="auth-wall">
   <div class="auth-card">
-    <div class="auth-icon">📚</div>
+    <span class="auth-icon">📚</span>
     <h2>Study Room</h2>
-    <p>Sign in to access your personal lecture library</p>
-    <button class="auth-btn" onclick="signInGoogle()">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+    <p>Your personal PDF annotation studio.<br>Sign in to access your lecture library.</p>
+    <button class="auth-google-btn" onclick="signInGoogle()">
+      <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       Continue with Google
     </button>
   </div>
 </div>
 
-<!-- ═══ LIBRARY ══════════════════════════════════════ -->
+<!-- ═══ LIBRARY ═════════════════════════════════════════ -->
 <div id="library" style="display:none">
   <div class="lib-header">
-    <div class="lib-logo">
-      <span class="lib-logo-icon">🩺</span>
-      <div>
-        <h1>Study Room</h1>
-        <p>Your personal lecture library</p>
-      </div>
+    <div class="lib-brand">
+      <span class="lib-brand-icon">🩺</span>
+      <div><h1>Study Room</h1><p>Your personal lecture library</p></div>
     </div>
     <div class="lib-header-right">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input class="search-input" id="search-input" placeholder="Search lectures..." oninput="renderGrid()">
+        <input class="search-input" id="search-input" placeholder="Search lectures…" oninput="renderGrid()">
       </div>
       <button class="upload-btn" onclick="document.getElementById('file-input').click()">
-        <span style="font-size:18px;line-height:1">+</span> Upload PDF
+        <span style="font-size:18px;line-height:1;margin-top:-1px">+</span> Upload PDF
       </button>
       <div class="user-pill">
         <div class="user-avatar" id="user-avatar">?</div>
-        <span id="user-name" style="font-size:13px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <span id="user-name" style="font-size:13px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
         <button class="signout-btn" onclick="signOut()">Sign out</button>
       </div>
-      <a href="index.html" style="font-size:13px;color:var(--muted);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:6px;transition:background .12s" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">← MedExam</a>
+      <a href="index.html" class="back-btn">← MedExam</a>
     </div>
   </div>
 
-  <!-- Drop zone -->
   <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
     <div id="drop-content">
       <div class="drop-icon">📄</div>
       <p class="drop-text">Drop a PDF here or <span>click to browse</span></p>
-      <p class="drop-sub">Supports any PDF lecture or textbook file</p>
+      <p class="drop-sub">Any PDF lecture, textbook, or study guide</p>
     </div>
     <div id="upload-progress" style="display:none">
       <div class="upload-progress-wrap">
@@ -266,9 +362,9 @@ input[type=color].text-color{width:20px;height:20px;border:none;padding:0;border
   <div class="lib-grid" id="lib-grid"></div>
 </div>
 
-<!-- ═══ VIEWER ═══════════════════════════════════════ -->
+<!-- ═══ VIEWER ═══════════════════════════════════════════ -->
 <div id="viewer">
-  <!-- Toolbar -->
+  <!-- TOOLBAR -->
   <div id="toolbar">
     <div class="tb-left">
       <button class="tb-back" onclick="closeViewer()">← Library</button>
@@ -277,75 +373,113 @@ input[type=color].text-color{width:20px;height:20px;border:none;padding:0;border
         <span class="tb-save saved" id="tb-save">✓ Saved</span>
       </div>
     </div>
+    <div class="tb-divider"></div>
 
     <div class="tb-center">
-      <div class="tb-tools" id="tb-tools">
+      <!-- Group 1: Selection & Highlighting -->
+      <div class="tool-group">
         <button class="tb-tool active" data-tool="select" onclick="setTool('select')" title="Select (S)">
           <span class="tool-icon">↖</span><span class="tool-label">Select</span>
         </button>
-        <button class="tb-tool" data-tool="highlight" onclick="setTool('highlight');toggleColorPicker('highlight')" title="Highlight (H)">
+        <button class="tb-tool" data-tool="highlight" onclick="setTool('highlight');openSubPanel('hl-panel')" title="Highlight text (H)">
           <span class="tool-icon">🖊</span><span class="tool-label">Highlight</span>
-        </button>
-        <button class="tb-tool" data-tool="pen" onclick="setTool('pen');toggleColorPicker('pen')" title="Draw (D)">
-          <span class="tool-icon">✏️</span><span class="tool-label">Draw</span>
-        </button>
-        <button class="tb-tool" data-tool="line" onclick="setTool('line');closeColorPicker()" title="Line (L)">
-          <span class="tool-icon">╱</span><span class="tool-label">Line</span>
-        </button>
-        <button class="tb-tool" data-tool="eraser" onclick="setTool('eraser');closeColorPicker()" title="Eraser (E)">
-          <span class="tool-icon">⬜</span><span class="tool-label">Eraser</span>
-        </button>
-        <button class="tb-tool" data-tool="text" onclick="setTool('text');closeColorPicker()" title="Text (T)">
-          <span class="tool-icon" style="font-size:16px;font-weight:700">T</span><span class="tool-label">Text</span>
-        </button>
-        <button class="tb-tool" data-tool="note" onclick="setTool('note');closeColorPicker()" title="Sticky Note (N)">
-          <span class="tool-icon">📌</span><span class="tool-label">Note</span>
-        </button>
-        <button class="tb-tool" data-tool="laser" onclick="setTool('laser');closeColorPicker()" title="Laser (P)">
-          <span class="tool-icon" style="color:#E53E3E">⬤</span><span class="tool-label">Laser</span>
         </button>
       </div>
 
-      <!-- Color picker popup -->
-      <div class="color-popup" id="color-popup">
-        <div class="color-row" id="color-dots"></div>
-        <div class="size-row" id="size-row">
-          <span class="size-label">Size</span>
-          <input type="range" class="size-slider" id="size-slider" min="1" max="20" value="3" oninput="penSize=+this.value;document.getElementById('size-val').textContent=penSize+'px'">
-          <span class="size-val" id="size-val">3px</span>
+      <!-- Group 2: Drawing -->
+      <div class="tool-group">
+        <button class="tb-tool" data-tool="pen" onclick="setTool('pen');openSubPanel('pen-panel')" title="Draw (D)">
+          <span class="tool-icon">✏️</span><span class="tool-label">Draw</span>
+        </button>
+        <button class="tb-tool" data-tool="line" onclick="setTool('line');closeSubPanel()" title="Line (L)">
+          <span class="tool-icon">╱</span><span class="tool-label">Line</span>
+        </button>
+        <button class="tb-tool" data-tool="eraser" onclick="setTool('eraser');openSubPanel('eraser-panel')" title="Eraser (E)">
+          <span class="tool-icon">⬜</span><span class="tool-label">Eraser</span>
+        </button>
+      </div>
+
+      <!-- Group 3: Annotations -->
+      <div class="tool-group">
+        <button class="tb-tool" data-tool="text" onclick="setTool('text');closeSubPanel()" title="Add Text (T)">
+          <span class="tool-icon" style="font-weight:800;font-size:16px">T</span><span class="tool-label">Text</span>
+        </button>
+        <button class="tb-tool" data-tool="note" onclick="setTool('note');closeSubPanel()" title="Sticky Note (N)">
+          <span class="tool-icon">📌</span><span class="tool-label">Note</span>
+        </button>
+        <button class="tb-tool" data-tool="laser" onclick="setTool('laser');closeSubPanel()" title="Laser (P)">
+          <span class="tool-icon" style="color:#DC2626">⬤</span><span class="tool-label">Laser</span>
+        </button>
+      </div>
+
+      <!-- SUB PANELS -->
+      <!-- Highlight panel -->
+      <div class="sub-panel" id="hl-panel">
+        <div class="sub-panel-title">Highlight Color</div>
+        <div class="color-swatches" id="hl-swatches"></div>
+      </div>
+
+      <!-- Pen panel -->
+      <div class="sub-panel" id="pen-panel">
+        <div class="sub-panel-title">Pen Color</div>
+        <div class="color-swatches" id="pen-swatches"></div>
+        <div class="panel-row">
+          <span class="panel-label">Size</span>
+          <input type="range" class="panel-slider" id="pen-size-slider" min="1" max="24" value="3" oninput="penSize=+this.value;document.getElementById('pen-size-val').textContent=penSize">
+          <span class="panel-val" id="pen-size-val">3</span>
+        </div>
+        <div class="panel-row">
+          <span class="panel-label">Opacity</span>
+          <input type="range" class="panel-slider" id="pen-opacity-slider" min="10" max="100" value="100" oninput="penOpacity=+this.value/100;document.getElementById('pen-opacity-val').textContent=this.value+'%'">
+          <span class="panel-val" id="pen-opacity-val">100%</span>
         </div>
       </div>
 
-      <div class="tb-sep"></div>
+      <!-- Eraser panel -->
+      <div class="sub-panel" id="eraser-panel">
+        <div class="sub-panel-title">Eraser Mode</div>
+        <div class="eraser-modes">
+          <button class="emode-btn active" data-emode="precise" onclick="setEraserMode('precise')">Precise</button>
+          <button class="emode-btn" data-emode="stroke" onclick="setEraserMode('stroke')">Stroke</button>
+          <button class="emode-btn" data-emode="drawing" onclick="setEraserMode('drawing')">Drawing Only</button>
+        </div>
+        <div class="panel-row">
+          <span class="panel-label">Size</span>
+          <input type="range" class="panel-slider" id="eraser-size-slider" min="5" max="60" value="18" oninput="eraserSize=+this.value;document.getElementById('eraser-size-val').textContent=this.value">
+          <span class="panel-val" id="eraser-size-val">18</span>
+        </div>
+      </div>
+
+      <div class="tb-divider"></div>
       <button class="tb-clear" onclick="clearPage()">🗑 Clear Page</button>
     </div>
 
     <div class="tb-right">
-      <button class="tb-sidebar-btn" id="sidebar-btn" onclick="toggleSidebar()" title="Toggle pages">⏴</button>
+      <button class="tb-icon-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle pages panel">⏴</button>
       <div class="zoom-group">
-        <button class="zoom-btn" onclick="setZoom(zoom-.2)">−</button>
+        <button class="zoom-btn" onclick="setZoom(zoom-.15)">−</button>
         <span class="zoom-val" id="zoom-val">140%</span>
-        <button class="zoom-btn" onclick="setZoom(zoom+.2)">+</button>
+        <button class="zoom-btn" onclick="setZoom(zoom+.15)">+</button>
         <button class="zoom-fit" onclick="setZoom(1.4)">Fit</button>
       </div>
       <div class="page-group">
         <button class="page-btn" id="prev-btn" onclick="goTo(curPage-1)">‹</button>
-        <input class="page-input" id="page-input" value="1" onkeydown="if(event.key==='Enter'){goTo(+this.value);this.blur()}" onblur="goTo(+this.value)">
+        <input class="page-input" id="page-input" value="1" onkeydown="if(event.key==='Enter'){goTo(+this.value||1);this.blur()}" onblur="goTo(+this.value||1)">
         <span class="page-total" id="page-total">/ 0</span>
         <button class="page-btn" id="next-btn" onclick="goTo(curPage+1)">›</button>
       </div>
     </div>
   </div>
 
-  <!-- Body -->
+  <!-- BODY -->
   <div id="viewer-body">
     <div id="thumb-sidebar"></div>
     <div id="viewer-main">
       <div id="page-wrap">
         <canvas id="pdf-canvas"></canvas>
-        <div class="render-overlay" id="render-overlay" style="display:none">
-          <div class="spinner"></div>
-        </div>
+        <div class="render-overlay" id="render-overlay" style="display:none"><div class="spinner"></div></div>
+        <div id="text-layer"></div>
+        <div id="hl-layer"></div>
         <canvas id="ann-canvas"></canvas>
         <div id="notes-layer"></div>
         <div id="texts-layer"></div>
@@ -354,784 +488,868 @@ input[type=color].text-color{width:20px;height:20px;border:none;padding:0;border
   </div>
 </div>
 
+<!-- Context menu -->
+<div id="ctx-menu">
+  <button class="ctx-item" id="ctx-delete-hl" onclick="deleteHoverHighlight()">🗑 Remove Highlight</button>
+  <button class="ctx-item danger" id="ctx-clear-page" onclick="clearPage()">🧹 Clear Page</button>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
 <script>
+'use strict';
 // ═══════════════════════════════════════════════════════
-// CONFIG
+// CONFIG & INIT
 // ═══════════════════════════════════════════════════════
-const SURL = 'https://vuiutunyhiwcritvyowe.supabase.co';
-const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1aXV0dW55aGl3Y3JpdHZ5b3dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MzM1ODUsImV4cCI6MjA4OTQwOTU4NX0.1u_7oTqeym3OEnD5LYdmoeTkAeDRqqn8sgJ3tEMJZJA';
-const sb = supabase.createClient(SURL, SKEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } });
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const SURL='https://vuiutunyhiwcritvyowe.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1aXV0dW55aGl3Y3JpdHZ5b3dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MzM1ODUsImV4cCI6MjA4OTQwOTU4NX0.1u_7oTqeym3OEnD5LYdmoeTkAeDRqqn8sgJ3tEMJZJA';
+const sb=supabase.createClient(SURL,SKEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:localStorage}});
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
-let CU = null, lectures = [], activeLec = null, pdfDoc = null;
-let curPage = 1, totalPages = 0, zoom = 1.4;
-let tool = 'select', penColor = '#E53E3E', penSize = 3;
-let highlightColor = 'rgba(255,235,59,0.45)';
-let annotations = {}; // { page_1: { highlights, drawings, notes, texts } }
-let saveTimer = null, saveStatus = 'saved';
-let sidebarVisible = true, thumbnails = {};
+let CU=null,lectures=[],activeLec=null,pdfDoc=null;
+let curPage=1,totalPages=0,zoom=1.4;
+let tool='select';
+let penColor='#E53E3E',penSize=3,penOpacity=1.0;
+let hlColor='rgba(255,235,59,0.5)';
+let eraserMode='precise',eraserSize=18;
+let annotations={}; // { page_N: { highlights:[], drawings:[], notes:[], texts:[] } }
+let saveTimer=null;
+let sidebarVisible=true;
 // Drawing state
-let isDrawing = false, lastPos = null, currentStroke = [], lineStart = null, snapshot = null;
-// Laser state
-let laserTimer = null;
-// Drag state for notes
-let draggingNote = null, dragOffsetX = 0, dragOffsetY = 0;
-// Editing
-let editingNoteId = null, editingTextId = null;
+let isDrawing=false,lastPos=null,currentStroke=[],lineStart=null,snap=null;
+let straightenTimer=null;
+// Laser
+let laserFadeTimer=null;
+// Drag notes
+let draggingNote=null,dragOX=0,dragOY=0;
+// Hover highlight
+let hoverHlId=null;
+// Text props memory
+let textColor='#DC2626',textSize=16,textBold=false,textItalic=false;
+// Sub panel
+let activeSubPanel=null;
+
+// ═══════════════════════════════════════════════════════
+// COLOR CONSTANTS
+// ═══════════════════════════════════════════════════════
+const PEN_COLORS=['#111827','#DC2626','#EA580C','#D97706','#16A34A','#2563EB','#7C3AED','#DB2777','#0EA5E9','#fff'];
+const HL_COLORS=[
+  {v:'rgba(255,235,59,0.5)',d:'#FFF176',label:'Yellow'},
+  {v:'rgba(102,187,106,0.5)',d:'#A5D6A7',label:'Green'},
+  {v:'rgba(66,165,245,0.5)',d:'#90CAF9',label:'Blue'},
+  {v:'rgba(240,98,146,0.5)',d:'#F48FB1',label:'Pink'},
+  {v:'rgba(255,167,38,0.5)',d:'#FFCC80',label:'Orange'},
+  {v:'rgba(171,71,188,0.5)',d:'#CE93D8',label:'Purple'},
+  {v:'rgba(38,166,154,0.5)',d:'#80CBC4',label:'Teal'},
+];
+const NOTE_COLORS=['#FFF59D','#A5D6A7','#90CAF9','#F48FB1','#FFCC80','#CE93D8'];
 
 // ═══════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════
-async function init() {
-  const { data } = await sb.auth.getUser();
-  CU = data?.user ?? null;
-  if (CU) showLibrary();
-  sb.auth.onAuthStateChange((_, session) => {
-    CU = session?.user ?? null;
-    if (CU) showLibrary(); else showAuth();
+async function init(){
+  buildSwatches();
+  const {data}=await sb.auth.getUser();
+  CU=data?.user??null;
+  if(CU) showLibrary(); else showAuth();
+  sb.auth.onAuthStateChange((_,session)=>{
+    CU=session?.user??null;
+    if(CU) showLibrary(); else showAuth();
   });
 }
-
-function signInGoogle() {
-  sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
-}
-function signOut() {
-  sb.auth.signOut().then(() => { CU = null; showAuth(); });
-}
-
-function showAuth() {
-  document.getElementById('auth-wall').style.display = 'flex';
-  document.getElementById('library').style.display = 'none';
+function signInGoogle(){sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href}});}
+function signOut(){sb.auth.signOut().then(()=>{CU=null;showAuth();});}
+function showAuth(){
+  document.getElementById('auth-wall').style.display='flex';
+  document.getElementById('library').style.display='none';
   document.getElementById('viewer').classList.remove('active');
 }
-function showLibrary() {
-  document.getElementById('auth-wall').style.display = 'none';
-  document.getElementById('library').style.display = 'block';
+function showLibrary(){
+  document.getElementById('auth-wall').style.display='none';
+  document.getElementById('library').style.display='block';
   document.getElementById('viewer').classList.remove('active');
-  // Set user info
-  const name = CU.user_metadata?.full_name || CU.email || '';
-  document.getElementById('user-name').textContent = name.split(' ')[0] || name.split('@')[0];
-  document.getElementById('user-avatar').textContent = (name[0] || '?').toUpperCase();
+  const name=CU.user_metadata?.full_name||CU.email||'';
+  document.getElementById('user-name').textContent=(name.split(' ')[0]||name.split('@')[0]).substring(0,12);
+  document.getElementById('user-avatar').textContent=(name[0]||'?').toUpperCase();
   loadLectures();
 }
 
 // ═══════════════════════════════════════════════════════
 // LIBRARY
 // ═══════════════════════════════════════════════════════
-async function loadLectures() {
+async function loadLectures(){
   renderSkeletons();
-  const { data } = await sb.from('study_lectures').select('*').eq('user_id', CU.id).order('updated_at', { ascending: false });
-  lectures = data || [];
-  renderGrid();
+  const {data}=await sb.from('study_lectures').select('*').eq('user_id',CU.id).order('updated_at',{ascending:false});
+  lectures=data||[];renderGrid();
 }
-
-function renderSkeletons() {
-  const g = document.getElementById('lib-grid');
-  g.innerHTML = Array(6).fill('<div class="lec-skeleton"></div>').join('');
-}
-
-function renderGrid() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const filtered = lectures.filter(l => l.name.toLowerCase().includes(q));
-  document.getElementById('lib-stats').textContent = `${lectures.length} lecture${lectures.length !== 1 ? 's' : ''}${q ? ` · ${filtered.length} result${filtered.length !== 1 ? 's' : ''}` : ''}`;
-  const g = document.getElementById('lib-grid');
-  if (!filtered.length) {
-    g.innerHTML = `<div class="lib-empty"><div class="lib-empty-icon">${q ? '🔍' : '📭'}</div><h3>${q ? 'No results' : 'No lectures yet'}</h3><p>${q ? 'Try a different search' : 'Upload your first PDF above'}</p></div>`;
-    return;
-  }
-  g.innerHTML = filtered.map(l => `
+function renderSkeletons(){document.getElementById('lib-grid').innerHTML=Array(6).fill('<div class="lec-skeleton"></div>').join('');}
+function renderGrid(){
+  const q=document.getElementById('search-input').value.toLowerCase();
+  const filtered=lectures.filter(l=>l.name.toLowerCase().includes(q));
+  document.getElementById('lib-stats').textContent=`${lectures.length} lecture${lectures.length!==1?'s':''}${q?` · ${filtered.length} match${filtered.length!==1?'es':''}`:''}`; 
+  const g=document.getElementById('lib-grid');
+  if(!filtered.length){g.innerHTML=`<div class="lib-empty"><div class="lib-empty-icon">${q?'🔍':'📭'}</div><h3>${q?'No results':'No lectures yet'}</h3><p>${q?'Try a different search':'Upload your first PDF above'}</p></div>`;return;}
+  g.innerHTML=filtered.map(l=>`
     <div class="lec-card" onclick="openLecture('${l.id}')">
-      <div class="lec-thumb">
-        <span class="lec-thumb-icon">📑</span>
-        ${l.last_page > 1 ? `<div class="lec-badge">p.${l.last_page}</div>` : ''}
-      </div>
+      <div class="lec-thumb"><span class="lec-thumb-icon">📑</span>${l.last_page>1?`<div class="lec-badge">p.${l.last_page}</div>`:''}</div>
       <div class="lec-body">
-        <div class="lec-name" id="name-${l.id}">${escHtml(l.name)}</div>
+        <div class="lec-name" id="ln-${l.id}">${esc(l.name)}</div>
         <div class="lec-date">${new Date(l.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
       </div>
       <div class="lec-actions" onclick="event.stopPropagation()">
-        <button class="lec-action" title="Rename" onclick="startRename('${l.id}')">✏️</button>
-        <button class="lec-action del" title="Delete" onclick="deleteLecture('${l.id}')">🗑️</button>
+        <button class="lec-action" onclick="startRename('${l.id}')">✏️</button>
+        <button class="lec-action del" onclick="deleteLecture('${l.id}')">🗑️</button>
       </div>
     </div>`).join('');
 }
-
-function startRename(id) {
-  const lec = lectures.find(l => l.id === id);
-  if (!lec) return;
-  const el = document.getElementById(`name-${id}`);
-  el.outerHTML = `<input class="rename-input" id="ri-${id}" value="${escHtml(lec.name)}" onclick="event.stopPropagation()" onblur="saveRename('${id}',this.value)" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){renderGrid();}">`;
-  const inp = document.getElementById(`ri-${id}`);
-  inp.focus(); inp.select();
+function startRename(id){
+  const l=lectures.find(x=>x.id===id);if(!l)return;
+  const el=document.getElementById(`ln-${id}`);
+  el.outerHTML=`<input class="rename-input" id="ri-${id}" value="${esc(l.name)}" onclick="event.stopPropagation()" onblur="saveRename('${id}',this.value)" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')renderGrid()">`;
+  const inp=document.getElementById(`ri-${id}`);inp.focus();inp.select();
 }
-
-async function saveRename(id, val) {
-  if (!val.trim()) { renderGrid(); return; }
-  await sb.from('study_lectures').update({ name: val.trim() }).eq('id', id);
-  lectures = lectures.map(l => l.id === id ? { ...l, name: val.trim() } : l);
-  renderGrid();
+async function saveRename(id,val){
+  if(!val.trim()){renderGrid();return;}
+  await sb.from('study_lectures').update({name:val.trim()}).eq('id',id);
+  lectures=lectures.map(l=>l.id===id?{...l,name:val.trim()}:l);renderGrid();
 }
-
-async function deleteLecture(id) {
-  const lec = lectures.find(l => l.id === id);
-  if (!lec || !confirm(`Delete "${lec.name}"? This cannot be undone.`)) return;
-  await sb.storage.from('study-pdfs').remove([lec.storage_path]);
-  await sb.from('study_lectures').delete().eq('id', id);
-  lectures = lectures.filter(l => l.id !== id);
-  renderGrid();
-  toast('Lecture deleted');
+async function deleteLecture(id){
+  const l=lectures.find(x=>x.id===id);
+  if(!l||!confirm(`Delete "${l.name}"? Cannot be undone.`))return;
+  await sb.storage.from('study-pdfs').remove([l.storage_path]);
+  await sb.from('study_lectures').delete().eq('id',id);
+  // Also clear localStorage
+  localStorage.removeItem(`sr_${id}`);
+  lectures=lectures.filter(x=>x.id!==id);renderGrid();toast('Lecture deleted');
 }
 
 // ═══════════════════════════════════════════════════════
 // UPLOAD
 // ═══════════════════════════════════════════════════════
-const dropzone = document.getElementById('dropzone');
-dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('active'); });
-dropzone.addEventListener('dragleave', () => dropzone.classList.remove('active'));
-dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('active'); const f = e.dataTransfer.files[0]; if (f) uploadPDF(f); });
-
-function handleFileSelect(inp) { if (inp.files[0]) uploadPDF(inp.files[0]); inp.value = ''; }
-
-async function uploadPDF(file) {
-  if (file.type !== 'application/pdf') { toast('Please select a PDF file'); return; }
-  setUploadProgress(true, 5);
-  const fname = `${CU.id}/${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
-  const { error: se } = await sb.storage.from('study-pdfs').upload(fname, file);
-  if (se) { setUploadProgress(false); toast('Upload failed: ' + se.message); return; }
-  setUploadProgress(true, 65);
-  const { data: urlData } = sb.storage.from('study-pdfs').getPublicUrl(fname);
-  const { data: lec, error: de } = await sb.from('study_lectures').insert({
-    user_id: CU.id, name: file.name.replace('.pdf',''), storage_path: fname,
-    pdf_url: urlData.publicUrl,
-    annotations: JSON.stringify({}), last_page: 1
+const dz=document.getElementById('dropzone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('active');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('active'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('active');const f=e.dataTransfer.files[0];if(f)uploadPDF(f);});
+function handleFileSelect(inp){if(inp.files[0])uploadPDF(inp.files[0]);inp.value='';}
+async function uploadPDF(file){
+  if(file.type!=='application/pdf'){toast('Please select a PDF file');return;}
+  setUploadProg(true,5);
+  const fname=`${CU.id}/${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+  const {error:se}=await sb.storage.from('study-pdfs').upload(fname,file);
+  if(se){setUploadProg(false);toast('Upload failed: '+se.message);return;}
+  setUploadProg(true,65);
+  const {data:ud}=sb.storage.from('study-pdfs').getPublicUrl(fname);
+  const {data:lec,error:de}=await sb.from('study_lectures').insert({
+    user_id:CU.id,name:file.name.replace('.pdf',''),storage_path:fname,
+    pdf_url:ud.publicUrl,annotations:JSON.stringify({}),last_page:1
   }).select().single();
-  setUploadProgress(true, 100);
-  setTimeout(() => {
-    setUploadProgress(false);
-    if (!de) { lectures = [lec, ...lectures]; renderGrid(); toast('✓ Uploaded — click to study'); }
-    else toast('DB error: ' + de.message);
-  }, 500);
+  setUploadProg(true,100);
+  setTimeout(()=>{setUploadProg(false);if(!de){lectures=[lec,...lectures];renderGrid();toast('✓ Uploaded — click to study');}else toast('DB error: '+de.message);},500);
 }
-
-function setUploadProgress(show, pct = 0) {
-  document.getElementById('drop-content').style.display = show ? 'none' : '';
-  document.getElementById('upload-progress').style.display = show ? 'block' : 'none';
-  document.getElementById('upload-fill').style.width = pct + '%';
-  document.getElementById('upload-text').textContent = `Uploading… ${pct}%`;
+function setUploadProg(show,pct=0){
+  document.getElementById('drop-content').style.display=show?'none':'';
+  document.getElementById('upload-progress').style.display=show?'block':'none';
+  document.getElementById('upload-fill').style.width=pct+'%';
+  document.getElementById('upload-text').textContent=`Uploading… ${pct}%`;
 }
 
 // ═══════════════════════════════════════════════════════
 // OPEN / CLOSE VIEWER
 // ═══════════════════════════════════════════════════════
-async function openLecture(id) {
-  const lec = lectures.find(l => l.id === id);
-  if (!lec) return;
-  activeLec = lec;
-  try { annotations = JSON.parse(lec.annotations) || {}; } catch { annotations = {}; }
-  curPage = lec.last_page || 1;
-  zoom = 1.4;
-  pdfDoc = null; thumbnails = {};
-  document.getElementById('library').style.display = 'none';
+async function openLecture(id){
+  const lec=lectures.find(l=>l.id===id);if(!lec)return;
+  activeLec=lec;
+  // Load from localStorage first (freshest), fall back to Supabase
+  const local=localStorage.getItem(`sr_${id}`);
+  try{annotations=JSON.parse(local||lec.annotations)||{};}catch{annotations={};}
+  curPage=lec.last_page||1;zoom=1.4;pdfDoc=null;
+  document.getElementById('library').style.display='none';
   document.getElementById('viewer').classList.add('active');
-  document.getElementById('tb-lec-name').textContent = lec.name;
+  document.getElementById('tb-lec-name').textContent=lec.name;
   updateSaveUI('saved');
   setTool('select');
   loadPDF(lec.pdf_url);
 }
-
-async function closeViewer() {
+async function closeViewer(){
   clearTimeout(saveTimer);
   await doSave();
-  activeLec = null; pdfDoc = null;
+  // Update in-memory lectures list
+  lectures=lectures.map(l=>l.id===activeLec.id?{...l,last_page:curPage,updated_at:new Date().toISOString()}:l);
+  activeLec=null;pdfDoc=null;
   document.getElementById('viewer').classList.remove('active');
-  document.getElementById('library').style.display = 'block';
-  // Update lecture in local array
-  lectures = lectures.map(l => l.id === activeLec?.id ? { ...l, last_page: curPage, updated_at: new Date().toISOString() } : l);
+  document.getElementById('library').style.display='block';
   renderGrid();
 }
 
 // ═══════════════════════════════════════════════════════
-// PDF LOADING & RENDERING
+// PDF LOAD & RENDER
 // ═══════════════════════════════════════════════════════
-async function loadPDF(url) {
-  document.getElementById('render-overlay').style.display = 'flex';
-  try {
-    pdfDoc = await pdfjsLib.getDocument({ url, withCredentials: false }).promise;
-    totalPages = pdfDoc.numPages;
-    document.getElementById('page-total').textContent = `/ ${totalPages}`;
-    await sb.from('study_lectures').update({ page_count: totalPages }).eq('id', activeLec.id);
+async function loadPDF(url){
+  document.getElementById('render-overlay').style.display='flex';
+  try{
+    pdfDoc=await pdfjsLib.getDocument({url,withCredentials:false}).promise;
+    totalPages=pdfDoc.numPages;
+    document.getElementById('page-total').textContent=`/ ${totalPages}`;
+    await sb.from('study_lectures').update({page_count:totalPages}).eq('id',activeLec.id);
     await renderPage(curPage);
     buildThumbs();
-  } catch(e) {
-    toast('Could not load PDF. Check storage permissions.'); console.error(e);
-    document.getElementById('render-overlay').style.display = 'none';
-  }
+  }catch(e){console.error(e);toast('Could not load PDF.');document.getElementById('render-overlay').style.display='none';}
 }
 
-let renderTask = null;
-async function renderPage(p) {
-  if (!pdfDoc) return;
-  if (renderTask) { try { renderTask.cancel(); } catch(e){} }
-  document.getElementById('render-overlay').style.display = 'flex';
-  curPage = Math.max(1, Math.min(totalPages, p));
-  document.getElementById('page-input').value = curPage;
-  document.getElementById('prev-btn').disabled = curPage <= 1;
-  document.getElementById('next-btn').disabled = curPage >= totalPages;
-  // Highlight active thumb
-  document.querySelectorAll('.thumb-item').forEach(el => el.classList.toggle('active', +el.dataset.page === curPage));
+let renderTask=null;
+async function renderPage(p){
+  if(!pdfDoc)return;
+  if(renderTask){try{renderTask.cancel();}catch(e){}}
+  document.getElementById('render-overlay').style.display='flex';
+  curPage=Math.max(1,Math.min(totalPages,p));
+  document.getElementById('page-input').value=curPage;
+  document.getElementById('prev-btn').disabled=curPage<=1;
+  document.getElementById('next-btn').disabled=curPage>=totalPages;
+  document.querySelectorAll('.thumb-item').forEach(el=>el.classList.toggle('active',+el.dataset.page===curPage));
 
-  try {
-    const page = await pdfDoc.getPage(curPage);
-    const vp = page.getViewport({ scale: zoom });
-    const canvas = document.getElementById('pdf-canvas');
-    canvas.width = vp.width; canvas.height = vp.height;
-    const annCanvas = document.getElementById('ann-canvas');
-    annCanvas.width = vp.width; annCanvas.height = vp.height;
-    document.getElementById('notes-layer').style.width = vp.width + 'px';
-    document.getElementById('notes-layer').style.height = vp.height + 'px';
-    document.getElementById('texts-layer').style.width = vp.width + 'px';
-    document.getElementById('texts-layer').style.height = vp.height + 'px';
-    renderTask = page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+  try{
+    const page=await pdfDoc.getPage(curPage);
+    const vp=page.getViewport({scale:zoom});
+    // Size PDF canvas
+    const pdfCanvas=document.getElementById('pdf-canvas');
+    pdfCanvas.width=vp.width;pdfCanvas.height=vp.height;
+    // Size ann canvas
+    const annCanvas=document.getElementById('ann-canvas');
+    annCanvas.width=vp.width;annCanvas.height=vp.height;
+    // Size layers
+    const pw=document.getElementById('page-wrap');
+    pw.style.width=vp.width+'px';pw.style.height=vp.height+'px';
+    ['text-layer','hl-layer','notes-layer','texts-layer'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){el.style.width=vp.width+'px';el.style.height=vp.height+'px';}
+    });
+    // Render PDF
+    renderTask=page.render({canvasContext:pdfCanvas.getContext('2d'),viewport:vp});
     await renderTask.promise;
-    document.getElementById('render-overlay').style.display = 'none';
-    redrawAnnotations();
+    // Render text layer for DOM highlighting
+    await renderTextLayer(page,vp);
+    document.getElementById('render-overlay').style.display='none';
+    redrawCanvas();
+    renderHighlights();
     renderNotes();
     renderTexts();
-  } catch(e) {
-    if (e?.name !== 'RenderingCancelledException') { console.error(e); document.getElementById('render-overlay').style.display = 'none'; }
+  }catch(e){
+    if(e?.name!=='RenderingCancelledException'){console.error(e);document.getElementById('render-overlay').style.display='none';}
   }
 }
 
-function setZoom(z) {
-  zoom = Math.max(0.4, Math.min(4, z));
-  document.getElementById('zoom-val').textContent = Math.round(zoom * 100) + '%';
-  renderPage(curPage);
+// ─── pdf.js text layer ─────────────────────────────────
+async function renderTextLayer(page,viewport){
+  const tl=document.getElementById('text-layer');
+  tl.innerHTML='';
+  const tc=await page.getTextContent();
+  await pdfjsLib.renderTextLayer({textContentSource:tc,container:tl,viewport,textDivs:[]}).promise;
+  // Apply scale transforms from pdf.js
+  tl.querySelectorAll('span').forEach(span=>{
+    if(!span.style.fontSize)span.style.fontSize='0';
+  });
 }
 
-function goTo(p) { renderPage(Math.max(1, Math.min(totalPages, p))); }
+function setZoom(z){zoom=Math.max(0.3,Math.min(5,z));document.getElementById('zoom-val').textContent=Math.round(zoom*100)+'%';renderPage(curPage);}
+function goTo(p){renderPage(Math.max(1,Math.min(totalPages,p)));}
 
 // ═══════════════════════════════════════════════════════
 // THUMBNAILS
 // ═══════════════════════════════════════════════════════
-async function buildThumbs() {
-  const sb2 = document.getElementById('thumb-sidebar');
-  sb2.innerHTML = '';
-  for (let i = 1; i <= totalPages; i++) {
-    const item = document.createElement('div');
-    item.className = `thumb-item${i === curPage ? ' active' : ''}`;
-    item.dataset.page = i;
-    item.onclick = () => goTo(i);
-    item.innerHTML = `<div class="thumb-placeholder" id="tp-${i}"></div><span class="thumb-num">${i}</span>`;
+async function buildThumbs(){
+  const sb2=document.getElementById('thumb-sidebar');
+  sb2.innerHTML='';
+  for(let i=1;i<=totalPages;i++){
+    const item=document.createElement('div');
+    item.className=`thumb-item${i===curPage?' active':''}`;
+    item.dataset.page=i;item.onclick=()=>goTo(i);
+    item.innerHTML=`<div class="thumb-placeholder" id="tp-${i}"></div><span class="thumb-num">${i}</span>`;
     sb2.appendChild(item);
   }
-  // Render thumbs lazily
-  for (let i = 1; i <= Math.min(totalPages, 60); i++) {
-    try {
-      const page = await pdfDoc.getPage(i);
-      const vp = page.getViewport({ scale: 0.18 });
-      const c = document.createElement('canvas');
-      c.width = vp.width; c.height = vp.height;
-      await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-      const img = document.createElement('img');
-      img.src = c.toDataURL(); img.className = 'thumb-img';
-      const placeholder = document.getElementById(`tp-${i}`);
-      if (placeholder) placeholder.replaceWith(img);
-    } catch(e) {}
+  for(let i=1;i<=Math.min(totalPages,80);i++){
+    try{
+      const page=await pdfDoc.getPage(i);
+      const vp=page.getViewport({scale:0.18});
+      const c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+      await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+      const img=document.createElement('img');img.src=c.toDataURL();img.className='thumb-img';
+      const ph=document.getElementById(`tp-${i}`);if(ph)ph.replaceWith(img);
+    }catch(e){}
   }
 }
-
-function toggleSidebar() {
-  sidebarVisible = !sidebarVisible;
-  document.getElementById('thumb-sidebar').classList.toggle('hidden', !sidebarVisible);
-  document.getElementById('sidebar-btn').textContent = sidebarVisible ? '⏴' : '⏵';
+function toggleSidebar(){
+  sidebarVisible=!sidebarVisible;
+  document.getElementById('thumb-sidebar').classList.toggle('hidden',!sidebarVisible);
+  document.getElementById('sidebar-toggle-btn').textContent=sidebarVisible?'⏴':'⏵';
 }
 
 // ═══════════════════════════════════════════════════════
-// ANNOTATION CANVAS — DRAWING
+// PAGE ANNOTATION STORE
 // ═══════════════════════════════════════════════════════
-function getPageAnnotations() {
-  const key = `page_${curPage}`;
-  return annotations[key] || { highlights: [], drawings: [], notes: [], texts: [] };
-}
-function setPageAnnotations(pa) {
-  const key = `page_${curPage}`;
-  annotations[key] = pa;
-  scheduleAutoSave();
+function pk(){return `page_${curPage}`;}
+function getPA(){return annotations[pk()]||(annotations[pk()]={highlights:[],drawings:[],notes:[],texts:[]});}
+function setPA(pa){annotations[pk()]=pa;scheduleAutoSave();}
+function updatePA(fn){const pa=getPA();fn(pa);setPA(pa);}
+
+// ═══════════════════════════════════════════════════════
+// DOM TEXT HIGHLIGHTING
+// ═══════════════════════════════════════════════════════
+// Highlight stored as: {id, rects:[{x,y,w,h}], color, text}
+// Rects are in PDF canvas pixels (absolute within page-wrap)
+
+function enableHighlightMode(on){
+  const tl=document.getElementById('text-layer');
+  tl.classList.toggle('highlight-mode',on);
+  document.getElementById('ann-canvas').style.pointerEvents=on?'none':'all';
 }
 
-function redrawAnnotations() {
-  const canvas = document.getElementById('ann-canvas');
-  if (!canvas.width) return;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const pa = getPageAnnotations();
-  // Highlights (multiply blend)
-  (pa.highlights || []).forEach(h => {
-    if (!h.points?.length) return;
-    ctx.save();
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.strokeStyle = h.color; ctx.lineWidth = h.size;
-    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.beginPath();
-    h.points.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
-    ctx.stroke(); ctx.restore();
+// Listen for mouseup on text-layer to capture selection
+document.getElementById('text-layer').addEventListener('mouseup',onTextSelectionEnd);
+document.getElementById('text-layer').addEventListener('touchend',onTextSelectionEnd);
+
+function onTextSelectionEnd(e){
+  if(tool!=='highlight')return;
+  const sel=window.getSelection();
+  if(!sel||sel.isCollapsed||!sel.rangeCount)return;
+  const range=sel.getRangeAt(0);
+  if(!range||range.collapsed)return;
+  const pageWrap=document.getElementById('page-wrap');
+  const wrapRect=pageWrap.getBoundingClientRect();
+  const clientRects=Array.from(range.getClientRects());
+  if(!clientRects.length)return;
+
+  // Convert client rects to page-wrap-relative px (matching canvas coordinate space)
+  const pdfCanvas=document.getElementById('pdf-canvas');
+  const scaleX=pdfCanvas.width/wrapRect.width;
+  const scaleY=pdfCanvas.height/wrapRect.height;
+
+  const rects=clientRects.filter(r=>r.width>0&&r.height>1).map(r=>({
+    x:(r.left-wrapRect.left)*scaleX,
+    y:(r.top-wrapRect.top)*scaleY,
+    w:r.width*scaleX,
+    h:r.height*scaleY,
+  }));
+
+  if(!rects.length){sel.removeAllRanges();return;}
+
+  const hl={id:uid(),rects,color:hlColor,text:sel.toString().trim()};
+  updatePA(pa=>{pa.highlights=[...(pa.highlights||[]),hl];});
+  sel.removeAllRanges();
+  renderHighlights();
+  toast('Highlighted ✓');
+}
+
+function renderHighlights(){
+  const hl=document.getElementById('hl-layer');
+  hl.innerHTML='';
+  const pa=getPA();
+  const pdfCanvas=document.getElementById('pdf-canvas');
+  const wrapRect=document.getElementById('page-wrap').getBoundingClientRect();
+  const scaleX=wrapRect.width/pdfCanvas.width;
+  const scaleY=wrapRect.height/pdfCanvas.height;
+
+  (pa.highlights||[]).forEach(h=>{
+    h.rects.forEach(r=>{
+      const mark=document.createElement('div');
+      mark.className='hl-mark';
+      mark.dataset.hlId=h.id;
+      mark.style.cssText=`left:${r.x*scaleX}px;top:${r.y*scaleY}px;width:${r.w*scaleX}px;height:${r.h*scaleY}px;background:${h.color}`;
+      mark.title=h.text||'';
+      mark.addEventListener('contextmenu',e=>{e.preventDefault();showCtxMenu(e,h.id);});
+      mark.addEventListener('click',e=>{if(tool==='eraser')deleteHighlight(h.id);});
+      hl.appendChild(mark);
+    });
   });
-  // Drawings & lines
-  (pa.drawings || []).forEach(d => {
+}
+
+function deleteHighlight(id){
+  updatePA(pa=>{pa.highlights=(pa.highlights||[]).filter(h=>h.id!==id);});
+  renderHighlights();
+}
+
+function showCtxMenu(e,hlId){
+  hoverHlId=hlId;
+  const menu=document.getElementById('ctx-menu');
+  menu.style.left=e.clientX+'px';menu.style.top=e.clientY+'px';
+  menu.classList.add('open');
+}
+function deleteHoverHighlight(){if(hoverHlId)deleteHighlight(hoverHlId);closeCtxMenu();}
+function closeCtxMenu(){document.getElementById('ctx-menu').classList.remove('open');hoverHlId=null;}
+document.addEventListener('click',e=>{if(!e.target.closest('#ctx-menu'))closeCtxMenu();});
+
+// ═══════════════════════════════════════════════════════
+// CANVAS DRAWING — ANN-CANVAS
+// ═══════════════════════════════════════════════════════
+function redrawCanvas(){
+  const canvas=document.getElementById('ann-canvas');
+  if(!canvas.width)return;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const pa=getPA();
+  (pa.drawings||[]).forEach(d=>{
     ctx.save();
-    ctx.strokeStyle = d.color; ctx.lineWidth = d.size;
-    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    if (d.type === 'line') {
-      ctx.beginPath(); ctx.moveTo(d.x1,d.y1); ctx.lineTo(d.x2,d.y2); ctx.stroke();
-    } else if (d.points?.length) {
+    ctx.globalAlpha=d.opacity??1;
+    ctx.strokeStyle=d.color;ctx.lineWidth=d.size;
+    ctx.lineCap='round';ctx.lineJoin='round';
+    if(d.type==='line'){
+      ctx.beginPath();ctx.moveTo(d.x1,d.y1);ctx.lineTo(d.x2,d.y2);ctx.stroke();
+    }else if(d.points?.length>1){
       ctx.beginPath();
-      d.points.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+      d.points.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));
       ctx.stroke();
     }
     ctx.restore();
   });
 }
 
-function getCanvasPos(e) {
-  const canvas = document.getElementById('ann-canvas');
-  const rect = canvas.getBoundingClientRect();
-  const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
-  const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  const cy = e.touches ? e.touches[0].clientY : e.clientY;
-  return [( cx - rect.left) * sx, (cy - rect.top) * sy];
+function getAnnPos(e){
+  const canvas=document.getElementById('ann-canvas');
+  const rect=canvas.getBoundingClientRect();
+  const sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+  const cx=e.touches?e.touches[0].clientX:e.clientX;
+  const cy=e.touches?e.touches[0].clientY:e.clientY;
+  return[(cx-rect.left)*sx,(cy-rect.top)*sy];
 }
 
-const annCanvas = document.getElementById('ann-canvas');
-annCanvas.addEventListener('mousedown', onDrawStart);
-annCanvas.addEventListener('mousemove', onDrawMove);
-annCanvas.addEventListener('mouseup', onDrawEnd);
-annCanvas.addEventListener('mouseleave', onDrawEnd);
-annCanvas.addEventListener('touchstart', onDrawStart, { passive: false });
-annCanvas.addEventListener('touchmove', onDrawMove, { passive: false });
-annCanvas.addEventListener('touchend', onDrawEnd);
+const annCanvas=document.getElementById('ann-canvas');
+annCanvas.addEventListener('mousedown',onAnnStart);
+annCanvas.addEventListener('mousemove',onAnnMove);
+annCanvas.addEventListener('mouseup',onAnnEnd);
+annCanvas.addEventListener('mouseleave',onAnnEnd);
+annCanvas.addEventListener('touchstart',onAnnStart,{passive:false});
+annCanvas.addEventListener('touchmove',onAnnMove,{passive:false});
+annCanvas.addEventListener('touchend',onAnnEnd);
 
-function onDrawStart(e) {
-  if (!['pen','highlight','eraser','line','laser'].includes(tool)) return;
+function onAnnStart(e){
+  if(!['pen','line','eraser','laser'].includes(tool))return;
   e.preventDefault();
-  isDrawing = true;
-  const pos = getCanvasPos(e);
-  lastPos = pos;
-  if (tool === 'line') { lineStart = pos; snapshot = annCanvas.getContext('2d').getImageData(0, 0, annCanvas.width, annCanvas.height); return; }
-  if (tool === 'laser') return;
-  currentStroke = [pos];
+  isDrawing=true;
+  const pos=getAnnPos(e);
+  lastPos=pos;
+  if(tool==='line'){lineStart=pos;snap=annCanvas.getContext('2d').getImageData(0,0,annCanvas.width,annCanvas.height);return;}
+  if(tool==='laser')return;
+  currentStroke=[pos];
+  clearTimeout(straightenTimer);
 }
 
-function onDrawMove(e) {
-  if (!isDrawing) return;
-  e.preventDefault();
-  const pos = getCanvasPos(e);
-  const ctx = annCanvas.getContext('2d');
-
-  if (tool === 'laser') {
-    redrawAnnotations();
-    ctx.save(); ctx.beginPath(); ctx.arc(pos[0], pos[1], 11, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,50,50,.7)'; ctx.fill(); ctx.restore();
-    clearTimeout(laserTimer);
+function onAnnMove(e){
+  if(!isDrawing)return;e.preventDefault();
+  const pos=getAnnPos(e);
+  const ctx=annCanvas.getContext('2d');
+  if(tool==='laser'){
+    redrawCanvas();
+    ctx.save();ctx.beginPath();ctx.arc(pos[0],pos[1],13,0,Math.PI*2);
+    ctx.fillStyle='rgba(220,38,38,.75)';ctx.fill();
+    ctx.beginPath();ctx.arc(pos[0],pos[1],4,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.9)';ctx.fill();
+    ctx.restore();
+    clearTimeout(laserFadeTimer);return;
+  }
+  if(tool==='line'&&lineStart){
+    ctx.putImageData(snap,0,0);
+    ctx.save();ctx.strokeStyle=penColor;ctx.lineWidth=penSize;ctx.lineCap='round';ctx.globalAlpha=penOpacity;
+    ctx.beginPath();ctx.moveTo(lineStart[0],lineStart[1]);ctx.lineTo(pos[0],pos[1]);ctx.stroke();ctx.restore();
     return;
   }
-  if (tool === 'line' && lineStart) {
-    ctx.putImageData(snapshot, 0, 0);
-    ctx.save(); ctx.strokeStyle = penColor; ctx.lineWidth = penSize; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(lineStart[0], lineStart[1]); ctx.lineTo(pos[0], pos[1]); ctx.stroke(); ctx.restore();
+  if(tool==='eraser'){
+    const r=eraserSize;
+    if(eraserMode==='precise'){
+      ctx.save();ctx.globalCompositeOperation='destination-out';
+      ctx.beginPath();ctx.arc(pos[0],pos[1],r,0,Math.PI*2);ctx.fill();ctx.restore();
+    }else if(eraserMode==='stroke'||eraserMode==='drawing'){
+      // Visual feedback circle
+      redrawCanvas();
+      ctx.save();ctx.beginPath();ctx.arc(pos[0],pos[1],r,0,Math.PI*2);
+      ctx.strokeStyle='rgba(220,38,38,.5)';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+    }
     return;
   }
-  if (tool === 'eraser') {
-    const r = penSize * 3;
-    ctx.save(); ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath(); ctx.arc(pos[0], pos[1], r, 0, Math.PI*2); ctx.fill(); ctx.restore();
-    const pa = getPageAnnotations();
-    pa.drawings = (pa.drawings||[]).filter(d => {
-      if (d.type === 'line') return !ptNearLine([d.x1,d.y1],[d.x2,d.y2], pos, r);
-      return !(d.points||[]).some(([px,py]) => Math.hypot(px-pos[0],py-pos[1]) < r);
-    });
-    pa.highlights = (pa.highlights||[]).filter(h =>
-      !(h.points||[]).some(([px,py]) => Math.hypot(px-pos[0],py-pos[1]) < r)
-    );
-    setPageAnnotations(pa);
-    return;
-  }
-  // Pen / highlight — live draw
+  // Pen — live draw
   ctx.save();
-  if (tool === 'highlight') { ctx.globalCompositeOperation = 'multiply'; ctx.strokeStyle = highlightColor; ctx.lineWidth = 18; }
-  else { ctx.strokeStyle = penColor; ctx.lineWidth = penSize; }
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  ctx.beginPath(); ctx.moveTo(lastPos[0], lastPos[1]); ctx.lineTo(pos[0], pos[1]); ctx.stroke(); ctx.restore();
-  currentStroke.push(pos); lastPos = pos;
-}
+  ctx.globalAlpha=penOpacity;
+  ctx.strokeStyle=penColor;ctx.lineWidth=penSize;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.beginPath();ctx.moveTo(lastPos[0],lastPos[1]);ctx.lineTo(pos[0],pos[1]);ctx.stroke();
+  ctx.restore();
+  currentStroke.push(pos);lastPos=pos;
 
-function onDrawEnd(e) {
-  if (!isDrawing) return;
-  isDrawing = false;
-  if (tool === 'laser') { laserTimer = setTimeout(() => redrawAnnotations(), 700); return; }
-  if (tool === 'line' && lineStart) {
-    const pos = e.changedTouches ? getCanvasPos({clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY}) : getCanvasPos(e);
-    const pa = getPageAnnotations();
-    pa.drawings = [...(pa.drawings||[]), { type:'line', x1:lineStart[0], y1:lineStart[1], x2:pos[0], y2:pos[1], color:penColor, size:penSize }];
-    setPageAnnotations(pa); lineStart = null; return;
+  // Auto-straighten: reset timer each move
+  clearTimeout(straightenTimer);
+  if(tool==='pen'){
+    straightenTimer=setTimeout(()=>{
+      if(isDrawing&&currentStroke.length>=2){
+        // Replace with straight line from first to last point
+        const first=currentStroke[0];
+        const last=currentStroke[currentStroke.length-1];
+        currentStroke=[first,last];
+        redrawCanvas();
+        ctx.save();ctx.globalAlpha=penOpacity;
+        ctx.strokeStyle=penColor;ctx.lineWidth=penSize;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(first[0],first[1]);ctx.lineTo(last[0],last[1]);ctx.stroke();
+        ctx.restore();
+        toast('Stroke straightened');
+      }
+    },800);
   }
-  if (tool === 'eraser') return;
-  if (currentStroke.length < 2) { currentStroke = []; return; }
-  const stroke = { type:'stroke', points:currentStroke, color: tool==='highlight' ? highlightColor : penColor, size: tool==='highlight' ? 18 : penSize };
-  const pa = getPageAnnotations();
-  if (tool === 'highlight') pa.highlights = [...(pa.highlights||[]), stroke];
-  else pa.drawings = [...(pa.drawings||[]), stroke];
-  setPageAnnotations(pa);
-  currentStroke = [];
 }
 
-function ptNearLine(p1, p2, pt, thr) {
-  const [x1,y1]=p1,[x2,y2]=p2,[px,py]=pt;
+function onAnnEnd(e){
+  if(!isDrawing)return;
+  isDrawing=false;
+  clearTimeout(straightenTimer);
+
+  if(tool==='laser'){
+    laserFadeTimer=setTimeout(()=>redrawCanvas(),600);return;
+  }
+  if(tool==='line'&&lineStart){
+    const pos=e.changedTouches?getAnnPos({clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY}):getAnnPos(e);
+    updatePA(pa=>{pa.drawings=[...(pa.drawings||[]),{type:'line',x1:lineStart[0],y1:lineStart[1],x2:pos[0],y2:pos[1],color:penColor,size:penSize,opacity:penOpacity}];});
+    lineStart=null;return;
+  }
+  if(tool==='eraser'){
+    if(eraserMode==='stroke'||eraserMode==='drawing'){
+      // Click-to-delete nearest stroke
+      const pos=getAnnPos(e);
+      const r=eraserSize;
+      updatePA(pa=>{
+        pa.drawings=(pa.drawings||[]).filter(d=>{
+          if(eraserMode==='drawing'&&d.type==='line')return !ptNearLine([d.x1,d.y1],[d.x2,d.y2],pos,r);
+          if(d.type==='line')return !ptNearLine([d.x1,d.y1],[d.x2,d.y2],pos,r);
+          return !(d.points||[]).some(([px,py])=>Math.hypot(px-pos[0],py-pos[1])<r);
+        });
+      });
+      redrawCanvas();
+    }
+    return;
+  }
+  if(currentStroke.length<2){currentStroke=[];return;}
+  updatePA(pa=>{pa.drawings=[...(pa.drawings||[]),{type:'stroke',points:currentStroke,color:penColor,size:penSize,opacity:penOpacity}];});
+  currentStroke=[];
+}
+
+function ptNearLine(p1,p2,pt,thr){
+  const[x1,y1]=p1,[x2,y2]=p2,[px,py]=pt;
   const dx=x2-x1,dy=y2-y1,len2=dx*dx+dy*dy;
-  if(!len2) return Math.hypot(px-x1,py-y1)<thr;
+  if(!len2)return Math.hypot(px-x1,py-y1)<thr;
   const t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/len2));
   return Math.hypot(px-(x1+t*dx),py-(y1+t*dy))<thr;
 }
 
-// Ann canvas cursor & pointer events
-function updateCanvasStyle() {
-  const active = ['pen','highlight','eraser','line','laser'].includes(tool);
-  annCanvas.style.pointerEvents = active ? 'all' : 'none';
-  annCanvas.style.cursor = tool==='eraser'?'cell':active?'crosshair':'default';
+function updateAnnCanvasStyle(){
+  const active=['pen','line','eraser','laser'].includes(tool);
+  annCanvas.style.pointerEvents=active?'all':'none';
+  if(tool==='eraser') annCanvas.style.cursor='cell';
+  else if(active) annCanvas.style.cursor='crosshair';
+  else annCanvas.style.cursor='default';
+  // Text layer for highlighting
+  enableHighlightMode(tool==='highlight');
+  // Notes/texts layers
+  document.getElementById('notes-layer').style.pointerEvents=(tool==='note'||tool==='select')?'all':'none';
+  document.getElementById('texts-layer').style.pointerEvents=(tool==='text'||tool==='select')?'all':'none';
+  // hl-layer for eraser
+  document.getElementById('hl-layer').style.pointerEvents=(tool==='eraser'||tool==='select')?'all':'none';
 }
 
 // ═══════════════════════════════════════════════════════
 // STICKY NOTES
 // ═══════════════════════════════════════════════════════
-const NOTE_COLORS = ['#FFF59D','#A5D6A7','#90CAF9','#F48FB1','#FFCC80','#CE93D8'];
+document.getElementById('notes-layer').addEventListener('click',addNote);
+document.getElementById('notes-layer').addEventListener('mousemove',dragNoteMove);
+document.getElementById('notes-layer').addEventListener('mouseup',()=>{draggingNote=null;});
 
-document.getElementById('notes-layer').addEventListener('click', addNote);
-document.getElementById('notes-layer').addEventListener('mousemove', dragNoteMove);
-document.getElementById('notes-layer').addEventListener('mouseup', dragNoteEnd);
-
-function addNote(e) {
-  if (tool !== 'note') return;
-  if (e.target !== e.currentTarget && !e.target.classList.contains('notes-layer')) {
-    // clicked on existing note — don't add
-    if (e.target.closest('.sticky-note')) return;
-  }
-  const layer = document.getElementById('notes-layer');
-  const rect = layer.getBoundingClientRect();
-  const w = annCanvas.width, h = annCanvas.height;
-  const sx = w / rect.width, sy = h / rect.height;
-  const x = (e.clientX - rect.left) * sx;
-  const y = (e.clientY - rect.top) * sy;
-  const pa = getPageAnnotations();
-  const id = Date.now().toString();
-  const color = NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
-  pa.notes = [...(pa.notes||[]), { id, x, y, text:'', color, w:180 }];
-  setPageAnnotations(pa);
-  renderNotes();
-  // Focus new note
-  setTimeout(() => { const ta = document.getElementById(`nt-${id}`); if(ta) ta.focus(); }, 50);
+function getLayerPos(e){
+  const layer=document.getElementById('notes-layer');
+  const rect=layer.getBoundingClientRect();
+  const w=annCanvas.width,h=annCanvas.height;
+  return[(e.clientX-rect.left)*(w/rect.width),(e.clientY-rect.top)*(h/rect.height)];
 }
 
-function renderNotes() {
-  const layer = document.getElementById('notes-layer');
-  const w = annCanvas.width, h = annCanvas.height;
-  const pa = getPageAnnotations();
-  layer.innerHTML = '';
-  (pa.notes||[]).forEach(n => {
-    const el = document.createElement('div');
-    el.className = 'sticky-note';
-    el.id = `note-${n.id}`;
-    el.style.cssText = `left:${(n.x/w)*100}%;top:${(n.y/h)*100}%;width:${(n.w/w)*100}%;background:${n.color}`;
-    el.innerHTML = `
-      <div class="note-handle" onmousedown="dragNoteStart(event,'${n.id}')">
-        <span class="note-dots">⠿</span>
-        <div class="note-colors">${NOTE_COLORS.map(c=>`<button class="note-color" style="background:${c}" onclick="setNoteColor('${n.id}','${c}')"></button>`).join('')}</div>
-        <button class="note-del" onclick="deleteNote('${n.id}')">×</button>
-      </div>
-      <textarea class="note-body" id="nt-${n.id}" placeholder="Type note…" onchange="updateNoteText('${n.id}',this.value)" oninput="updateNoteText('${n.id}',this.value)">${escHtml(n.text)}</textarea>`;
-    layer.appendChild(el);
+function addNote(e){
+  if(tool!=='note')return;
+  if(e.target.closest('.sticky-note')||e.target.closest('.note-emoji'))return;
+  const[x,y]=getLayerPos(e);
+  const id=uid();const color=NOTE_COLORS[Math.floor(Math.random()*NOTE_COLORS.length)];
+  updatePA(pa=>{pa.notes=[...(pa.notes||[]),{id,x,y,text:'',color,minimized:false,emoji:'📝'}];});
+  renderNotes();
+  setTimeout(()=>{const ta=document.getElementById(`nb-${id}`);if(ta)ta.focus();},60);
+}
+
+function renderNotes(){
+  const layer=document.getElementById('notes-layer');
+  layer.innerHTML='';
+  const pa=getPA();
+  const w=annCanvas.width,h=annCanvas.height;
+  (pa.notes||[]).forEach(n=>{
+    if(n.minimized){
+      // Emoji anchor
+      const em=document.createElement('div');
+      em.className='note-emoji';em.textContent=n.emoji||'📝';
+      em.style.cssText=`left:${(n.x/w)*100}%;top:${(n.y/h)*100}%`;
+      em.title='Click to expand note';
+      em.onclick=()=>toggleNoteMinimize(n.id,false);
+      layer.appendChild(em);
+    }else{
+      const el=document.createElement('div');
+      el.className='sticky-note';el.id=`note-${n.id}`;
+      el.style.cssText=`left:${(n.x/w)*100}%;top:${(n.y/h)*100}%;background:${n.color}`;
+      el.innerHTML=`
+        <div class="note-handle" onmousedown="dragNoteStart(event,'${n.id}')">
+          <span class="note-grip">⠿</span>
+          <div class="note-colors">${NOTE_COLORS.map(c=>`<button class="note-col-btn" style="background:${c}" onclick="setNoteColor('${n.id}','${c}')"></button>`).join('')}</div>
+          <button class="note-min-btn" title="Minimize to emoji" onclick="toggleNoteMinimize('${n.id}',true)">⬇</button>
+          <button class="note-del-btn" onclick="deleteNote('${n.id}')">×</button>
+        </div>
+        <textarea class="note-body" id="nb-${n.id}" placeholder="Type your note…" oninput="updateNoteText('${n.id}',this.value)">${esc(n.text)}</textarea>`;
+      layer.appendChild(el);
+    }
   });
 }
 
-function dragNoteStart(e, id) {
-  if (tool !== 'select') return;
+function toggleNoteMinimize(id,min){
+  updatePA(pa=>{pa.notes=pa.notes.map(n=>n.id===id?{...n,minimized:min}:n);});
+  renderNotes();
+}
+function dragNoteStart(e,id){
+  if(tool!=='select')return;
   e.preventDefault();
-  const layer = document.getElementById('notes-layer');
-  const rect = layer.getBoundingClientRect();
-  const w = annCanvas.width, h = annCanvas.height;
-  const sx = w/rect.width, sy = h/rect.height;
-  const pa = getPageAnnotations();
-  const n = pa.notes?.find(n=>n.id===id); if(!n) return;
-  draggingNote = id;
-  dragOffsetX = (e.clientX - rect.left)*sx - n.x;
-  dragOffsetY = (e.clientY - rect.top)*sy - n.y;
+  const[mx,my]=getLayerPos(e);
+  const pa=getPA();const n=pa.notes?.find(n=>n.id===id);if(!n)return;
+  draggingNote=id;dragOX=mx-n.x;dragOY=my-n.y;
 }
-function dragNoteMove(e) {
-  if (!draggingNote) return;
-  const layer = document.getElementById('notes-layer');
-  const rect = layer.getBoundingClientRect();
-  const w = annCanvas.width, h = annCanvas.height;
-  const sx = w/rect.width, sy = h/rect.height;
-  const x = (e.clientX - rect.left)*sx - dragOffsetX;
-  const y = (e.clientY - rect.top)*sy - dragOffsetY;
-  const pa = getPageAnnotations();
-  pa.notes = pa.notes.map(n => n.id===draggingNote ? {...n,x,y} : n);
-  setPageAnnotations(pa);
-  const el = document.getElementById(`note-${draggingNote}`);
-  if (el) { el.style.left=(x/w)*100+'%'; el.style.top=(y/h)*100+'%'; }
+function dragNoteMove(e){
+  if(!draggingNote)return;
+  const[mx,my]=getLayerPos(e);
+  const x=mx-dragOX,y=my-dragOY;
+  updatePA(pa=>{pa.notes=pa.notes.map(n=>n.id===draggingNote?{...n,x,y}:n);});
+  const el=document.getElementById(`note-${draggingNote}`);
+  if(el){const w=annCanvas.width,h=annCanvas.height;el.style.left=(x/w)*100+'%';el.style.top=(y/h)*100+'%';}
 }
-function dragNoteEnd() { draggingNote = null; }
-function setNoteColor(id, color) {
-  const pa = getPageAnnotations();
-  pa.notes = pa.notes.map(n => n.id===id ? {...n,color} : n);
-  setPageAnnotations(pa); renderNotes();
-}
-function updateNoteText(id, text) {
-  const pa = getPageAnnotations();
-  pa.notes = pa.notes.map(n => n.id===id ? {...n,text} : n);
-  setPageAnnotations(pa);
-}
-function deleteNote(id) {
-  const pa = getPageAnnotations();
-  pa.notes = pa.notes.filter(n => n.id!==id);
-  setPageAnnotations(pa); renderNotes();
-}
+function setNoteColor(id,color){updatePA(pa=>{pa.notes=pa.notes.map(n=>n.id===id?{...n,color}:n);});renderNotes();}
+function updateNoteText(id,text){updatePA(pa=>{pa.notes=pa.notes.map(n=>n.id===id?{...n,text}:n);});}
+function deleteNote(id){updatePA(pa=>{pa.notes=pa.notes.filter(n=>n.id!==id);});renderNotes();}
 
 // ═══════════════════════════════════════════════════════
 // TEXT ANNOTATIONS
 // ═══════════════════════════════════════════════════════
-let textColor = '#E53E3E', textSize = 16, textBold = false;
+document.getElementById('texts-layer').addEventListener('click',addTextAnn);
 
-document.getElementById('texts-layer').addEventListener('click', addTextAnn);
-
-function addTextAnn(e) {
-  if (tool !== 'text') return;
-  if (e.target.closest('.text-ann')) return;
-  const layer = document.getElementById('texts-layer');
-  const rect = layer.getBoundingClientRect();
-  const w = annCanvas.width, h = annCanvas.height;
-  const sx = w/rect.width, sy = h/rect.height;
-  const x = (e.clientX-rect.left)*sx, y = (e.clientY-rect.top)*sy;
-  const id = Date.now().toString();
-  const pa = getPageAnnotations();
-  pa.texts = [...(pa.texts||[]), { id, x, y, text:'', color:textColor, size:textSize, bold:textBold }];
-  setPageAnnotations(pa);
-  editingTextId = id;
-  renderTexts();
-  setTimeout(()=>{ const ta=document.getElementById(`te-${id}`); if(ta) ta.focus(); },50);
+function getTextsLayerPos(e){
+  const layer=document.getElementById('texts-layer');
+  const rect=layer.getBoundingClientRect();
+  const w=annCanvas.width,h=annCanvas.height;
+  return[(e.clientX-rect.left)*(w/rect.width),(e.clientY-rect.top)*(h/rect.height)];
 }
 
-function renderTexts() {
-  const layer = document.getElementById('texts-layer');
-  const w = annCanvas.width, h = annCanvas.height;
-  const pa = getPageAnnotations();
-  layer.innerHTML = '';
-  (pa.texts||[]).forEach(t => {
-    const el = document.createElement('div');
-    el.className = 'text-ann';
-    el.id = `tann-${t.id}`;
-    el.style.cssText = `left:${(t.x/w)*100}%;top:${(t.y/h)*100}%`;
-    if (editingTextId === t.id) {
-      el.innerHTML = `
-        <div class="text-edit-wrap">
+function addTextAnn(e){
+  if(tool!=='text')return;
+  if(e.target.closest('.text-ann'))return;
+  const[x,y]=getTextsLayerPos(e);
+  const id=uid();
+  updatePA(pa=>{pa.texts=[...(pa.texts||[]),{id,x,y,text:'',color:textColor,size:textSize,bold:textBold,italic:textItalic,editing:true}];});
+  renderTexts();
+  setTimeout(()=>{const ta=document.getElementById(`tte-${id}`);if(ta)ta.focus();},50);
+}
+
+function renderTexts(){
+  const layer=document.getElementById('texts-layer');
+  layer.innerHTML='';
+  const pa=getPA();
+  const w=annCanvas.width,h=annCanvas.height;
+  (pa.texts||[]).forEach(t=>{
+    const el=document.createElement('div');
+    el.className='text-ann';el.id=`tann-${t.id}`;
+    el.style.cssText=`left:${(t.x/w)*100}%;top:${(t.y/h)*100}%`;
+    if(t.editing){
+      el.innerHTML=`
+        <div class="text-editor-wrap">
           <div class="text-mini-tb">
-            <input type="color" class="text-color" value="${t.color}" oninput="updateTextProp('${t.id}','color',this.value)">
-            <select class="text-size" onchange="updateTextProp('${t.id}','size',+this.value)">
-              ${[10,12,14,16,18,20,24,28,32,40].map(s=>`<option value="${s}"${t.size===s?' selected':''}>${s}</option>`).join('')}
+            <input type="color" class="text-color-pick" value="${t.color}" oninput="updateTextProp('${t.id}','color',this.value)">
+            <select class="text-size-sel" onchange="updateTextProp('${t.id}','size',+this.value)">
+              ${[10,12,14,16,18,20,22,24,28,32,36,40,48].map(s=>`<option${t.size===s?' selected':''}>${s}</option>`).join('')}
             </select>
-            <button class="text-bold${t.bold?' on':''}" onclick="updateTextProp('${t.id}','bold',!${t.bold})">B</button>
-            <button class="text-del-btn" onclick="deleteTextAnn('${t.id}')">×</button>
+            <button class="text-bold-btn${t.bold?' on':''}" onclick="updateTextProp('${t.id}','bold',${!t.bold})">B</button>
+            <button class="text-italic-btn${t.italic?' on':''}" onclick="updateTextProp('${t.id}','italic',${!t.italic})"><i>I</i></button>
+            <button class="text-close-btn" onclick="commitTextEdit('${t.id}')">✓</button>
           </div>
-          <textarea class="text-textarea" id="te-${t.id}" style="color:${t.color};font-size:${t.size}px;font-weight:${t.bold?'700':'400'}"
-            onblur="finishTextEdit('${t.id}',this.value)"
+          <textarea class="text-textarea" id="tte-${t.id}"
+            style="color:${t.color};font-size:${t.size}px;font-weight:${t.bold?700:400};font-style:${t.italic?'italic':'normal'}"
             oninput="updateTextContent('${t.id}',this.value)"
-          >${escHtml(t.text)}</textarea>
+            onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter')commitTextEdit('${t.id}')"
+          >${esc(t.text)}</textarea>
         </div>`;
-    } else {
-      el.innerHTML = `<span class="text-display" style="color:${t.color};font-size:${t.size}px;font-weight:${t.bold?'700':'400'}" onclick="editText('${t.id}')">${escHtml(t.text)||'…'}</span>`;
+    }else{
+      el.innerHTML=`
+        <div class="text-display" style="color:${t.color};font-size:${t.size}px;font-weight:${t.bold?700:400};font-style:${t.italic?'italic':'normal'}" onclick="if(tool==='select')editTextAnn('${t.id}')">
+          ${esc(t.text)||'…'}
+          <div class="text-del-x" onclick="event.stopPropagation();deleteTextAnn('${t.id}')">×</div>
+        </div>`;
     }
     layer.appendChild(el);
   });
 }
 
-function updateTextProp(id, prop, val) {
-  const pa = getPageAnnotations();
-  pa.texts = pa.texts.map(t => t.id===id ? {...t,[prop]:val} : t);
-  if (prop==='color') textColor=val; if (prop==='size') textSize=val; if (prop==='bold') textBold=val;
-  setPageAnnotations(pa); renderTexts();
-  setTimeout(()=>{ const ta=document.getElementById(`te-${id}`); if(ta) ta.focus(); },30);
+function updateTextProp(id,prop,val){
+  if(prop==='color')textColor=val;if(prop==='size')textSize=+val;
+  if(prop==='bold')textBold=val;if(prop==='italic')textItalic=val;
+  updatePA(pa=>{pa.texts=pa.texts.map(t=>t.id===id?{...t,[prop]:val,editing:true}:t);});
+  renderTexts();
+  setTimeout(()=>{const ta=document.getElementById(`tte-${id}`);if(ta)ta.focus();},30);
 }
-function updateTextContent(id, text) {
-  const pa = getPageAnnotations();
-  pa.texts = pa.texts.map(t => t.id===id ? {...t,text} : t);
-  setPageAnnotations(pa);
-}
-function finishTextEdit(id, text) {
-  const pa = getPageAnnotations();
-  if (!text.trim()) { pa.texts = pa.texts.filter(t=>t.id!==id); }
-  else { pa.texts = pa.texts.map(t => t.id===id ? {...t,text} : t); }
-  setPageAnnotations(pa);
-  editingTextId = null;
+function updateTextContent(id,text){updatePA(pa=>{pa.texts=pa.texts.map(t=>t.id===id?{...t,text}:t);});}
+function commitTextEdit(id){
+  updatePA(pa=>{
+    pa.texts=pa.texts.map(t=>t.id===id?{...t,editing:false}:t)
+      .filter(t=>t.id!==id||t.text.trim());
+  });
   renderTexts();
 }
-function editText(id) {
-  if (tool !== 'select') return;
-  editingTextId = id;
+function editTextAnn(id){
+  updatePA(pa=>{pa.texts=pa.texts.map(t=>t.id===id?{...t,editing:true}:t);});
   renderTexts();
-  setTimeout(()=>{ const ta=document.getElementById(`te-${id}`); if(ta) ta.focus(); },30);
+  setTimeout(()=>{const ta=document.getElementById(`tte-${id}`);if(ta)ta.focus();},40);
 }
-function deleteTextAnn(id) {
-  const pa = getPageAnnotations();
-  pa.texts = pa.texts.filter(t=>t.id!==id);
-  setPageAnnotations(pa); editingTextId=null; renderTexts();
-}
+function deleteTextAnn(id){updatePA(pa=>{pa.texts=pa.texts.filter(t=>t.id!==id);});renderTexts();}
 
 // ═══════════════════════════════════════════════════════
-// TOOLBAR
+// TOOLBAR — TOOLS & SUB PANELS
 // ═══════════════════════════════════════════════════════
-const PEN_COLORS = ['#E53E3E','#E67E22','#F1C40F','#2ECC71','#3498DB','#9B59B6','#1ABC9C','#E91E63','#000000','#FFFFFF'];
-const HL_COLORS = [
-  {v:'rgba(255,235,59,0.45)',d:'rgba(255,235,59,.9)'},
-  {v:'rgba(102,187,106,0.45)',d:'rgba(102,187,106,.9)'},
-  {v:'rgba(66,165,245,0.45)',d:'rgba(66,165,245,.9)'},
-  {v:'rgba(240,98,146,0.45)',d:'rgba(240,98,146,.9)'},
-  {v:'rgba(255,167,38,0.45)',d:'rgba(255,167,38,.9)'},
-  {v:'rgba(171,71,188,0.45)',d:'rgba(171,71,188,.9)'},
-];
-
-function setTool(t) {
-  tool = t;
-  document.querySelectorAll('.tb-tool').forEach(btn => btn.classList.toggle('active', btn.dataset.tool === t));
-  updateCanvasStyle();
-  // Update notes/texts layer pointer events
-  document.getElementById('notes-layer').style.pointerEvents = (t==='note'||t==='select') ? 'all' : 'none';
-  document.getElementById('texts-layer').style.pointerEvents = (t==='text'||t==='select') ? 'all' : 'none';
+function buildSwatches(){
+  // Highlight swatches
+  const hls=document.getElementById('hl-swatches');
+  hls.innerHTML='';
+  HL_COLORS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className=`swatch${c.v===hlColor?' active':''}`;
+    b.style.background=c.d;b.title=c.label;
+    b.onclick=()=>{hlColor=c.v;hls.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
+    hls.appendChild(b);
+  });
+  // Pen swatches
+  const pens=document.getElementById('pen-swatches');
+  pens.innerHTML='';
+  PEN_COLORS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className=`swatch${c===penColor?' active':''}`;
+    b.style.cssText=`background:${c};${c==='#fff'?'border:2px solid #ccc;':''}`;
+    b.onclick=()=>{penColor=c;pens.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
+    pens.appendChild(b);
+  });
+  const cc=document.createElement('input');cc.type='color';cc.className='custom-swatch';cc.value=penColor;
+  cc.oninput=e=>penColor=e.target.value;pens.appendChild(cc);
 }
 
-let colorPickerMode = null;
-function toggleColorPicker(mode) {
-  const popup = document.getElementById('color-popup');
-  if (colorPickerMode === mode && popup.classList.contains('open')) {
-    closeColorPicker(); return;
-  }
-  colorPickerMode = mode;
-  const dots = document.getElementById('color-dots');
-  const sizeRow = document.getElementById('size-row');
-  dots.innerHTML = '';
-  if (mode === 'pen') {
-    PEN_COLORS.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = `color-dot${c===penColor?' active':''}`;
-      btn.style.cssText = `background:${c};${c==='#FFFFFF'?'border:1px solid #ccc;':''}`;
-      btn.onclick = () => { penColor=c; document.querySelectorAll('#color-dots .color-dot').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); };
-      dots.appendChild(btn);
-    });
-    // Custom color
-    const cc = document.createElement('input');
-    cc.type='color'; cc.className='custom-color'; cc.value=penColor;
-    cc.oninput = e => penColor=e.target.value;
-    dots.appendChild(cc);
-    sizeRow.style.display = 'flex';
-  } else {
-    HL_COLORS.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = `color-dot${c.v===highlightColor?' active':''}`;
-      btn.style.cssText = `background:${c.d}`;
-      btn.onclick = () => { highlightColor=c.v; document.querySelectorAll('#color-dots .color-dot').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); };
-      dots.appendChild(btn);
-    });
-    sizeRow.style.display = 'none';
-  }
-  popup.classList.add('open');
+function setTool(t){
+  tool=t;
+  document.querySelectorAll('.tb-tool').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
+  updateAnnCanvasStyle();
 }
-function closeColorPicker() {
-  document.getElementById('color-popup').classList.remove('open');
-  colorPickerMode = null;
+function setEraserMode(m){
+  eraserMode=m;
+  document.querySelectorAll('.emode-btn').forEach(b=>b.classList.toggle('active',b.dataset.emode===m));
 }
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('#color-popup') && !e.target.closest('.tb-tool[data-tool="pen"]') && !e.target.closest('.tb-tool[data-tool="highlight"]')) {
-    closeColorPicker();
-  }
+function openSubPanel(id){
+  closeSubPanel();
+  const panel=document.getElementById(id);
+  if(panel){panel.classList.add('open');activeSubPanel=id;}
+}
+function closeSubPanel(){
+  document.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('open'));
+  activeSubPanel=null;
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.sub-panel')&&!e.target.closest('.tb-tool')){closeSubPanel();}
+  if(!e.target.closest('#ctx-menu'))closeCtxMenu();
 });
 
-function clearPage() {
-  if (!confirm('Clear all annotations on this page?')) return;
-  setPageAnnotations({ highlights:[], drawings:[], notes:[], texts:[] });
-  redrawAnnotations(); renderNotes(); renderTexts();
+function clearPage(){
+  if(!confirm('Clear ALL annotations on this page? (drawings, highlights, notes, texts)'))return;
+  setPA({highlights:[],drawings:[],notes:[],texts:[]});
+  redrawCanvas();renderHighlights();renderNotes();renderTexts();
+  toast('Page cleared');
 }
 
 // ═══════════════════════════════════════════════════════
-// SAVE
+// SAVE — DUAL LAYER (localStorage + Supabase)
 // ═══════════════════════════════════════════════════════
-function scheduleAutoSave() {
+function scheduleAutoSave(){
   updateSaveUI('unsaved');
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
+  saveTimer=setTimeout(async()=>{
     updateSaveUI('saving');
-    const { error } = await sb.from('study_lectures').update({
-      annotations: JSON.stringify(annotations),
-      last_page: curPage,
-      updated_at: new Date().toISOString()
-    }).eq('id', activeLec.id);
-    updateSaveUI(error ? 'unsaved' : 'saved');
-    localStorage.setItem(`study_${activeLec.id}`, JSON.stringify(annotations));
-  }, 1500);
+    // localStorage is instant — always save here first
+    if(activeLec)localStorage.setItem(`sr_${activeLec.id}`,JSON.stringify(annotations));
+    // Then sync to Supabase
+    if(activeLec){
+      const{error}=await sb.from('study_lectures').update({
+        annotations:JSON.stringify(annotations),last_page:curPage,updated_at:new Date().toISOString()
+      }).eq('id',activeLec.id);
+      updateSaveUI(error?'unsaved':'saved');
+    }
+  },1200);
 }
-
-async function doSave() {
-  if (!activeLec) return;
+async function doSave(){
+  if(!activeLec)return;
   updateSaveUI('saving');
+  localStorage.setItem(`sr_${activeLec.id}`,JSON.stringify(annotations));
   await sb.from('study_lectures').update({
-    annotations: JSON.stringify(annotations),
-    last_page: curPage,
-    updated_at: new Date().toISOString()
-  }).eq('id', activeLec.id);
-  localStorage.setItem(`study_${activeLec.id}`, JSON.stringify(annotations));
+    annotations:JSON.stringify(annotations),last_page:curPage,updated_at:new Date().toISOString()
+  }).eq('id',activeLec.id);
   updateSaveUI('saved');
 }
-
-function updateSaveUI(status) {
-  saveStatus = status;
-  const el = document.getElementById('tb-save');
-  el.className = `tb-save ${status}`;
-  el.textContent = status==='saved'?'✓ Saved':status==='saving'?'⟳ Saving…':'● Unsaved';
+function updateSaveUI(s){
+  const el=document.getElementById('tb-save');
+  el.className=`tb-save ${s}`;
+  el.textContent=s==='saved'?'✓ Saved':s==='saving'?'⟳ Saving…':'● Unsaved';
 }
 
 // ═══════════════════════════════════════════════════════
 // KEYBOARD SHORTCUTS
 // ═══════════════════════════════════════════════════════
-document.addEventListener('keydown', e => {
-  if (!document.getElementById('viewer').classList.contains('active')) return;
-  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-  const map = { s:'select',h:'highlight',d:'pen',l:'line',e:'eraser',t:'text',n:'note',p:'laser' };
-  if (map[e.key.toLowerCase()]) { setTool(map[e.key.toLowerCase()]); return; }
-  if (e.key==='ArrowRight'||e.key==='ArrowDown') goTo(curPage+1);
-  if (e.key==='ArrowLeft'||e.key==='ArrowUp') goTo(curPage-1);
-  if (e.key==='+'||e.key==='=') setZoom(zoom+.2);
-  if (e.key==='-') setZoom(zoom-.2);
-  if (e.key==='Escape') { setTool('select'); closeColorPicker(); }
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('viewer').classList.contains('active'))return;
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+  const map={s:'select',h:'highlight',d:'pen',l:'line',e:'eraser',t:'text',n:'note',p:'laser'};
+  if(map[e.key.toLowerCase()]){
+    setTool(map[e.key.toLowerCase()]);
+    if(e.key.toLowerCase()==='h')openSubPanel('hl-panel');
+    else if(e.key.toLowerCase()==='d')openSubPanel('pen-panel');
+    else if(e.key.toLowerCase()==='e')openSubPanel('eraser-panel');
+    else closeSubPanel();
+    return;
+  }
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')goTo(curPage+1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')goTo(curPage-1);
+  if(e.key==='+'||e.key==='=')setZoom(zoom+.15);
+  if(e.key==='-')setZoom(zoom-.15);
+  if(e.key==='Escape'){setTool('select');closeSubPanel();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();doSave();toast('Saved ✓');}
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoLastStroke();}
 });
+
+// ─── Undo last stroke ───────────────────────────────────
+function undoLastStroke(){
+  updatePA(pa=>{if(pa.drawings?.length)pa.drawings.pop();});
+  redrawCanvas();toast('Undone');
+}
 
 // ═══════════════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════════════
 let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800);
 }
 
 // ═══════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════
-function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ═══════════════════════════════════════════════════════
 // BOOT
