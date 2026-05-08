@@ -715,7 +715,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     </div>
     <div class="admin-content">
       <div class="admin-sec active" id="asec-subjects">
-        <div class="admin-toolbar"><h2>🫀 Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add System</button></div>
+        <div class="admin-toolbar"><h2>🫀 Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add Rotation</button></div>
         <div id="subj-wrap"><div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add one!</p></div></div>
       </div>
       <div class="admin-sec" id="asec-categories">
@@ -853,7 +853,12 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
         <div class="form-group" style="margin-bottom:0;"><label class="form-label">Year</label>
           <select class="form-input form-select" id="sm-year">
             <option value="">— Select year —</option>
-            ${[1,2,3,4,5,6].map(y=>`<option value="${y}">Year ${y}</option>`).join('')}
+            <option value="1">Year 1</option>
+            <option value="2">Year 2</option>
+            <option value="3">Year 3</option>
+            <option value="4">Year 4</option>
+            <option value="5">Year 5</option>
+            <option value="6">Year 6</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0;"><label class="form-label">Rotation</label>
@@ -1765,7 +1770,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     </div>
     <div class="admin-content">
       <div class="admin-sec active" id="asec-subjects">
-        <div class="admin-toolbar"><h2>🫀 Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add System</button></div>
+        <div class="admin-toolbar"><h2>🫀 Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add Rotation</button></div>
         <div id="subj-wrap"><div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add one!</p></div></div>
       </div>
       <div class="admin-sec" id="asec-categories">
@@ -2890,21 +2895,23 @@ async function refreshCounts(){
   if(selSubjects.size===0&&!randomMode)return;
   try{
     let pool=[];
+    // Build scoped category IDs from allSubjects (already filtered by track/year/rotation)
+    const scopeCatIds=[];
+    allSubjects.forEach(s=>{(subjectCategories[s.id]||[]).forEach(cat=>scopeCatIds.push(cat.id));});
     if(randomMode){
-      const{data:qs,error:e}=await sb.from('questions').select('id,category_id,discipline_id');
+      const{data:qs,error:e}=scopeCatIds.length
+        ?await sb.from('questions').select('id,category_id,discipline_id').in('category_id',scopeCatIds)
+        :await sb.from('questions').select('id,category_id,discipline_id').in('category_id',['00000000-0000-0000-0000-000000000000']);
       if(e){console.error('refreshCounts random error:',e);updateCountDisplay(0,0,0);return;}
       pool=qs||[];
     } else {
       const catIds=[];
-      selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
-      const[{data:catQs,error:e1},{data:uncatQs,error:e2}]=await Promise.all([
-        catIds.length?sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds):Promise.resolve({data:[],error:null}),
-        sb.from('questions').select('id,category_id,discipline_id').is('category_id',null)
-      ]);
+      selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>{if(scopeCatIds.includes(cid))catIds.push(cid);});});
+      const{data:catQs,error:e1}=catIds.length
+        ?await sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds)
+        :Promise.resolve({data:[],error:null});
       if(e1)console.error('catQs error:',e1);
-      if(e2)console.error('uncatQs error:',e2);
-      pool=[...(catQs||[]),...(uncatQs||[])];
-      const seen=new Set();pool=pool.filter(q=>{if(seen.has(q.id))return false;seen.add(q.id);return true;});
+      pool=catQs||[];
     }
     if(!allDiscsSelected&&selDisciplines.size>0){
       pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
@@ -2933,18 +2940,21 @@ async function refreshCounts(){
 async function generateSession(){
   const qcount=parseInt(document.getElementById('qcount-slider').value);
   let pool=[];
+  // Scope to subjects already filtered by track/year/rotation
+  const genScopeCatIds=[];
+  allSubjects.forEach(s=>{(subjectCategories[s.id]||[]).forEach(cat=>genScopeCatIds.push(cat.id));});
   if(randomMode){
-    const{data:qs}=await sb.from('questions').select('*');
+    const{data:qs}=genScopeCatIds.length
+      ?await sb.from('questions').select('*').in('category_id',genScopeCatIds)
+      :await sb.from('questions').select('*').in('category_id',['00000000-0000-0000-0000-000000000000']);
     pool=qs||[];
   } else {
     const catIds=[];
-    selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>catIds.push(cid));});
-    const[{data:catQs},{data:uncatQs}]=await Promise.all([
-      catIds.length?sb.from('questions').select('*').in('category_id',catIds):Promise.resolve({data:[]}),
-      sb.from('questions').select('*').is('category_id',null)
-    ]);
-    pool=[...(catQs||[]),...(uncatQs||[])];
-    const seen=new Set();pool=pool.filter(q=>{if(seen.has(q.id))return false;seen.add(q.id);return true;});
+    selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>{if(genScopeCatIds.includes(cid)||genScopeCatIds.length===0)catIds.push(cid);});});
+    const{data:catQs}=catIds.length
+      ?await sb.from('questions').select('*').in('category_id',catIds)
+      :Promise.resolve({data:[]});
+    pool=catQs||[];
   }
   if(!allDiscsSelected&&selDisciplines.size>0){
     pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
@@ -4473,7 +4483,7 @@ async function loadSubjTable(){
 }
 function openSubjModal(id=null){
   editSubjId=id;
-  document.getElementById('subj-modal-title').textContent=id?'Edit System':'Add System';
+  document.getElementById('subj-modal-title').textContent=id?'Edit Rotation':'Add Rotation';
   const s=id?aSubjects.find(x=>x.id===id):null;
   document.getElementById('sm-name').value=s?.name||'';
   document.getElementById('sm-desc').value=s?.description||'';
