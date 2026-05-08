@@ -466,6 +466,47 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .tbl-grid{display:grid;grid-template-columns:repeat(8,26px);gap:3px;margin-bottom:10px;}
 .tbl-cell{width:26px;height:26px;border:1.5px solid var(--gray200);border-radius:3px;cursor:pointer;}
 .tbl-cell.hov{background:#bae6fd;border-color:#38bdf8;}
+
+/* ── TRACK / JU NAVIGATION ── */
+.track-selector{min-height:calc(100vh - 58px);display:flex;align-items:center;justify-content:center;padding:40px 24px;}
+.track-cards{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;max-width:720px;width:100%;}
+.track-card{flex:1;min-width:260px;max-width:310px;background:white;border-radius:18px;border:2px solid var(--gray200);padding:40px 28px;cursor:pointer;transition:all 0.18s;box-shadow:var(--shadow-md);text-align:center;}
+.track-card:hover{border-color:var(--navy2);transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.track-card .tc-icon{font-size:52px;margin-bottom:18px;}
+.track-card .tc-title{font-size:20px;font-weight:800;color:var(--navy2);margin-bottom:8px;}
+.track-card .tc-desc{font-size:13px;color:var(--gray500);line-height:1.65;}
+.track-card.tc-usmle{border-top:4px solid #3b82f6;}
+.track-card.tc-ju{border-top:4px solid #7c3aed;}
+.year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:500px;}
+.year-card{background:white;border-radius:12px;border:2px solid var(--gray200);padding:26px 16px;cursor:pointer;text-align:center;transition:all 0.15s;box-shadow:var(--shadow);}
+.year-card:hover{border-color:var(--navy2);background:#eff6ff;}
+.year-card .yc-num{font-size:30px;font-weight:800;color:var(--navy2);}
+.year-card .yc-label{font-size:12px;color:var(--gray500);margin-top:4px;}
+.rotation-grid{display:flex;flex-wrap:wrap;gap:12px;}
+.rotation-card{flex:1;min-width:170px;background:white;border-radius:12px;border:2px solid var(--gray200);padding:16px;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;}
+.rotation-card:hover{border-color:var(--navy2);background:#eff6ff;}
+.rotation-card .rc-icon{font-size:22px;}
+.rotation-card .rc-name{font-size:14px;font-weight:700;color:var(--navy2);}
+.rotation-card.rc-all{background:var(--navy2);border-color:var(--navy2);}
+.rotation-card.rc-all .rc-name{color:white;}
+.ju-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gray500);margin-bottom:20px;flex-wrap:wrap;}
+.ju-breadcrumb .bc-item{cursor:pointer;color:var(--blue);font-weight:600;}
+.ju-breadcrumb .bc-item:hover{text-decoration:underline;}
+.ju-breadcrumb .bc-sep{color:var(--gray300);}
+.ju-breadcrumb .bc-current{color:var(--gray700);font-weight:600;}
+.subrot-item{border:1.5px solid var(--gray200);border-radius:10px;margin-bottom:8px;overflow:hidden;background:white;transition:border-color 0.12s;}
+.subrot-item.on{border-color:var(--navy2);}
+.subrot-header{display:flex;align-items:center;padding:13px 16px;cursor:pointer;user-select:none;}
+.subrot-check{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--gray300);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-right:12px;transition:all 0.12s;}
+.subrot-check.on{background:var(--navy2);border-color:var(--navy2);color:white;}
+.subrot-name{flex:1;font-size:14px;font-weight:700;color:var(--navy2);}
+.subrot-count{font-size:12px;color:var(--gray400);margin-right:8px;}
+.subrot-arrow{font-size:11px;color:var(--gray400);transition:transform 0.2s;margin-left:4px;}
+.subrot-arrow.open{transform:rotate(90deg);}
+.subrot-lectures{padding:10px 16px 14px 48px;border-top:1px solid var(--gray100);}
+.lecture-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:6px;border:1.5px solid var(--gray200);cursor:pointer;font-size:12px;font-weight:600;background:white;margin:3px 3px 3px 0;transition:all 0.12s;}
+.lecture-chip:hover{border-color:var(--blue-light);}
+.lecture-chip.on{border-color:var(--navy2);background:#eff6ff;color:var(--navy2);}
 </style>
 </head>
 <body>
@@ -762,10 +803,36 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <div class="modal-bg" id="subj-modal" style="display:none;">
   <div class="modal" style="text-align:left;">
     <h2 id="subj-modal-title">Add System</h2>
-    <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="sm-name" placeholder="e.g. Cardiology"></div>
+    <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="sm-name" placeholder="e.g. Breast Rotation"></div>
     <div class="form-group"><label class="form-label">Description</label><input type="text" class="form-input" id="sm-desc" placeholder="Brief description"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div class="form-group"><label class="form-label">Icon (emoji)</label><input type="text" class="form-input" id="sm-icon" placeholder="❤️" style="width:80px;"></div>
+      <div class="form-group"><label class="form-label">Track</label>
+        <select class="form-input form-select" id="sm-track" onchange="document.getElementById('sm-ju-fields').style.display=this.value==='ju'?'block':'none'">
+          <option value="usmle">USMLE Step 1</option>
+          <option value="ju">Med JU</option>
+        </select>
+      </div>
+    </div>
+    <div id="sm-ju-fields" style="display:none;background:var(--gray50);border-radius:8px;padding:14px;margin-bottom:4px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px;">JU Settings</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group" style="margin-bottom:0;"><label class="form-label">Year</label>
+          <select class="form-input form-select" id="sm-year">
+            <option value="">— Select year —</option>
+            ${[1,2,3,4,5,6].map(y=>`<option value="${y}">Year ${y}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;"><label class="form-label">Rotation</label>
+          <select class="form-input form-select" id="sm-rotation">
+            <option value="">— Select rotation —</option>
+            <option value="surgery">Surgery</option>
+            <option value="internal_medicine">Internal Medicine</option>
+            <option value="anesthesia">Anesthesia</option>
+            <option value="neurology">Neurology</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div class="modal-btns"><button class="btn btn-secondary" onclick="hideAModal('subj-modal')">Cancel</button><button class="btn btn-primary" onclick="saveSubj()">Save</button></div>
   </div>
@@ -2105,6 +2172,11 @@ async function initApp(){
   initSupportFab();
 }
 let allSubjects=[];   // systems (from subjects table)
+// ── Track/JU state ──
+let appTrack=null;       // 'usmle'|'ju'
+let juYear=null;         // 1-6
+let juRotation=null;     // rotation slug or 'all'
+let juOpenSubRots=new Set(); // open accordion IDs
 let allDisciplines=[]; // subjects (from disciplines table)
 let selSubjects=new Set();    // selected system ids
 let selDisciplines=new Set(); // selected discipline ids (empty = all)
@@ -2122,9 +2194,15 @@ async function goHome(){
 }
 
 async function loadHome(){
-  // Load all data needed for exam generation in background
+  // Build subjects query filtered by current track/year/rotation
+  let subjQ=sb.from('subjects').select('*').order('name');
+  if(appTrack==='usmle') subjQ=subjQ.eq('track','usmle');
+  else if(appTrack==='ju'&&juYear){
+    subjQ=subjQ.eq('track','ju').eq('year',juYear);
+    if(juRotation&&juRotation!=='all') subjQ=subjQ.eq('rotation',juRotation);
+  }
   const[{data:subjects},{data:discs},{data:cats}]=await Promise.all([
-    sb.from('subjects').select('*').order('name'),
+    subjQ,
     sb.from('disciplines').select('*').order('name'),
     sb.from('categories').select('*').order('name')
   ]);
@@ -2141,6 +2219,9 @@ async function loadHome(){
 }
 
 async function renderDashboard(){
+  if(!appTrack){showTrackSelector();return;}
+  if(appTrack==='ju'&&!juYear){showJUYearSelect();return;}
+  if(appTrack==='ju'&&juYear&&!juRotation){showJURotationSelect();return;}
   if(window.location.hash&&window.location.hash!=='#home'&&window.location.hash!=='#exam')history.pushState({page:"homePage"},"","#home");
   const body=document.getElementById('homeBody');
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
@@ -2155,11 +2236,14 @@ async function renderDashboard(){
   const pct=allAns.length>0?Math.round(correct/allAns.length*100):0;
   const name=CP?.full_name?.split(' ')[0]||'Student';
 
+  const _rotLabel=juRotation&&juRotation!=='all'?juRotation.replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase()):juRotation==='all'?'All Rotations':'';
+  const _bc=appTrack==='ju'?`<div class="ju-breadcrumb" style="margin-bottom:8px;"><span class="bc-item" onclick="appTrack=null;juYear=null;juRotation=null;renderDashboard()">🏠 Home</span><span class="bc-sep">›</span><span class="bc-item" onclick="appTrack=null;renderDashboard()">Med JU</span><span class="bc-sep">›</span><span class="bc-item" onclick="juRotation=null;showJURotationSelect()">Year ${juYear}</span>${_rotLabel?`<span class="bc-sep">›</span><span class="bc-current">${_rotLabel}</span>`:''}</div>`:'';
   body.innerHTML=`
     <div class="dash-wrap">
       <div class="dash-greeting">
+        ${_bc}
         <h1>Welcome back, ${name} 👋</h1>
-        <p>What would you like to do today?</p>
+        <p>${appTrack==='usmle'?'USMLE Step 1 · '+allSubjects.length+' systems':appTrack==='ju'?'JU Year '+juYear+(_rotLabel?' · '+_rotLabel:''):''}</p>
       </div>
       <div class="dash-cards">
         <!-- Create Exam -->
@@ -2211,6 +2295,240 @@ async function renderDashboard(){
     </div>`;
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  TRACK / JU NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showTrackSelector(){
+  history.pushState({page:"homePage"},"","#home");
+  const body=document.getElementById('homeBody');
+  body.innerHTML=`
+    <div class="track-selector">
+      <div style="text-align:center;max-width:720px;width:100%;">
+        <h1 style="font-size:26px;font-weight:800;color:var(--navy2);margin-bottom:8px;">Welcome to MedExam 🏥</h1>
+        <p style="font-size:15px;color:var(--gray500);margin-bottom:36px;">Select your curriculum to get started</p>
+        <div class="track-cards">
+          <div class="track-card tc-usmle" onclick="selectTrack('usmle')">
+            <div class="tc-icon">🇺🇸</div>
+            <div class="tc-title">Med USMLE Step 1</div>
+            <div class="tc-desc">System-based questions following the USMLE Step 1 blueprint</div>
+          </div>
+          <div class="track-card tc-ju" onclick="selectTrack('ju')">
+            <div class="tc-icon">🏛️</div>
+            <div class="tc-title">Med JU</div>
+            <div class="tc-desc">University of Jordan curriculum — rotation-based clinical questions</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function selectTrack(track){
+  appTrack=track;selSubjects=new Set();selCategories={};
+  if(track==='usmle') await renderDashboard();
+  else showJUYearSelect();
+}
+
+function showJUYearSelect(){
+  const body=document.getElementById('homeBody');
+  body.innerHTML=`
+    <div style="max-width:600px;margin:0 auto;padding:40px 24px;">
+      <div class="ju-breadcrumb">
+        <span class="bc-item" onclick="appTrack=null;juYear=null;juRotation=null;renderDashboard()">🏠 Home</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-item" onclick="appTrack=null;renderDashboard()">Med JU</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Select Year</span>
+      </div>
+      <h2 style="font-size:22px;font-weight:800;color:var(--navy2);margin-bottom:6px;">Select Your Year</h2>
+      <p style="font-size:14px;color:var(--gray500);margin-bottom:28px;">Choose your academic year to access rotation-based questions</p>
+      <div class="year-grid">
+        ${[1,2,3,4,5,6].map(y=>`
+          <div class="year-card" onclick="${y===4?"selectJUYear("+y+")":'toast("Coming soon — only Year 4 is available now!")'}" style="${y!==4?'opacity:0.45;cursor:not-allowed;':''}">
+            <div class="yc-num">${y}</div>
+            <div class="yc-label">Year ${y}${y===4?' ✓':''}</div>
+          </div>`).join('')}
+      </div>
+      <p style="font-size:12px;color:var(--gray400);text-align:center;margin-top:20px;">More years coming soon.</p>
+    </div>`;
+}
+
+async function selectJUYear(year){
+  juYear=year;juRotation=null;selSubjects=new Set();selCategories={};
+  showJURotationSelect();
+}
+
+function showJURotationSelect(){
+  const body=document.getElementById('homeBody');
+  const rots=[
+    {id:'internal_medicine',name:'Internal Medicine',icon:'🫀'},
+    {id:'surgery',name:'Surgery',icon:'🔬'},
+    {id:'anesthesia',name:'Anesthesia',icon:'💉'},
+    {id:'neurology',name:'Neurology',icon:'🧠'},
+  ];
+  body.innerHTML=`
+    <div style="max-width:700px;margin:0 auto;padding:40px 24px;">
+      <div class="ju-breadcrumb">
+        <span class="bc-item" onclick="appTrack=null;juYear=null;juRotation=null;renderDashboard()">🏠 Home</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-item" onclick="appTrack=null;renderDashboard()">Med JU</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-item" onclick="juYear=null;showJUYearSelect()">Year ${juYear}</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Select Rotation</span>
+      </div>
+      <h2 style="font-size:22px;font-weight:800;color:var(--navy2);margin-bottom:6px;">Year ${juYear} — Select Rotation</h2>
+      <p style="font-size:14px;color:var(--gray500);margin-bottom:28px;">Choose a rotation or study all together</p>
+      <div class="rotation-grid">
+        <div class="rotation-card rc-all" onclick="selectJURotation('all')" style="flex-basis:100%;">
+          <span class="rc-icon">⭐</span><span class="rc-name">All Rotations</span>
+        </div>
+        ${rots.map(r=>`
+          <div class="rotation-card" onclick="selectJURotation('${r.id}')">
+            <span class="rc-icon">${r.icon}</span><span class="rc-name">${r.name}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+async function selectJURotation(rotation){
+  juRotation=rotation;selSubjects=new Set();selCategories={};
+  await renderDashboard();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  JU CREATE EXAM — sub-rotation picker
+// ═══════════════════════════════════════════════════════════════
+function renderJUCreateExamHTML(){
+  const subRots=allSubjects;
+  const rotLabel=juRotation&&juRotation!=='all'
+    ?juRotation.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())
+    :'All Rotations';
+  return `
+    <div class="gen-card">
+      <h2>🩺 Generate Practice Session</h2>
+      <div class="sub">JU — Year ${juYear} · ${rotLabel}</div>
+
+      <div style="display:flex;align-items:center;gap:12px;background:${randomMode?'#eff6ff':'var(--gray50)'};border:1.5px solid ${randomMode?'var(--blue)':'var(--gray200)'};border-radius:10px;padding:12px 16px;margin-bottom:20px;cursor:pointer;" onclick="toggleRandomMode()">
+        <div style="font-size:24px;">🎲</div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:700;color:${randomMode?'var(--blue)':'var(--gray700)'};">Random Mode</div>
+        <div style="font-size:12px;color:var(--gray400);margin-top:2px;">Pull random questions ignoring sub-rotation filters</div></div>
+        <div style="width:40px;height:22px;background:${randomMode?'var(--blue)':'var(--gray300)'};border-radius:11px;position:relative;flex-shrink:0;">
+          <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;${randomMode?'right:2px':'left:2px'};box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div></div>
+      </div>
+
+      <div class="timed-toggle${timedMode?' on':''}" onclick="toggleTimedMode()">
+        <div style="font-size:22px;">⏱️</div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:700;color:${timedMode?'var(--red)':'var(--gray700)'};">Timed Mode</div>
+        <div style="font-size:12px;color:var(--gray400);margin-top:2px;">60 seconds per question</div></div>
+        <div style="width:40px;height:22px;background:${timedMode?'#ef4444':'var(--gray300)'};border-radius:11px;position:relative;flex-shrink:0;">
+          <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;${timedMode?'right:2px':'left:2px'};box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div></div>
+      </div>
+
+      <div id="filter-steps-wrap" style="display:${randomMode?'none':'block'};">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="gen-step-title" style="margin:0;">Step 1 — Select Sub-rotation</div>
+          <div style="display:flex;gap:10px;">
+            <span style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;" onclick="juSelectAllSubRots()">Select all</span>
+            <span style="font-size:12px;color:var(--gray400);">|</span>
+            <span style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;" onclick="juDeselectAllSubRots()">Deselect all</span>
+          </div>
+        </div>
+        <div id="ju-subrot-list">
+          ${subRots.length===0?'<div style="color:var(--gray400);font-size:13px;padding:12px 0;">No sub-rotations found. Add subjects via the Admin panel with track=ju, year=4, rotation=surgery.</div>':
+          subRots.map(s=>{
+            const isOn=selSubjects.has(s.id);
+            const cats=subjectCategories[s.id]||[];
+            const isOpen=juOpenSubRots.has(s.id);
+            return `<div class="subrot-item${isOn?' on':''}" id="subrot-${s.id}">
+              <div class="subrot-header">
+                <div class="subrot-check${isOn?' on':''}" onclick="event.stopPropagation();juToggleSubRot('${s.id}')">${isOn?'✓':''}</div>
+                <span class="subrot-name">${s.name}</span>
+                <span class="subrot-count">${cats.length} lecture${cats.length!==1?'s':''}</span>
+                ${cats.length>0?`<span class="subrot-arrow${isOpen?' open':''}" onclick="event.stopPropagation();juToggleAccordion('${s.id}')">▶</span>`:''}
+              </div>
+              ${cats.length>0&&isOpen?`<div class="subrot-lectures open" id="subrot-lec-${s.id}">
+                <div style="font-size:11px;color:var(--gray400);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px;">Lectures</div>
+                ${cats.map(cat=>{
+                  const lecOn=!selCategories[s.id]||selCategories[s.id].has(cat.id);
+                  return `<span class="lecture-chip${lecOn?' on':''}" onclick="juToggleLecture('${s.id}','${cat.id}')">${cat.name}</span>`;
+                }).join('')}
+              </div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div id="filter-step" style="display:${selSubjects.size>0||randomMode?'block':'none'};">
+        <div class="gen-step-title">Step 2 — Question filter</div>
+        <div class="filter-row">
+          <button class="filter-btn${qFilter==='all'?' active':''}" onclick="setFilter('all')"><div class="fb-label">All Questions</div><div class="fb-count" id="cnt-all">Loading…</div></button>
+          <button class="filter-btn${qFilter==='new'?' active':''}" onclick="setFilter('new')"><div class="fb-label">New Only</div><div class="fb-count" id="cnt-new">Loading…</div></button>
+          <button class="filter-btn${qFilter==='wrong'?' active':''}" onclick="setFilter('wrong')"><div class="fb-label">Wrong Only</div><div class="fb-count" id="cnt-wrong">Loading…</div></button>
+          <button class="filter-btn${qFilter==='flagged'?' active':''}" onclick="setFilter('flagged')"><div class="fb-label">🚩 Flagged</div><div class="fb-count" id="cnt-flagged">Loading…</div></button>
+        </div>
+      </div>
+
+      <div id="count-step" style="display:${selSubjects.size>0||randomMode?'block':'none'};">
+        <div class="gen-step-title">Step 3 — Number of questions</div>
+        <div class="qcount-row">
+          <span class="qcount-label">Questions:</span>
+          <input type="range" class="qcount-slider" id="qcount-slider" min="1" max="40" value="20" oninput="document.getElementById('qcount-val').textContent=this.value;">
+          <span class="qcount-val" id="qcount-val">20</span>
+          <span class="qcount-max" id="qcount-max"></span>
+        </div>
+        <div id="gen-warning" style="display:none;background:var(--amber-light);color:var(--amber);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:14px;"></div>
+        <div style="background:var(--gray50);border:1.5px solid var(--gray200);border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--gray700);margin-bottom:10px;">⏰ Exam Time Limit <span style="font-weight:400;color:var(--gray400);">(optional)</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${[0,30,60,90,120,180].map(m=>`<button type="button" onclick="setExamTimeLimit(${m})" class="btn btn-sm${examTimeLimit===m?' btn-primary':' btn-secondary'}" style="min-width:52px;">${m===0?'None':m+'min'}</button>`).join('')}
+          </div>
+          ${examTimeLimit>0?`<div style="font-size:12px;color:var(--amber);margin-top:8px;">⚠️ Exam will auto-submit when ${examTimeLimit} minutes are up.</div>`:''}
+        </div>
+        <button class="btn btn-primary btn-lg" id="gen-btn" onclick="generateSession()" disabled>Generate Session →</button>
+      </div>
+    </div>
+
+    <div class="gen-card" style="margin-top:0;">
+      <h2>🔢 Generate by Question IDs</h2>
+      <div class="sub" style="margin-bottom:16px;">Enter specific question IDs to build a custom exam.</div>
+      <div class="form-group">
+        <label class="form-label">Question IDs <span style="color:var(--gray400);font-weight:400;">(comma separated)</span></label>
+        <textarea class="form-input" id="qid-input" rows="3" placeholder="SURG-001, SURG-002..."></textarea>
+      </div>
+      <div id="qid-warning" style="display:none;background:var(--amber-light);color:var(--amber);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:12px;"></div>
+      <button class="btn btn-primary" onclick="generateByIds()">Generate from IDs →</button>
+    </div>`;
+}
+
+function juToggleSubRot(id){
+  if(selSubjects.has(id)){selSubjects.delete(id);}
+  else{selSubjects.add(id);if(!selCategories[id])selCategories[id]=new Set((subjectCategories[id]||[]).map(c=>c.id));}
+  showCreateExam();if(selSubjects.size>0)refreshCounts();else updateCountDisplay(0,0,0);
+}
+
+function juToggleAccordion(id){
+  if(juOpenSubRots.has(id))juOpenSubRots.delete(id);else juOpenSubRots.add(id);
+  showCreateExam();
+}
+
+function juToggleLecture(subId,catId){
+  if(!selSubjects.has(subId)){selSubjects.add(subId);selCategories[subId]=new Set((subjectCategories[subId]||[]).map(c=>c.id));}
+  if(!selCategories[subId])selCategories[subId]=new Set((subjectCategories[subId]||[]).map(c=>c.id));
+  if(selCategories[subId].has(catId))selCategories[subId].delete(catId);else selCategories[subId].add(catId);
+  showCreateExam();refreshCounts();
+}
+
+function juSelectAllSubRots(){
+  allSubjects.forEach(s=>{selSubjects.add(s.id);if(!selCategories[s.id])selCategories[s.id]=new Set((subjectCategories[s.id]||[]).map(c=>c.id));});
+  showCreateExam();refreshCounts();
+}
+
+function juDeselectAllSubRots(){
+  selSubjects=new Set();allSubjects.forEach(s=>{selCategories[s.id]=new Set();});
+  showCreateExam();updateCountDisplay(0,0,0);
+}
+
+
 function updateSliderLabel(){
   const slider=document.getElementById('qcount-slider');
   const val=document.getElementById('qcount-val');
@@ -2255,20 +2573,25 @@ function setFilter(f){
 
 function showCreateExam(){
   history.pushState({page:"createExam"},"","#create");
+  // JU: pre-select all sub-rotations if nothing is selected yet
+  if(appTrack==='ju'&&selSubjects.size===0&&allSubjects.length>0){
+    allSubjects.forEach(s=>{selSubjects.add(s.id);if(!selCategories[s.id])selCategories[s.id]=new Set((subjectCategories[s.id]||[]).map(c=>c.id));});
+  }
   const prevSlider=document.getElementById('qcount-slider')?.value||'20';
   const body=document.getElementById('homeBody');
+  const _rl=appTrack==='ju'&&juRotation&&juRotation!=='all'?juRotation.replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase()):appTrack==='ju'?'All Rotations':'';
   body.innerHTML=`
     <div class="page-body" style="max-width:1000px;margin:0 auto;padding:28px 24px 80px;">
       <div class="back-header">
-        <button onclick="renderDashboard()">  Back</button>
-        <h2>   Create Exam</h2>
+        <button onclick="renderDashboard()">← Back</button>
+        <h2>✏️ Create Exam${appTrack==='ju'?' — JU Year '+juYear+(_rl?' · '+_rl:''):''}</h2>
       </div>
-      ${renderCreateExamHTML()}
+      ${appTrack==='ju'?renderJUCreateExamHTML():renderCreateExamHTML()}
     </div>`;
   const slider=document.getElementById('qcount-slider');
   const val=document.getElementById('qcount-val');
   if(slider){slider.value=prevSlider;if(val)val.textContent=prevSlider;}
-  renderCatAccordion();
+  if(appTrack!=='ju')renderCatAccordion();
   if(selSubjects.size>0||randomMode)refreshCounts();
 }
 
@@ -4057,15 +4380,28 @@ function openSubjModal(id=null){
   document.getElementById('sm-name').value=s?.name||'';
   document.getElementById('sm-desc').value=s?.description||'';
   document.getElementById('sm-icon').value=s?.icon||'📚';
+  const track=s?.track||'usmle';
+  document.getElementById('sm-track').value=track;
+  const juFields=document.getElementById('sm-ju-fields');
+  if(juFields)juFields.style.display=track==='ju'?'block':'none';
+  if(document.getElementById('sm-year'))document.getElementById('sm-year').value=s?.year||'';
+  if(document.getElementById('sm-rotation'))document.getElementById('sm-rotation').value=s?.rotation||'';
   showAModal('subj-modal');
 }
 async function saveSubj(){
   const name=document.getElementById('sm-name').value.trim();
   const description=document.getElementById('sm-desc').value.trim();
   const icon=document.getElementById('sm-icon').value.trim();
+  const track=document.getElementById('sm-track')?.value||'usmle';
+  const yearVal=document.getElementById('sm-year')?.value;
+  const year=yearVal?parseInt(yearVal):null;
+  const rotation=document.getElementById('sm-rotation')?.value||null;
   if(!name){toast('Name required');return;}
-  if(editSubjId)await sb.from('subjects').update({name,description,icon}).eq('id',editSubjId);
-  else await sb.from('subjects').insert({name,description,icon});
+  if(track==='ju'&&!year){toast('Please select a year for JU subjects');return;}
+  if(track==='ju'&&!rotation){toast('Please select a rotation for JU subjects');return;}
+  const payload={name,description,icon,track,year:track==='ju'?year:null,rotation:track==='ju'?rotation:null};
+  if(editSubjId)await sb.from('subjects').update(payload).eq('id',editSubjId);
+  else await sb.from('subjects').insert(payload);
   hideAModal('subj-modal');toast('System saved!');loadSubjTable();
 }
 async function delSubj(id){if(!confirm('Delete this system and all its topics/questions?'))return;await sb.from('subjects').delete().eq('id',id);toast('Deleted');loadSubjTable();}
