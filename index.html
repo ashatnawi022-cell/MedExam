@@ -5840,4 +5840,8 @@ function rteGetHTML(edId){
   return document.getElementById(edId)?.innerHTML||'';
 }
 function rteSetHTML(edId,html){
-    const el=document.get
+    const el=document.getElementById(edId);
+  if(el)el.innerHTML=html;}
+</script>
+</body>
+</html>
