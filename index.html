@@ -47,6 +47,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray50);color:var(--gray8
 .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 textarea.form-input{resize:vertical;min-height:80px;}
 
+
+.admin-scope-bar{background:var(--gray50);border-bottom:1px solid var(--gray200);padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.admin-scope-bar label{font-size:12px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.4px;}
+.admin-scope-bar select{padding:6px 10px;font-size:13px;border:1.5px solid var(--gray200);border-radius:7px;background:white;color:var(--gray800);font-family:'DM Sans',sans-serif;cursor:pointer;}
+.admin-scope-bar select:focus{border-color:var(--blue);outline:none;}
+.admin-scope-badge{font-size:12px;font-weight:700;color:var(--navy2);background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;padding:4px 12px;white-space:nowrap;}
 /* AUTH */
 .auth-wrap{min-height:100vh;display:flex;}
 .auth-left{width:400px;flex-shrink:0;background:var(--navy);padding:48px;display:flex;flex-direction:column;justify-content:space-between;}
@@ -668,6 +674,33 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </nav>
+  <div class="admin-scope-bar">
+    <label>Section:</label>
+    <select id="adm-track" onchange="admTrackChange()">
+      <option value="">-- Select Track --</option>
+      <option value="usmle">Med USMLE Step 1</option>
+      <option value="ju">Med JU</option>
+    </select>
+    <select id="adm-year" style="display:none;" onchange="admYearChange()">
+      <option value="">-- Select Year --</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4">Year 4</option>
+      <option value="5">Year 5</option>
+      <option value="6">Year 6</option>
+    </select>
+    <select id="adm-rotation" style="display:none;" onchange="admRotationChange()">
+      <option value="">-- Select Rotation --</option>
+      <option value="internal_medicine">Internal Medicine</option>
+      <option value="surgery">Surgery</option>
+      <option value="anesthesia">Anesthesia</option>
+      <option value="neurology">Neurology</option>
+      <option value="all">All Rotations</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="applyAdminScope()">Apply</button>
+    <span id="adm-scope-badge" class="admin-scope-badge" style="display:none;"></span>
+  </div>
   <div class="admin-layout">
     <div class="admin-sb">
       <div class="admin-sb-title">Content</div>
@@ -681,33 +714,6 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="admin-nav" onclick="aNav('support',event)" id="admin-support-btn">💬 Support <span id="admin-sup-badge" style="display:none;background:#ef4444;color:white;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;align-items:center;justify-content:center;margin-left:4px;padding:0 3px;">!</span></button>
     </div>
     <div class="admin-content">
-      <div id="admin-scope-bar" style="position:sticky;top:0;z-index:10;background:var(--gray50);border-bottom:1px solid var(--gray200);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span style="font-size:12px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Scope:</span>
-        <select class="form-input form-select" id="admin-track-sel" onchange="onAdminTrackChange()" style="width:180px;font-size:13px;padding:7px 12px;">
-          <option value="">-- Select Track --</option>
-          <option value="usmle">Med USMLE Step 1</option>
-          <option value="ju">Med JU</option>
-        </select>
-        <select class="form-input form-select" id="admin-year-sel" onchange="updateAdminYearRotVisibility()" style="display:none;width:140px;font-size:13px;padding:7px 12px;">
-          <option value="">-- Year --</option>
-          <option value="1">Year 1</option>
-          <option value="2">Year 2</option>
-          <option value="3">Year 3</option>
-          <option value="4">Year 4</option>
-          <option value="5">Year 5</option>
-          <option value="6">Year 6</option>
-        </select>
-        <select class="form-input form-select" id="admin-rot-sel" style="display:none;width:180px;font-size:13px;padding:7px 12px;">
-          <option value="">-- Rotation --</option>
-          <option value="internal_medicine">Internal Medicine</option>
-          <option value="surgery">Surgery</option>
-          <option value="anesthesia">Anesthesia</option>
-          <option value="neurology">Neurology</option>
-          <option value="all">All</option>
-        </select>
-        <button class="btn btn-primary btn-sm" onclick="applyAdminScope()">Apply</button>
-        <span id="admin-scope-label" style="font-size:12px;color:var(--blue);font-weight:600;margin-left:4px;"></span>
-      </div>
       <div class="admin-sec active" id="asec-subjects">
         <div class="admin-toolbar"><h2>🫀 Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add System</button></div>
         <div id="subj-wrap"><div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add one!</p></div></div>
@@ -1720,6 +1726,33 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
   </nav>
+  <div class="admin-scope-bar">
+    <label>Section:</label>
+    <select id="adm-track" onchange="admTrackChange()">
+      <option value="">-- Select Track --</option>
+      <option value="usmle">Med USMLE Step 1</option>
+      <option value="ju">Med JU</option>
+    </select>
+    <select id="adm-year" style="display:none;" onchange="admYearChange()">
+      <option value="">-- Select Year --</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4">Year 4</option>
+      <option value="5">Year 5</option>
+      <option value="6">Year 6</option>
+    </select>
+    <select id="adm-rotation" style="display:none;" onchange="admRotationChange()">
+      <option value="">-- Select Rotation --</option>
+      <option value="internal_medicine">Internal Medicine</option>
+      <option value="surgery">Surgery</option>
+      <option value="anesthesia">Anesthesia</option>
+      <option value="neurology">Neurology</option>
+      <option value="all">All Rotations</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="applyAdminScope()">Apply</button>
+    <span id="adm-scope-badge" class="admin-scope-badge" style="display:none;"></span>
+  </div>
   <div class="admin-layout">
     <div class="admin-sb">
       <div class="admin-sb-title">Content</div>
@@ -1731,33 +1764,6 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="admin-nav" onclick="aNav('users',event)">👥 Users</button>
     </div>
     <div class="admin-content">
-      <div id="admin-scope-bar" style="position:sticky;top:0;z-index:10;background:var(--gray50);border-bottom:1px solid var(--gray200);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span style="font-size:12px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Scope:</span>
-        <select class="form-input form-select" id="admin-track-sel" onchange="onAdminTrackChange()" style="width:180px;font-size:13px;padding:7px 12px;">
-          <option value="">-- Select Track --</option>
-          <option value="usmle">Med USMLE Step 1</option>
-          <option value="ju">Med JU</option>
-        </select>
-        <select class="form-input form-select" id="admin-year-sel" onchange="updateAdminYearRotVisibility()" style="display:none;width:140px;font-size:13px;padding:7px 12px;">
-          <option value="">-- Year --</option>
-          <option value="1">Year 1</option>
-          <option value="2">Year 2</option>
-          <option value="3">Year 3</option>
-          <option value="4">Year 4</option>
-          <option value="5">Year 5</option>
-          <option value="6">Year 6</option>
-        </select>
-        <select class="form-input form-select" id="admin-rot-sel" style="display:none;width:180px;font-size:13px;padding:7px 12px;">
-          <option value="">-- Rotation --</option>
-          <option value="internal_medicine">Internal Medicine</option>
-          <option value="surgery">Surgery</option>
-          <option value="anesthesia">Anesthesia</option>
-          <option value="neurology">Neurology</option>
-          <option value="all">All</option>
-        </select>
-        <button class="btn btn-primary btn-sm" onclick="applyAdminScope()">Apply</button>
-        <span id="admin-scope-label" style="font-size:12px;color:var(--blue);font-weight:600;margin-left:4px;"></span>
-      </div>
       <div class="admin-sec active" id="asec-subjects">
         <div class="admin-toolbar"><h2>🫀 Systems</h2><button class="btn btn-primary btn-sm" onclick="openSubjModal()">+ Add System</button></div>
         <div id="subj-wrap"><div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add one!</p></div></div>
@@ -2230,12 +2236,10 @@ let allSubjects=[];   // systems (from subjects table)
 let appTrack=null;       // 'usmle'|'ju'
 let juYear=null;         // 1-6
 let juRotation=null;     // rotation slug or 'all'
+let adminTrack=null;     // admin scope: 'usmle'|'ju'
+let adminYear=null;      // admin scope: 1-6
+let adminRotation=null;  // admin scope: rotation slug
 let juOpenSubRots=new Set(); // open accordion IDs
-// ── Admin scope state ──
-let adminTrack=null;      // null|'usmle'|'ju'
-let adminYear=null;       // null|1-6
-let adminRotation=null;   // null|rotation slug
-let currentAdminSection='subjects';
 let allDisciplines=[]; // subjects (from disciplines table)
 let selSubjects=new Set();    // selected system ids
 let selDisciplines=new Set(); // selected discipline ids (empty = all)
@@ -2250,15 +2254,6 @@ async function goHome(){
   showPage('homePage');
   await renderDashboard();
   initSupportFab();
-}
-
-// Helper: apply track scope to an attempts query
-function scopeAttsQ(q){
-  if(!appTrack)return q;
-  q=q.eq('track',appTrack);
-  if(appTrack==='ju'&&juYear)q=q.eq('year',juYear);
-  if(appTrack==='ju'&&juYear&&juRotation&&juRotation!=='all')q=q.eq('rotation',juRotation);
-  return q;
 }
 
 async function loadHome(){
@@ -2295,7 +2290,7 @@ async function renderDashboard(){
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   await loadHome();
   // get attempt stats
-  const{data:atts}=await scopeAttsQ(sb.from('attempts').select('status,answers,score').eq('user_id',CU.id));
+  const{data:atts}=await sb.from('attempts').select('status,answers,score').eq('user_id',CU.id);
   const total=(atts||[]).length;
   const done=(atts||[]).filter(a=>a.status==='done').length;
   const suspended=(atts||[]).filter(a=>a.status==='suspended').length;
@@ -2915,7 +2910,7 @@ async function refreshCounts(){
       pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
     }
     const allQIds=pool.map(q=>q.id);
-    const{data:atts,error:e3}=await scopeAttsQ(sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id));
+    const{data:atts,error:e3}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
     if(e3)console.error('attempts error:',e3);
     const answeredMap={};
     (atts||[]).forEach(att=>{
@@ -2955,7 +2950,7 @@ async function generateSession(){
     pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
   }
   if(qFilter!=='all'){
-    const{data:atts}=await scopeAttsQ(sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id));
+    const{data:atts}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
     const answeredMap={};
     (atts||[]).forEach(att=>{
       const qIds=att.question_ids||[];const ans=att.answers||[];
@@ -2979,7 +2974,7 @@ async function goMyExams(){
   history.pushState({page:"myExams"},"","#exams");
   const body=document.getElementById('homeBody');
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
-  const{data:atts}=await scopeAttsQ(sb.from('attempts').select('*').eq('user_id',CU.id)).order('updated_at',{ascending:false});
+  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).order('updated_at',{ascending:false});
   body.innerHTML=`
     <div class="page-body" style="max-width:900px;margin:0 auto;padding:28px 24px 80px;">
       <div class="back-header">
@@ -3171,7 +3166,6 @@ async function launchSession(questions,title,existingAtt=null){
   if(!att||att.status==='done'){
     const{data:newAtt}=await sb.from('attempts').insert({
       user_id:CU.id,status:'in_progress',score:0,
-      track:appTrack,year:juYear||null,rotation:(juRotation&&juRotation!=='all')?juRotation:null,
       answers:Array(questions.length).fill(null),
       question_times:Array(questions.length).fill(0),
       exam_seconds:0,current_question:0,
@@ -3661,7 +3655,7 @@ async function showAnalytics(){
   const body=document.getElementById('homeBody');
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   // Fetch all attempts with question data
-  const{data:atts}=await scopeAttsQ(sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done'));
+  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done');
   if(!atts||!atts.length){
     body.innerHTML=`<div class="analytics-wrap"><div class="back-header"><button onclick="renderDashboard()">← Back</button><h2>📊 Analytics</h2></div><div class="empty-state"><div class="esi">📊</div><p>No completed exams yet. Complete some sessions to see your analytics!</p></div></div>`;
     return;
@@ -3762,7 +3756,7 @@ async function exportWrongAnswers(){
   const origHTML=body.innerHTML;
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div><p style="text-align:center;margin-top:12px;color:var(--gray500);font-size:13px;">Preparing PDF...</p></div>';
   // Get all done attempts
-  const{data:atts}=await scopeAttsQ(sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done'));
+  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done');
   if(!atts||!atts.length){toast('No completed exams found');body.innerHTML=origHTML;return;}
   // Collect wrong question IDs
   const wrongIds=[];
@@ -4416,7 +4410,6 @@ function updateAdminSupportBadge(count){
 let aSubjects=[];
 
 function aNav(sec,ev){
-  currentAdminSection=sec;
   document.querySelectorAll('.admin-nav').forEach(n=>n.classList.remove('active'));
   ev.currentTarget.classList.add('active');
   document.querySelectorAll('.admin-sec').forEach(s=>s.classList.remove('active'));
@@ -4430,63 +4423,48 @@ function aNav(sec,ev){
   else if(sec==='support'){loadSupportTable();document.getElementById('support-conv-wrap').style.display='block';document.getElementById('support-reply-panel').style.display='none';}
 }
 
-// Admin scope helper
-function applyAdminScopeFilter(q){
-  if(!adminTrack)return q;
-  q=q.eq('track',adminTrack);
-  if(adminTrack==='ju'&&adminYear)q=q.eq('year',adminYear);
-  if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')q=q.eq('rotation',adminRotation);
-  return q;
-}
-function onAdminTrackChange(){
-  const t=document.getElementById('admin-track-sel')?.value;
-  const ySel=document.getElementById('admin-year-sel');
-  const rSel=document.getElementById('admin-rot-sel');
-  if(ySel)ySel.style.display=t==='ju'?'':'none';
-  if(rSel)rSel.style.display='none';
-  if(ySel&&t!=='ju')ySel.value='';
-  if(rSel)rSel.value='';
-}
-function updateAdminYearRotVisibility(){
-  const t=document.getElementById('admin-track-sel')?.value;
-  const y=document.getElementById('admin-year-sel')?.value;
-  const rSel=document.getElementById('admin-rot-sel');
-  if(rSel)rSel.style.display=(t==='ju'&&y)?'':'none';
-}
-function applyAdminScope(){
-  const t=document.getElementById('admin-track-sel')?.value||null;
-  const y=document.getElementById('admin-year-sel')?.value;
-  const r=document.getElementById('admin-rot-sel')?.value||null;
-  adminTrack=t||null;
-  adminYear=(t==='ju'&&y)?parseInt(y):null;
-  adminRotation=(t==='ju'&&y&&r)?r:null;
-  // update label
-  const lbl=document.getElementById('admin-scope-label');
-  if(lbl){
-    if(!adminTrack)lbl.textContent='';
-    else{
-      let txt=adminTrack==='usmle'?'USMLE Step 1':'JU';
-      if(adminYear)txt+=' · Year '+adminYear;
-      if(adminRotation&&adminRotation!=='all')txt+=' · '+adminRotation.replace(/_/g,' ').replace(/\w/g,c=>c.toUpperCase());
-      else if(adminRotation==='all')txt+=' · All Rotations';
-      lbl.textContent='📌 '+txt;
-    }
-  }
-  // reload current section
-  if(currentAdminSection==='subjects')loadSubjTable();
-  else if(currentAdminSection==='categories')loadACatSubjFilter();
-  else if(currentAdminSection==='disciplines')loadDiscTable();
-  else if(currentAdminSection==='questions')loadAQSubjFilter();
-}
-
 // SUBJECTS
 let editSubjId=null;
+function admTrackChange(){
+  const t=document.getElementById('adm-track').value;
+  document.getElementById('adm-year').style.display=t==='ju'?'inline-block':'none';
+  document.getElementById('adm-rotation').style.display='none';
+  if(t!=='ju'){document.getElementById('adm-year').value='';document.getElementById('adm-rotation').value='';}
+}
+function admYearChange(){
+  const y=document.getElementById('adm-year').value;
+  document.getElementById('adm-rotation').style.display=y?'inline-block':'none';
+  if(!y)document.getElementById('adm-rotation').value='';
+}
+function admRotationChange(){}
+function applyAdminScope(){
+  adminTrack=document.getElementById('adm-track').value||null;
+  adminYear=document.getElementById('adm-year').value?parseInt(document.getElementById('adm-year').value):null;
+  adminRotation=document.getElementById('adm-rotation').value||null;
+  const badge=document.getElementById('adm-scope-badge');
+  if(!adminTrack){badge.style.display='none';toast('Please select a track');return;}
+  const trackLabel=adminTrack==='usmle'?'USMLE':'JU';
+  const yearLabel=adminYear?` · Year ${adminYear}`:'';
+  const rotMap={internal_medicine:'Internal Medicine',surgery:'Surgery',anesthesia:'Anesthesia',neurology:'Neurology',all:'All Rotations'};
+  const rotLabel=adminRotation?` · ${rotMap[adminRotation]||adminRotation}`:'';
+  badge.textContent=`📌 ${trackLabel}${yearLabel}${rotLabel}`;
+  badge.style.display='inline-block';
+  // reload current admin section
+  const activeBtn=document.querySelector('.admin-nav.active');
+  if(activeBtn){
+    const section=activeBtn.getAttribute('onclick')?.match(/aNav\('(\w+)'/)?.[1];
+    if(section){aNav(section,{currentTarget:activeBtn});}
+  } else {loadSubjTable();}
+}
 async function loadSubjTable(){
   const w=document.getElementById('subj-wrap');
-  if(!adminTrack){w.innerHTML='<div class="empty-state"><div class="esi">🔍</div><p>Select a track above and click Apply to manage content.</p></div>';return;}
-  const{data:s}=await applyAdminScopeFilter(sb.from('subjects').select('*, categories(id)').order('name'));
+  if(!adminTrack){w.innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a section above to manage systems.</p></div>';return;}
+  let q=sb.from('subjects').select('*, categories(id)').eq('track',adminTrack).order('name');
+  if(adminTrack==='ju'&&adminYear)q=q.eq('year',adminYear);
+  if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')q=q.eq('rotation',adminRotation);
+  const{data:s}=await q;
   aSubjects=s||[];
-  if(!s?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No subjects yet for this scope. Add one!</p></div>';return;}
+  if(!s?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No subjects yet. Add one!</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>Icon</th><th>Name</th><th>Description</th><th>Categories</th><th>Actions</th></tr></thead><tbody>
     ${s.map(x=>`<tr><td style="font-size:20px;">${x.icon||' '}</td><td><b>${x.name}</b></td><td>${x.description||' '}</td><td>${(x.categories||[]).length}</td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openSubjModal('${x.id}')">Edit</button>
@@ -4504,8 +4482,8 @@ function openSubjModal(id=null){
   document.getElementById('sm-track').value=track;
   const juFields=document.getElementById('sm-ju-fields');
   if(juFields)juFields.style.display=track==='ju'?'block':'none';
-  if(document.getElementById('sm-year'))document.getElementById('sm-year').value=s?.year||(adminTrack==='ju'&&adminYear?adminYear:'')||'';
-  if(document.getElementById('sm-rotation'))document.getElementById('sm-rotation').value=s?.rotation||(adminTrack==='ju'&&adminRotation&&adminRotation!=='all'?adminRotation:'')||'';
+  if(document.getElementById('sm-year'))document.getElementById('sm-year').value=s?.year||adminYear||'';
+  if(document.getElementById('sm-rotation'))document.getElementById('sm-rotation').value=s?.rotation||adminRotation||'';
   showAModal('subj-modal');
 }
 async function saveSubj(){
@@ -4529,9 +4507,11 @@ async function delSubj(id){if(!confirm('Delete this system and all its topics/qu
 // CATEGORIES
 let editCatId=null;let aCats=[];
 async function loadACatSubjFilter(){
-  const w=document.getElementById('cats-wrap');
-  if(!adminTrack){w.innerHTML='<div class="empty-state"><div class="esi">🔍</div><p>Select a track above and click Apply to manage content.</p></div>';return;}
-  const{data:s}=await applyAdminScopeFilter(sb.from('subjects').select('id,name').order('name'));
+  if(!adminTrack){document.getElementById('cats-wrap').innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a section above first.</p></div>';return;}
+  let q=sb.from('subjects').select('id,name').eq('track',adminTrack).order('name');
+  if(adminTrack==='ju'&&adminYear)q=q.eq('year',adminYear);
+  if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')q=q.eq('rotation',adminRotation);
+  const{data:s}=await q;
   aSubjects=s||[];
   const sel=document.getElementById('catSubjFilter');
   sel.innerHTML='<option value="">  Select system  </option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
@@ -4576,9 +4556,11 @@ let editQId=null;let selCorr=null;
 const LTRS2='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 async function loadAQSubjFilter(){
-  const w=document.getElementById('q-wrap');
-  if(!adminTrack){w.innerHTML='<div class="empty-state"><div class="esi">🔍</div><p>Select a track above and click Apply to manage content.</p></div>';return;}
-  const{data:s}=await applyAdminScopeFilter(sb.from('subjects').select('id,name').order('name'));
+  if(!adminTrack){document.getElementById('q-wrap').innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a section above first.</p></div>';return;}
+  let q=sb.from('subjects').select('id,name').eq('track',adminTrack).order('name');
+  if(adminTrack==='ju'&&adminYear)q=q.eq('year',adminYear);
+  if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')q=q.eq('rotation',adminRotation);
+  const{data:s}=await q;
   aSubjects=s||[];
   const sel=document.getElementById('qSubjFilter');
   sel.innerHTML='<option value="">  Select system  </option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
@@ -4887,8 +4869,8 @@ async function openQModal(id=null){
   rteClearAll();
   cancelQuickAddTopic();
   document.getElementById('opts-container').innerHTML='';document.getElementById('oa-container').innerHTML='';document.getElementById('corr-sel').innerHTML='';
-  // populate subject/cat selects (scoped by adminTrack if set)
-  const{data:s}=await applyAdminScopeFilter(sb.from('subjects').select('id,name').order('name'));
+  // populate subject/cat selects
+  const{data:s}=await sb.from('subjects').select('id,name').order('name');
   document.getElementById('qm-subj').innerHTML=(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   // populate disciplines
   const{data:discs}=await sb.from('disciplines').select('id,name').order('name');
