@@ -634,6 +634,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="nav-right">
       <span class="nav-user" id="navUser" style="display:none;"></span>
       <span class="admin-badge" id="navAdminBadge" style="display:none;">ADMIN</span>
+      <button class="btn btn-sm btn-secondary" onclick="resetSection()" id="changeSectionBtn" style="display:none;">⇄ Change Section</button>
       <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">⚙️ Admin</button>
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
@@ -1693,6 +1694,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="nav-right">
       <span class="nav-user" id="navUser" style="display:none;"></span>
       <span class="admin-badge" id="navAdminBadge" style="display:none;">ADMIN</span>
+      <button class="btn btn-sm btn-secondary" onclick="resetSection()" id="changeSectionBtn" style="display:none;">⇄ Change Section</button>
       <button class="btn btn-sm btn-secondary" id="adminBtn" style="display:none;" onclick="if(CP?.is_admin){showPage('adminPage');loadSubjTable();}else{toast('Access denied');}">⚙️ Admin</button>
       <button class="btn btn-sm btn-secondary" onclick="doLogout()">🚪 Sign out</button>
     </div>
@@ -2288,6 +2290,7 @@ async function loadHome(){
 
 async function renderDashboard(){
   if(!appTrack){showTrackSelector();return;}
+  const csb=document.getElementById('changeSectionBtn');if(csb)csb.style.display='inline-flex';
   if(appTrack==='ju'&&!juYear){showJUYearSelect();return;}
   if(appTrack==='ju'&&juYear&&!juRotation){showJURotationSelect();return;}
   if(window.location.hash&&window.location.hash!=='#home'&&window.location.hash!=='#exam')history.pushState({page:"homePage"},"","#home");
@@ -2295,7 +2298,7 @@ async function renderDashboard(){
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   await loadHome();
   // get attempt stats
-  const{data:atts}=await sb.from('attempts').select('status,answers,score').eq('user_id',CU.id);
+  const{data:atts}=await scopeAtts(sb.from('attempts').select('status,answers,score').eq('user_id',CU.id));
   const total=(atts||[]).length;
   const done=(atts||[]).filter(a=>a.status==='done').length;
   const suspended=(atts||[]).filter(a=>a.status==='suspended').length;
@@ -2367,6 +2370,7 @@ async function renderDashboard(){
 //  TRACK / JU NAVIGATION
 // ═══════════════════════════════════════════════════════════════
 function showTrackSelector(){
+  const csb=document.getElementById('changeSectionBtn');if(csb)csb.style.display='none';
   history.pushState({page:"homePage"},"","#home");
   const body=document.getElementById('homeBody');
   body.innerHTML=`
@@ -2917,7 +2921,7 @@ async function refreshCounts(){
       pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
     }
     const allQIds=pool.map(q=>q.id);
-    const{data:atts,error:e3}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
+    const{data:atts,error:e3}=await scopeAtts(sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id));
     if(e3)console.error('attempts error:',e3);
     const answeredMap={};
     (atts||[]).forEach(att=>{
@@ -2960,7 +2964,7 @@ async function generateSession(){
     pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
   }
   if(qFilter!=='all'){
-    const{data:atts}=await sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id);
+    const{data:atts}=await scopeAtts(sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id));
     const answeredMap={};
     (atts||[]).forEach(att=>{
       const qIds=att.question_ids||[];const ans=att.answers||[];
@@ -2984,7 +2988,7 @@ async function goMyExams(){
   history.pushState({page:"myExams"},"","#exams");
   const body=document.getElementById('homeBody');
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
-  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).order('updated_at',{ascending:false});
+  const{data:atts}=await scopeAtts(sb.from('attempts').select('*').eq('user_id',CU.id)).order('updated_at',{ascending:false});
   body.innerHTML=`
     <div class="page-body" style="max-width:900px;margin:0 auto;padding:28px 24px 80px;">
       <div class="back-header">
@@ -3168,6 +3172,20 @@ let ES=null,eAttId=null,eSBOpen=false,eHLMode=false,eHLC=HLCOLS[0],eCheckMode=fa
 let eTick=null,qTick=null,eRun=false,qRun=false,eSec=0,qSec=0;
 const efmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 
+
+
+function resetSection(){
+  appTrack=null; juYear=null; juRotation=null;
+  selSubjects=new Set(); selCategories={}; allSubjects=[];
+  showTrackSelector();
+}
+function scopeAtts(q){
+  // Filter attempts by current track/year/rotation scope
+  q=q.eq('track',appTrack||'usmle');
+  if(appTrack==='ju'&&juYear) q=q.eq('year',juYear);
+  if(appTrack==='ju'&&juYear&&juRotation&&juRotation!=='all') q=q.eq('rotation',juRotation);
+  return q;
+}
 async function launchSession(questions,title,existingAtt=null){
   clearInterval(eTick);clearInterval(qTick);
   eCheckMode=false;eHLMode=false;eHLC=HLCOLS[0];eSBOpen=false;
@@ -3180,7 +3198,10 @@ async function launchSession(questions,title,existingAtt=null){
       question_times:Array(questions.length).fill(0),
       exam_seconds:0,current_question:0,
       question_ids:qIds,
-      filter_type:title
+      filter_type:title,
+      track:appTrack||'usmle',
+      year:juYear||null,
+      rotation:juRotation||null
     }).select().single();
     att=newAtt;
   }
@@ -3665,7 +3686,7 @@ async function showAnalytics(){
   const body=document.getElementById('homeBody');
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   // Fetch all attempts with question data
-  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done');
+  const{data:atts}=await scopeAtts(sb.from('attempts').select('*').eq('user_id',CU.id)).eq('status','done');
   if(!atts||!atts.length){
     body.innerHTML=`<div class="analytics-wrap"><div class="back-header"><button onclick="renderDashboard()">← Back</button><h2>📊 Analytics</h2></div><div class="empty-state"><div class="esi">📊</div><p>No completed exams yet. Complete some sessions to see your analytics!</p></div></div>`;
     return;
@@ -3766,7 +3787,7 @@ async function exportWrongAnswers(){
   const origHTML=body.innerHTML;
   body.innerHTML='<div class="spinner-wrap"><div class="spinner"></div><p style="text-align:center;margin-top:12px;color:var(--gray500);font-size:13px;">Preparing PDF...</p></div>';
   // Get all done attempts
-  const{data:atts}=await sb.from('attempts').select('*').eq('user_id',CU.id).eq('status','done');
+  const{data:atts}=await scopeAtts(sb.from('attempts').select('*').eq('user_id',CU.id)).eq('status','done');
   if(!atts||!atts.length){toast('No completed exams found');body.innerHTML=origHTML;return;}
   // Collect wrong question IDs
   const wrongIds=[];
