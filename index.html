@@ -2645,10 +2645,9 @@ function setFilter(f){
 
 function showCreateExam(){
   history.pushState({page:"createExam"},"","#create");
-  // JU: pre-select all sub-rotations if nothing is selected yet
-  if(appTrack==='ju'&&selSubjects.size===0&&allSubjects.length>0){
-    allSubjects.forEach(s=>{selSubjects.add(s.id);if(!selCategories[s.id])selCategories[s.id]=new Set((subjectCategories[s.id]||[]).map(c=>c.id));});
-  }
+  // Always start deselected — user picks what they want
+  selSubjects=new Set();
+  allSubjects.forEach(s=>{selCategories[s.id]=new Set((subjectCategories[s.id]||[]).map(cat=>cat.id));});
   const prevSlider=document.getElementById('qcount-slider')?.value||'20';
   const body=document.getElementById('homeBody');
   const _rl=appTrack==='ju'&&juRotation&&juRotation!=='all'?juRotation.replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase()):appTrack==='ju'?'All Rotations':'';
@@ -2663,6 +2662,7 @@ function showCreateExam(){
   const slider=document.getElementById('qcount-slider');
   const val=document.getElementById('qcount-val');
   if(slider){slider.value=prevSlider;if(val)val.textContent=prevSlider;}
+  updateCountDisplay(0,0,0,0);
   if(appTrack!=='ju')renderCatAccordion();
   if(selSubjects.size>0||randomMode)refreshCounts();
 }
@@ -4900,8 +4900,14 @@ async function openQModal(id=null){
   rteClearAll();
   cancelQuickAddTopic();
   document.getElementById('opts-container').innerHTML='';document.getElementById('oa-container').innerHTML='';document.getElementById('corr-sel').innerHTML='';
-  // populate subject/cat selects
-  const{data:s}=await sb.from('subjects').select('id,name').order('name');
+  // populate subject/cat selects — scoped to current admin section
+  let qmSubjQ=sb.from('subjects').select('id,name').order('name');
+  if(adminTrack){
+    qmSubjQ=qmSubjQ.eq('track',adminTrack);
+    if(adminTrack==='ju'&&adminYear)qmSubjQ=qmSubjQ.eq('year',adminYear);
+    if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')qmSubjQ=qmSubjQ.eq('rotation',adminRotation);
+  }
+  const{data:s}=await qmSubjQ;
   document.getElementById('qm-subj').innerHTML=(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   // populate disciplines
   const{data:discs}=await sb.from('disciplines').select('id,name').order('name');
