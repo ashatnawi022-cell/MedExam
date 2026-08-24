@@ -697,6 +697,11 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <option value="surgery">Surgery</option>
       <option value="anesthesia">Anesthesia</option>
       <option value="neurology">Neurology</option>
+      <option value="special_surgeries">Special Surgeries</option>
+      <option value="selected_medical_specialties">Selected Medical Specialties</option>
+      <option value="psychiatry">Psychiatry</option>
+      <option value="pediatrics">Pediatrics</option>
+      <option value="obstetrics_gynecology">Obstetrics and Gynecology</option>
       <option value="all">All Rotations</option>
     </select>
     <button class="btn btn-primary btn-sm" onclick="applyAdminScope()">Apply</button>
@@ -869,6 +874,11 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
             <option value="internal_medicine">Internal Medicine</option>
             <option value="anesthesia">Anesthesia</option>
             <option value="neurology">Neurology</option>
+            <option value="special_surgeries">Special Surgeries</option>
+            <option value="selected_medical_specialties">Selected Medical Specialties</option>
+            <option value="psychiatry">Psychiatry</option>
+            <option value="pediatrics">Pediatrics</option>
+            <option value="obstetrics_gynecology">Obstetrics and Gynecology</option>
           </select>
         </div>
       </div>
@@ -2400,6 +2410,11 @@ async function selectTrack(track){
   else showJUYearSelect();
 }
 
+const JU_UNLOCKED_YEARS=[4,5];
+function juYearClick(y){
+  if(JU_UNLOCKED_YEARS.includes(y))selectJUYear(y);
+  else toast('Coming soon — only Year '+JU_UNLOCKED_YEARS.join(' & Year ')+' available now!');
+}
 function showJUYearSelect(){
   const body=document.getElementById('homeBody');
   body.innerHTML=`
@@ -2415,9 +2430,9 @@ function showJUYearSelect(){
       <p style="font-size:14px;color:var(--gray500);margin-bottom:28px;">Choose your academic year to access rotation-based questions</p>
       <div class="year-grid">
         ${[1,2,3,4,5,6].map(y=>`
-          <div class="year-card" onclick="${y===4?"selectJUYear("+y+")":'toast("Coming soon — only Year 4 is available now!")'}" style="${y!==4?'opacity:0.45;cursor:not-allowed;':''}">
+          <div class="year-card" onclick="juYearClick(${y})" style="${!JU_UNLOCKED_YEARS.includes(y)?'opacity:0.45;cursor:not-allowed;':''}">
             <div class="yc-num">${y}</div>
-            <div class="yc-label">Year ${y}${y===4?' ✓':''}</div>
+            <div class="yc-label">Year ${y}${JU_UNLOCKED_YEARS.includes(y)?' ✓':''}</div>
           </div>`).join('')}
       </div>
       <p style="font-size:12px;color:var(--gray400);text-align:center;margin-top:20px;">More years coming soon.</p>
@@ -2429,14 +2444,24 @@ async function selectJUYear(year){
   showJURotationSelect();
 }
 
-function showJURotationSelect(){
-  const body=document.getElementById('homeBody');
-  const rots=[
+const JU_ROTATIONS_BY_YEAR={
+  4:[
     {id:'internal_medicine',name:'Internal Medicine',icon:'🫀'},
     {id:'surgery',name:'Surgery',icon:'🔬'},
     {id:'anesthesia',name:'Anesthesia',icon:'💉'},
     {id:'neurology',name:'Neurology',icon:'🧠'},
-  ];
+  ],
+  5:[
+    {id:'special_surgeries',name:'Special Surgeries',icon:'🔪'},
+    {id:'selected_medical_specialties',name:'Selected Medical Specialties',icon:'🩺'},
+    {id:'psychiatry',name:'Psychiatry',icon:'🧠'},
+    {id:'pediatrics',name:'Pediatrics',icon:'👶'},
+    {id:'obstetrics_gynecology',name:'Obstetrics and Gynecology',icon:'🤰'},
+  ],
+};
+function showJURotationSelect(){
+  const body=document.getElementById('homeBody');
+  const rots=JU_ROTATIONS_BY_YEAR[juYear]||[];
   body.innerHTML=`
     <div style="max-width:700px;margin:0 auto;padding:40px 24px;">
       <div class="ju-breadcrumb">
@@ -4476,7 +4501,7 @@ function applyAdminScope(){
   if(!adminTrack){badge.style.display='none';toast('Please select a track');return;}
   const trackLabel=adminTrack==='usmle'?'USMLE':'JU';
   const yearLabel=adminYear?` · Year ${adminYear}`:'';
-  const rotMap={internal_medicine:'Internal Medicine',surgery:'Surgery',anesthesia:'Anesthesia',neurology:'Neurology',all:'All Rotations'};
+  const rotMap={internal_medicine:'Internal Medicine',surgery:'Surgery',anesthesia:'Anesthesia',neurology:'Neurology',special_surgeries:'Special Surgeries',selected_medical_specialties:'Selected Medical Specialties',psychiatry:'Psychiatry',pediatrics:'Pediatrics',obstetrics_gynecology:'Obstetrics and Gynecology',all:'All Rotations'};
   const rotLabel=adminRotation?` · ${rotMap[adminRotation]||adminRotation}`:'';
   badge.textContent=`📌 ${trackLabel}${yearLabel}${rotLabel}`;
   badge.style.display='inline-block';
