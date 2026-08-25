@@ -85,6 +85,14 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .nav-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto;}
 .nav-user{display:none;}
 .admin-badge{background:var(--amber);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;}
+@media(max-width:480px){
+  .app-nav{padding:8px;gap:3px;flex-wrap:wrap;height:auto;overflow:visible;}
+  .app-nav .nav-brand svg{height:24px;}
+  .app-nav .nav-links{flex:1 1 auto;}
+  .app-nav .nav-right{gap:3px;flex-wrap:wrap;margin-left:0;}
+  .app-nav .nav-right .btn-sm{padding:6px 8px;font-size:11px;}
+  .app-nav .nav-links .nav-link{padding:6px 8px;font-size:12px;}
+}
 
 /* HOME */
 .page-body{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
@@ -189,7 +197,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .nav-strip{background:var(--navy3);padding:6px 16px;display:flex;align-items:center;}
 .nav-left{display:flex;align-items:center;gap:7px;width:150px;}
 .nav-center{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;}
-.nav-right{width:150px;}
+.nav-strip .nav-right{width:150px;}
 .sb-tog{background:rgba(255,255,255,0.12);border:none;color:white;padding:4px 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .sb-tog:hover{background:rgba(255,255,255,0.22);}
 .nav-ebtn{background:rgba(255,255,255,0.12);border:none;color:white;padding:4px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
@@ -687,23 +695,19 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     </div>
   </nav>
   <div class="admin-scope-bar">
-    <label>Section:</label>
-    <select id="adm-track" onchange="admTrackChange()">
-      <option value="">-- Select Track --</option>
-      <option value="usmle">Med USMLE Step 1</option>
-      <option value="ju">Med JU</option>
-    </select>
-    <select id="adm-year" style="display:none;" onchange="admYearChange()">
+    <label>Year:</label>
+    <select id="adm-year-top" onchange="admYearTopChange()">
       <option value="">-- Select Year --</option>
-      <option value="1">Year 1</option>
-      <option value="2">Year 2</option>
-      <option value="3">Year 3</option>
-      <option value="4">Year 4</option>
-      <option value="5">Year 5</option>
-      <option value="6">Year 6</option>
+      <option value="usmle">USMLE (Step 1)</option>
+      <option value="ju-1">JU — Year 1</option>
+      <option value="ju-2">JU — Year 2</option>
+      <option value="ju-3">JU — Year 3</option>
+      <option value="ju-4">JU — Year 4</option>
+      <option value="ju-5">JU — Year 5</option>
+      <option value="ju-6">JU — Year 6</option>
     </select>
     <select id="adm-rotation" style="display:none;" onchange="admRotationChange()">
-      <option value="">-- Select Rotation --</option>
+      <option value="">-- All Rotations --</option>
       <option value="internal_medicine">Internal Medicine</option>
       <option value="surgery">Surgery</option>
       <option value="anesthesia">Anesthesia</option>
@@ -713,9 +717,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <option value="psychiatry">Psychiatry</option>
       <option value="pediatrics">Pediatrics</option>
       <option value="obstetrics_gynecology">Obstetrics and Gynecology</option>
-      <option value="all">All Rotations</option>
     </select>
-    <button class="btn btn-primary btn-sm" onclick="applyAdminScope()">Apply</button>
     <span id="adm-scope-badge" class="admin-scope-badge" style="display:none;"></span>
   </div>
   <div class="admin-layout">
@@ -755,6 +757,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
           <h2>❓ Questions</h2>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <select class="form-input form-select" id="qSubjFilter" onchange="loadQCatFilter()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
+            <span id="qDiscFilterWrap" style="display:none;"><select class="form-input form-select" id="qDiscFilter" onchange="loadQTable()" style="width:170px;font-size:13px;padding:7px 12px;"></select></span>
             <select class="form-input form-select" id="qCatFilter" onchange="loadQTable()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
             <button class="btn btn-primary btn-sm" onclick="openQModal()">+ Add Question</button>
           </div>
@@ -852,6 +855,17 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <div class="modal-bg" id="sus-modal" style="display:none;"><div class="modal"><h2>Suspend Exam?</h2><p>Progress saved. Continue anytime from My Exams.</p><div class="modal-btns"><button class="btn btn-secondary" onclick="hideEModal('sus-modal')">Cancel</button><button class="btn btn-amber" onclick="eSuspend()">Suspend & Go Home</button></div></div></div>
 
 <!-- Admin modals -->
+<div class="modal-bg" id="flag-delete-modal" style="display:none;">
+  <div class="modal">
+    <h2>🗑️ Delete Reported Question</h2>
+    <p id="flag-delete-desc">You can permanently delete the reported question, or just dismiss this report and keep the question.</p>
+    <div class="modal-btns" style="flex-direction:column;gap:8px;">
+      <button class="btn btn-danger" id="flag-delete-qbtn" onclick="confirmDeleteQuestionFromFlag()" style="width:100%;">🗑️ Delete Question Permanently</button>
+      <button class="btn btn-secondary" onclick="confirmDismissFlag()" style="width:100%;">✕ Dismiss Report Only</button>
+      <button class="btn btn-secondary" onclick="hideAModal('flag-delete-modal')" style="width:100%;">Cancel</button>
+    </div>
+  </div>
+</div>
 <div class="modal-bg" id="subj-modal" style="display:none;">
   <div class="modal" style="text-align:left;">
     <h2 id="subj-modal-title">Add System</h2>
@@ -1301,6 +1315,14 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .nav-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto;}
 .nav-user{display:none;}
 .admin-badge{background:var(--amber);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;}
+@media(max-width:480px){
+  .app-nav{padding:8px;gap:3px;flex-wrap:wrap;height:auto;overflow:visible;}
+  .app-nav .nav-brand svg{height:24px;}
+  .app-nav .nav-links{flex:1 1 auto;}
+  .app-nav .nav-right{gap:3px;flex-wrap:wrap;margin-left:0;}
+  .app-nav .nav-right .btn-sm{padding:6px 8px;font-size:11px;}
+  .app-nav .nav-links .nav-link{padding:6px 8px;font-size:12px;}
+}
 
 /* HOME */
 .page-body{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
@@ -1405,7 +1427,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .nav-strip{background:var(--navy3);padding:6px 16px;display:flex;align-items:center;}
 .nav-left{display:flex;align-items:center;gap:7px;width:150px;}
 .nav-center{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;}
-.nav-right{width:150px;}
+.nav-strip .nav-right{width:150px;}
 .sb-tog{background:rgba(255,255,255,0.12);border:none;color:white;padding:4px 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .sb-tog:hover{background:rgba(255,255,255,0.22);}
 .nav-ebtn{background:rgba(255,255,255,0.12);border:none;color:white;padding:4px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
@@ -1767,30 +1789,29 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     </div>
   </nav>
   <div class="admin-scope-bar">
-    <label>Section:</label>
-    <select id="adm-track" onchange="admTrackChange()">
-      <option value="">-- Select Track --</option>
-      <option value="usmle">Med USMLE Step 1</option>
-      <option value="ju">Med JU</option>
-    </select>
-    <select id="adm-year" style="display:none;" onchange="admYearChange()">
+    <label>Year:</label>
+    <select id="adm-year-top" onchange="admYearTopChange()">
       <option value="">-- Select Year --</option>
-      <option value="1">Year 1</option>
-      <option value="2">Year 2</option>
-      <option value="3">Year 3</option>
-      <option value="4">Year 4</option>
-      <option value="5">Year 5</option>
-      <option value="6">Year 6</option>
+      <option value="usmle">USMLE (Step 1)</option>
+      <option value="ju-1">JU — Year 1</option>
+      <option value="ju-2">JU — Year 2</option>
+      <option value="ju-3">JU — Year 3</option>
+      <option value="ju-4">JU — Year 4</option>
+      <option value="ju-5">JU — Year 5</option>
+      <option value="ju-6">JU — Year 6</option>
     </select>
     <select id="adm-rotation" style="display:none;" onchange="admRotationChange()">
-      <option value="">-- Select Rotation --</option>
+      <option value="">-- All Rotations --</option>
       <option value="internal_medicine">Internal Medicine</option>
       <option value="surgery">Surgery</option>
       <option value="anesthesia">Anesthesia</option>
       <option value="neurology">Neurology</option>
-      <option value="all">All Rotations</option>
+      <option value="special_surgeries">Special Surgeries</option>
+      <option value="selected_medical_specialties">Selected Medical Specialties</option>
+      <option value="psychiatry">Psychiatry</option>
+      <option value="pediatrics">Pediatrics</option>
+      <option value="obstetrics_gynecology">Obstetrics and Gynecology</option>
     </select>
-    <button class="btn btn-primary btn-sm" onclick="applyAdminScope()">Apply</button>
     <span id="adm-scope-badge" class="admin-scope-badge" style="display:none;"></span>
   </div>
   <div class="admin-layout">
@@ -1828,6 +1849,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
           <h2>❓ Questions</h2>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <select class="form-input form-select" id="qSubjFilter" onchange="loadQCatFilter()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
+            <span id="qDiscFilterWrap" style="display:none;"><select class="form-input form-select" id="qDiscFilter" onchange="loadQTable()" style="width:170px;font-size:13px;padding:7px 12px;"></select></span>
             <select class="form-input form-select" id="qCatFilter" onchange="loadQTable()" style="width:170px;font-size:13px;padding:7px 12px;"></select>
             <button class="btn btn-primary btn-sm" onclick="openQModal()">+ Add Question</button>
           </div>
@@ -1881,6 +1903,17 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <div class="modal-bg" id="sus-modal" style="display:none;"><div class="modal"><h2>Suspend Exam?</h2><p>Progress saved. Continue anytime from My Exams.</p><div class="modal-btns"><button class="btn btn-secondary" onclick="hideEModal('sus-modal')">Cancel</button><button class="btn btn-amber" onclick="eSuspend()">Suspend & Go Home</button></div></div></div>
 
 <!-- Admin modals -->
+<div class="modal-bg" id="flag-delete-modal" style="display:none;">
+  <div class="modal">
+    <h2>🗑️ Delete Reported Question</h2>
+    <p id="flag-delete-desc">You can permanently delete the reported question, or just dismiss this report and keep the question.</p>
+    <div class="modal-btns" style="flex-direction:column;gap:8px;">
+      <button class="btn btn-danger" id="flag-delete-qbtn" onclick="confirmDeleteQuestionFromFlag()" style="width:100%;">🗑️ Delete Question Permanently</button>
+      <button class="btn btn-secondary" onclick="confirmDismissFlag()" style="width:100%;">✕ Dismiss Report Only</button>
+      <button class="btn btn-secondary" onclick="hideAModal('flag-delete-modal')" style="width:100%;">Cancel</button>
+    </div>
+  </div>
+</div>
 <div class="modal-bg" id="subj-modal" style="display:none;">
   <div class="modal" style="text-align:left;">
     <h2 id="subj-modal-title">Add System</h2>
@@ -4333,6 +4366,7 @@ async function loadFlagsTable(){
       +'<div style="display:flex;gap:6px;flex-shrink:0;">'
       +(q?'<button class="btn btn-sm btn-secondary" onclick="openQModal(\''+q.id+'\')">Edit Q</button>':'')
       +(isPending?'<button class="btn btn-sm" onclick="resolveFlagAdmin(\''+f.id+'\')" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac;">✓ Resolve</button>':'<span style="font-size:11px;color:#16a34a;font-weight:600;">Resolved</span>')
+      +'<button class="btn btn-sm" onclick="openFlagDeleteModal(\''+f.id+'\',\''+(q?.id||'')+'\')" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;" title="Delete question or dismiss report">🗑️ Delete</button>'
       +'</div>'
       +'</div>'
       +'</div>';
@@ -4341,6 +4375,37 @@ async function loadFlagsTable(){
 async function resolveFlagAdmin(flagId){
   await sb.from('question_flags').update({status:'resolved'}).eq('id',flagId);
   toast('Flag resolved ✓');
+  loadFlagsTable();
+}
+
+let _flagDeleteCtx=null;
+function openFlagDeleteModal(flagId,questionId){
+  _flagDeleteCtx={flagId:flagId,questionId:questionId||null};
+  const qBtn=document.getElementById('flag-delete-qbtn');
+  const desc=document.getElementById('flag-delete-desc');
+  if(qBtn)qBtn.style.display=_flagDeleteCtx.questionId?'block':'none';
+  if(desc)desc.textContent=_flagDeleteCtx.questionId
+    ?'You can permanently delete the reported question, or just dismiss this report and keep the question.'
+    :'The reported question could not be found (it may already be deleted). You can dismiss this report.';
+  showAModal('flag-delete-modal');
+}
+async function confirmDeleteQuestionFromFlag(){
+  if(!_flagDeleteCtx)return;
+  const{flagId,questionId}=_flagDeleteCtx;
+  hideAModal('flag-delete-modal');
+  if(questionId)await sb.from('questions').delete().eq('id',questionId);
+  await sb.from('question_flags').delete().eq('id',flagId);
+  toast('Question deleted 🗑️');
+  _flagDeleteCtx=null;
+  loadFlagsTable();
+}
+async function confirmDismissFlag(){
+  if(!_flagDeleteCtx)return;
+  const{flagId}=_flagDeleteCtx;
+  hideAModal('flag-delete-modal');
+  await sb.from('question_flags').delete().eq('id',flagId);
+  toast('Report dismissed');
+  _flagDeleteCtx=null;
   loadFlagsTable();
 }
 
@@ -4677,31 +4742,44 @@ function aNav(sec,ev){
 
 // SUBJECTS
 let editSubjId=null;
-function admTrackChange(){
-  const t=document.getElementById('adm-track').value;
-  document.getElementById('adm-year').style.display=t==='ju'?'inline-block':'none';
-  document.getElementById('adm-rotation').style.display='none';
-  if(t!=='ju'){document.getElementById('adm-year').value='';document.getElementById('adm-rotation').value='';}
+// Year is the top-level selector across the whole Admin Portal. Years 1-3 (and USMLE, which has
+// no year concept) branch by System directly; Years 4-6 branch by Rotation first, since a single
+// rotation (e.g. "Selected Medical Specialties") can group several sub-rotation subjects.
+function admYearTopChange(){
+  const v=document.getElementById('adm-year-top').value;
+  const rotSel=document.getElementById('adm-rotation');
+  if(!v){
+    adminTrack=null;adminYear=null;adminRotation=null;
+    rotSel.style.display='none';rotSel.value='';
+    document.getElementById('adm-scope-badge').style.display='none';
+    return;
+  }
+  if(v==='usmle'){
+    adminTrack='usmle';adminYear=null;adminRotation=null;
+    rotSel.style.display='none';rotSel.value='';
+  } else {
+    adminTrack='ju';adminYear=parseInt(v.split('-')[1]);
+    const showRotation=adminYear>=4; // Years 1-3: System branch (no rotation dimension yet)
+    rotSel.style.display=showRotation?'inline-block':'none';
+    if(!showRotation)adminRotation=null;
+    rotSel.value='';
+  }
+  applyAdminScope();
 }
-function admYearChange(){
-  const y=document.getElementById('adm-year').value;
-  document.getElementById('adm-rotation').style.display=y?'inline-block':'none';
-  if(!y)document.getElementById('adm-rotation').value='';
-}
-function admRotationChange(){}
-function applyAdminScope(){
-  adminTrack=document.getElementById('adm-track').value||null;
-  adminYear=document.getElementById('adm-year').value?parseInt(document.getElementById('adm-year').value):null;
+function admRotationChange(){
   adminRotation=document.getElementById('adm-rotation').value||null;
+  applyAdminScope();
+}
+function applyAdminScope(){
   const badge=document.getElementById('adm-scope-badge');
-  if(!adminTrack){badge.style.display='none';toast('Please select a track');return;}
+  if(!adminTrack){badge.style.display='none';return;}
   const trackLabel=adminTrack==='usmle'?'USMLE':'JU';
   const yearLabel=adminYear?` · Year ${adminYear}`:'';
-  const rotMap={internal_medicine:'Internal Medicine',surgery:'Surgery',anesthesia:'Anesthesia',neurology:'Neurology',special_surgeries:'Special Surgeries',selected_medical_specialties:'Selected Medical Specialties',psychiatry:'Psychiatry',pediatrics:'Pediatrics',obstetrics_gynecology:'Obstetrics and Gynecology',all:'All Rotations'};
-  const rotLabel=adminRotation?` · ${rotMap[adminRotation]||adminRotation}`:'';
+  const rotMap={internal_medicine:'Internal Medicine',surgery:'Surgery',anesthesia:'Anesthesia',neurology:'Neurology',special_surgeries:'Special Surgeries',selected_medical_specialties:'Selected Medical Specialties',psychiatry:'Psychiatry',pediatrics:'Pediatrics',obstetrics_gynecology:'Obstetrics and Gynecology'};
+  const rotLabel=adminRotation?` · ${rotMap[adminRotation]||adminRotation}`:(adminTrack==='ju'&&adminYear>=4?' · All Rotations':'');
   badge.textContent=`📌 ${trackLabel}${yearLabel}${rotLabel}`;
   badge.style.display='inline-block';
-  // reload current admin section
+  // reload current admin section so the cascade takes effect immediately (no manual Apply step)
   const activeBtn=document.querySelector('.admin-nav.active');
   if(activeBtn){
     const section=activeBtn.getAttribute('onclick')?.match(/aNav\('(\w+)'/)?.[1];
@@ -4710,7 +4788,7 @@ function applyAdminScope(){
 }
 async function loadSubjTable(){
   const w=document.getElementById('subj-wrap');
-  if(!adminTrack){w.innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a section above to manage systems.</p></div>';return;}
+  if(!adminTrack){w.innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a year above to manage systems.</p></div>';return;}
   let q=sb.from('subjects').select('*, categories(id)').eq('track',adminTrack).order('name');
   if(adminTrack==='ju'&&adminYear)q=q.eq('year',adminYear);
   if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')q=q.eq('rotation',adminRotation);
@@ -4759,27 +4837,37 @@ async function delSubj(id){if(!confirm('Delete this system and all its topics/qu
 // CATEGORIES
 let editCatId=null;let aCats=[];
 async function loadACatSubjFilter(){
-  if(!adminTrack){document.getElementById('cats-wrap').innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a section above first.</p></div>';return;}
+  if(!adminTrack){document.getElementById('cats-wrap').innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a year above first.</p></div>';return;}
   let q=sb.from('subjects').select('id,name').eq('track',adminTrack).order('name');
   if(adminTrack==='ju'&&adminYear)q=q.eq('year',adminYear);
-  if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')q=q.eq('rotation',adminRotation);
+  if(adminTrack==='ju'&&adminYear&&adminRotation)q=q.eq('rotation',adminRotation);
   const{data:s}=await q;
   aSubjects=s||[];
   const sel=document.getElementById('catSubjFilter');
-  sel.innerHTML='<option value="">  Select system  </option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  const allLabel=(adminTrack==='ju'&&adminYear>=4)?'-- All Systems --':'-- All Systems --';
+  sel.innerHTML=(aSubjects.length?`<option value="__all__">${allLabel}</option>`:'<option value="">No systems in this scope</option>')+aSubjects.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   // also populate category modal subject select
-  document.getElementById('cm-subj').innerHTML=(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  document.getElementById('cm-subj').innerHTML=aSubjects.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   loadCatsTable();
 }
 async function loadCatsTable(){
   const sid=document.getElementById('catSubjFilter').value;
   const w=document.getElementById('cats-wrap');
-  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>Select a subject</p></div>';return;}
-  const{data:c}=await sb.from('categories').select('*, questions(id)').eq('subject_id',sid).order('name');
+  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>Select a system</p></div>';return;}
+  const showingAll=sid==='__all__';
+  let q=sb.from('categories').select('*, questions(id), subjects(name)');
+  if(showingAll){
+    const ids=aSubjects.map(x=>x.id);
+    if(!ids.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No systems in this scope yet.</p></div>';return;}
+    q=q.in('subject_id',ids);
+  } else {
+    q=q.eq('subject_id',sid);
+  }
+  const{data:c}=await q.order('name');
   aCats=c||[];
   if(!c?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No categories yet. Add one!</p></div>';return;}
-  w.innerHTML=`<table class="data-table"><thead><tr><th>Name</th><th>Questions</th><th>Actions</th></tr></thead><tbody>
-    ${c.map(x=>`<tr><td><b>${x.name}</b></td><td>${(x.questions||[]).length}</td><td class="tbl-actions">
+  w.innerHTML=`<table class="data-table"><thead><tr><th>Name</th>${showingAll?'<th>System</th>':''}<th>Questions</th><th>Actions</th></tr></thead><tbody>
+    ${c.map(x=>`<tr><td><b>${x.name}</b></td>${showingAll?`<td><span style="background:var(--gray100);padding:2px 8px;border-radius:6px;font-size:12px;">${x.subjects?.name||'—'}</span></td>`:''}<td>${(x.questions||[]).length}</td><td class="tbl-actions">
       <button class="btn btn-sm btn-secondary" onclick="openCatModal('${x.id}')">Edit</button>
       <button class="btn btn-sm btn-danger" onclick="delCat('${x.id}')">Delete</button>
     </td></tr>`).join('')}</tbody></table>`;
@@ -4789,7 +4877,8 @@ function openCatModal(id=null){
   document.getElementById('cat-modal-title').textContent=id?'Edit Topic':'Add Topic';
   const c=id?aCats.find(x=>x.id===id):null;
   document.getElementById('cm-name').value=c?.name||'';
-  const sid=document.getElementById('catSubjFilter').value;
+  const filterVal=document.getElementById('catSubjFilter').value;
+  const sid=c?.subject_id||(filterVal&&filterVal!=='__all__'?filterVal:'');
   if(sid)document.getElementById('cm-subj').value=sid;
   showAModal('cat-modal');
 }
@@ -4807,40 +4896,83 @@ async function delCat(id){if(!confirm('Delete category and unlink its questions?
 let editQId=null;let selCorr=null;
 const LTRS2='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+// Global list of "Subjects" (disciplines, e.g. Physiology, Pathology) — this is the level that
+// sits between System and Topic for Years 1-3 / USMLE only; Years 4-6 don't use it.
+let aDisciplinesGlobal=null;
+async function loadDisciplinesGlobal(){
+  if(aDisciplinesGlobal)return aDisciplinesGlobal;
+  const{data}=await sb.from('disciplines').select('id,name').order('name');
+  aDisciplinesGlobal=data||[];
+  return aDisciplinesGlobal;
+}
+async function updateQDiscFilterVisibility(){
+  const wrap=document.getElementById('qDiscFilterWrap');
+  if(!wrap)return;
+  const showDisc=adminTrack==='usmle'||(adminTrack==='ju'&&adminYear&&adminYear<=3);
+  wrap.style.display=showDisc?'inline-block':'none';
+  if(showDisc){
+    const discs=await loadDisciplinesGlobal();
+    const sel=document.getElementById('qDiscFilter');
+    sel.innerHTML='<option value="">-- All Subjects --</option>'+discs.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  }
+}
 async function loadAQSubjFilter(){
-  if(!adminTrack){document.getElementById('q-wrap').innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a section above first.</p></div>';return;}
+  if(!adminTrack){document.getElementById('q-wrap').innerHTML='<div class="empty-state"><div class="esi">👆</div><p>Select a year above first.</p></div>';return;}
   let q=sb.from('subjects').select('id,name').eq('track',adminTrack).order('name');
   if(adminTrack==='ju'&&adminYear)q=q.eq('year',adminYear);
-  if(adminTrack==='ju'&&adminYear&&adminRotation&&adminRotation!=='all')q=q.eq('rotation',adminRotation);
+  if(adminTrack==='ju'&&adminYear&&adminRotation)q=q.eq('rotation',adminRotation);
   const{data:s}=await q;
   aSubjects=s||[];
   const sel=document.getElementById('qSubjFilter');
-  sel.innerHTML='<option value="">  Select system  </option>'+(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
-  document.getElementById('qm-subj').innerHTML=(s||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
-  document.getElementById('qCatFilter').innerHTML='<option value="">  Select topic  </option>';
+  sel.innerHTML=(aSubjects.length?'<option value="__all__">-- All Systems --</option>':'<option value="">No systems in this scope</option>')+aSubjects.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  document.getElementById('qm-subj').innerHTML=aSubjects.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  await updateQDiscFilterVisibility();
+  await loadQCatFilter();
 }
 async function loadQCatFilter(){
   const sid=document.getElementById('qSubjFilter').value;
   const sel=document.getElementById('qCatFilter');
-  if(!sid){sel.innerHTML='<option value="">  Select topic  </option>';return;}
-  const{data:c}=await sb.from('categories').select('id,name').eq('subject_id',sid).order('name');
-  sel.innerHTML='<option value="">All categories</option>'+(c||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
-  loadQTable();
+  if(!sid){sel.innerHTML='<option value="">-- All Topics --</option>';await loadQTable();return;}
+  let q=sb.from('categories').select('id,name');
+  if(sid==='__all__'){
+    const ids=aSubjects.map(x=>x.id);
+    if(!ids.length){sel.innerHTML='<option value="">-- All Topics --</option>';await loadQTable();return;}
+    q=q.in('subject_id',ids);
+  } else {
+    q=q.eq('subject_id',sid);
+  }
+  const{data:c}=await q.order('name');
+  sel.innerHTML='<option value="">-- All Topics --</option>'+(c||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  await loadQTable();
 }
 async function loadQTable(){
   const sid=document.getElementById('qSubjFilter').value;
   const cid=document.getElementById('qCatFilter').value;
+  const did=document.getElementById('qDiscFilter')?.value||'';
   const w=document.getElementById('q-wrap');
-  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>Select a subject</p></div>';return;}
+  if(!sid){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>Select a system</p></div>';return;}
   w.innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   let query=sb.from('questions').select('*, categories(name), disciplines(name)').order('created_at',{ascending:false});
-  // filter by subject via category
-  const{data:cats}=await sb.from('categories').select('id').eq('subject_id',sid);
-  const catIds=(cats||[]).map(c=>c.id);
-  if(!catIds.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No categories in this subject yet.</p></div>';return;}
-  if(cid)query=query.eq('category_id',cid);
-  else query=query.in('category_id',catIds);
-  const{data:qs}=await query;
+  let catIds;
+  if(cid){
+    catIds=[cid];
+  } else {
+    let catQ=sb.from('categories').select('id');
+    if(sid==='__all__'){
+      const ids=aSubjects.map(x=>x.id);
+      if(!ids.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No systems in this scope yet.</p></div>';return;}
+      catQ=catQ.in('subject_id',ids);
+    } else {
+      catQ=catQ.eq('subject_id',sid);
+    }
+    const{data:cats}=await catQ;
+    catIds=(cats||[]).map(c=>c.id);
+  }
+  if(!catIds.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No categories in this scope yet.</p></div>';return;}
+  query=query.in('category_id',catIds);
+  if(did)query=query.eq('discipline_id',did);
+  const{data:qs,error:qErr}=await fetchAllRows(()=>query);
+  if(qErr){console.error('loadQTable error:',qErr);w.innerHTML='<div class="empty-state"><p>Could not load questions.</p></div>';return;}
   if(!qs?.length){w.innerHTML='<div class="empty-state"><div class="esi">📭</div><p>No questions yet.</p></div>';return;}
   w.innerHTML=`<table class="data-table"><thead><tr><th>ID</th><th>Question</th><th>Topic</th><th>Subject</th><th>Correct</th><th>Actions</th></tr></thead><tbody>
     ${qs.map((q,i)=>{
@@ -5134,7 +5266,7 @@ async function openQModal(id=null){
   const{data:discs}=await sb.from('disciplines').select('id,name').order('name');
   document.getElementById('qm-disc').innerHTML='<option value="">  None  </option>'+(discs||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
   const sid=document.getElementById('qSubjFilter').value;
-  if(sid){document.getElementById('qm-subj').value=sid;await loadQModalCats();}
+  if(sid&&sid!=='__all__'){document.getElementById('qm-subj').value=sid;await loadQModalCats();}
   const cid=document.getElementById('qCatFilter').value;
   if(cid)document.getElementById('qm-cat').value=cid;
   if(id){
