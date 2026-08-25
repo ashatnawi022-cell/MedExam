@@ -120,6 +120,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .cat-toggle-all{font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;}
 .cat-chips{display:flex;flex-wrap:wrap;gap:6px;}
 .cat-chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:1.5px solid var(--gray200);cursor:pointer;font-size:12px;font-weight:600;background:white;transition:all 0.1s;}
+.cat-chip-badge{font-weight:400;color:var(--gray400);font-size:11px;}
 .cat-chip.on{background:var(--green-light);border-color:#86efac;color:#15803d;}
 .cat-chip.off{background:var(--gray100);border-color:var(--gray200);color:var(--gray400);text-decoration:line-through;}
 
@@ -520,6 +521,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .subrot-arrow.open{transform:rotate(90deg);}
 .subrot-lectures{padding:10px 16px 14px 48px;border-top:1px solid var(--gray100);}
 .lecture-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:6px;border:1.5px solid var(--gray200);cursor:pointer;font-size:12px;font-weight:600;background:white;margin:3px 3px 3px 0;transition:all 0.12s;}
+.lecture-chip-badge{font-weight:400;color:var(--gray400);font-size:11px;}
 .lecture-chip:hover{border-color:var(--blue-light);}
 .lecture-chip.on{border-color:var(--navy2);background:#eff6ff;color:var(--navy2);}
 </style>
@@ -1334,6 +1336,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .cat-toggle-all{font-size:12px;color:var(--blue);cursor:pointer;font-weight:600;}
 .cat-chips{display:flex;flex-wrap:wrap;gap:6px;}
 .cat-chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:1.5px solid var(--gray200);cursor:pointer;font-size:12px;font-weight:600;background:white;transition:all 0.1s;}
+.cat-chip-badge{font-weight:400;color:var(--gray400);font-size:11px;}
 .cat-chip.on{background:var(--green-light);border-color:#86efac;color:#15803d;}
 .cat-chip.off{background:var(--gray100);border-color:var(--gray200);color:var(--gray400);text-decoration:line-through;}
 
@@ -2284,6 +2287,7 @@ let selSubjects=new Set();    // selected system ids
 let selDisciplines=new Set(); // selected discipline ids (empty = all)
 let selCategories={};         // systemId -> Set of category ids
 let subjectCategories={};     // systemId -> [{id,name}]
+let categoryCounts={};        // categoryId -> {all,new,wrong,flagged} — for topic badges
 let qFilter='all';
 let qCounts={all:0,new:0,wrong:0};
 
@@ -2567,9 +2571,11 @@ function renderJUCreateExamHTML(){
               </div>
               ${cats.length>0&&isOpen?`<div class="subrot-lectures open" id="subrot-lec-${s.id}">
                 <div style="font-size:11px;color:var(--gray400);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px;">Lectures</div>
-                ${cats.map(cat=>{
+                ${[...cats].sort((a,b)=>a.name.localeCompare(b.name)).map(cat=>{
                   const lecOn=!selCategories[s.id]||selCategories[s.id].has(cat.id);
-                  return `<span class="lecture-chip${lecOn?' on':''}" onclick="juToggleLecture('${s.id}','${cat.id}')">${cat.name}</span>`;
+                  const cnt=categoryCounts[cat.id];
+                  const badge=cnt?`(${qFilter==='new'?cnt.new:qFilter==='wrong'?cnt.wrong:qFilter==='flagged'?cnt.flagged:cnt.all})`:'';
+                  return `<span class="lecture-chip${lecOn?' on':''}" onclick="juToggleLecture('${s.id}','${cat.id}')">${cat.name} <span class="lecture-chip-badge" data-cat-badge="${cat.id}">${badge}</span></span>`;
                 }).join('')}
               </div>`:''}
             </div>`;
@@ -2725,9 +2731,10 @@ function updateCountDisplay(all,nw,wr,fl){
 function setFilter(f){
   qFilter=f;
   document.querySelectorAll('.filter-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['all','new','wrong'][i]===f);
+    b.classList.toggle('active',['all','new','wrong','flagged'][i]===f);
   });
-  updateCountDisplay(qCounts.all,qCounts.new,qCounts.wrong);
+  updateCountDisplay(qCounts.all,qCounts.new,qCounts.wrong,qCounts.flagged);
+  updateTopicBadges();
 }
 
 function showCreateExam(fresh=false){
@@ -2952,9 +2959,11 @@ function renderCatAccordion(){
           <span class="cat-toggle-all" onclick="toggleAllCats('${sid}',${allOn})">${allOn?'Deselect all':'Select all'}</span>
         </div>
         <div class="cat-chips">
-          ${cats.map(c=>{
+          ${[...cats].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>{
             const on=selCategories[sid]?.has(c.id);
-            return `<div class="cat-chip ${on?'on':'off'}" onclick="toggleCat('${sid}','${c.id}')">${on?'✓':''} ${c.name}</div>`;
+            const cnt=categoryCounts[c.id];
+            const badge=cnt?`(${qFilter==='new'?cnt.new:qFilter==='wrong'?cnt.wrong:qFilter==='flagged'?cnt.flagged:cnt.all})`:'';
+            return `<div class="cat-chip ${on?'on':'off'}" onclick="toggleCat('${sid}','${c.id}')">${on?'✓':''} ${c.name} <span class="cat-chip-badge" data-cat-badge="${c.id}">${badge}</span></div>`;
           }).join('')}
         </div>
       </div>
@@ -2984,32 +2993,50 @@ function toggleAllCats(sid,allOn){
   refreshCounts();
 }
 
+// Supabase/PostgREST caps a single select() at 1000 rows by default. Any query that can
+// plausibly match more rows than that (e.g. counting/fetching questions across a whole
+// subject) must page through with .range() or it will silently truncate results.
+async function fetchAllRows(queryFactory,pageSize=1000){
+  let allRows=[];let offset=0;
+  while(true){
+    const{data,error}=await queryFactory().range(offset,offset+pageSize-1);
+    if(error)return{data:null,error};
+    allRows=allRows.concat(data||[]);
+    if(!data||data.length<pageSize)break;
+    offset+=pageSize;
+  }
+  return{data:allRows,error:null};
+}
+
 async function refreshCounts(){
   if(selSubjects.size===0&&!randomMode)return;
   try{
-    let pool=[];
     // Build scoped category IDs from allSubjects (already filtered by track/year/rotation)
     const scopeCatIds=[];
     allSubjects.forEach(s=>{(subjectCategories[s.id]||[]).forEach(cat=>scopeCatIds.push(cat.id));});
+    // Fetch the FULL scope (every category under the current subjects/rotation), fully paginated —
+    // a single .select() caps at 1000 rows server-side, which silently undercounts once a subject
+    // passes that many questions. This same pool also feeds the per-topic badges below.
+    const{data:fullPool,error:eFull}=scopeCatIds.length
+      ?await fetchAllRows(()=>sb.from('questions').select('id,category_id,discipline_id').in('category_id',scopeCatIds))
+      :await fetchAllRows(()=>sb.from('questions').select('id,category_id,discipline_id').in('category_id',['00000000-0000-0000-0000-000000000000']));
+    if(eFull){console.error('refreshCounts error:',eFull);updateCountDisplay(0,0,0);return;}
+    let fullScopePool=fullPool||[];
+    if(!allDiscsSelected&&selDisciplines.size>0){
+      fullScopePool=fullScopePool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
+    }
+
+    // Narrow to only the currently CHECKED categories for the aggregate "available questions" count
+    let pool;
     if(randomMode){
-      const{data:qs,error:e}=scopeCatIds.length
-        ?await sb.from('questions').select('id,category_id,discipline_id').in('category_id',scopeCatIds)
-        :await sb.from('questions').select('id,category_id,discipline_id').in('category_id',['00000000-0000-0000-0000-000000000000']);
-      if(e){console.error('refreshCounts random error:',e);updateCountDisplay(0,0,0);return;}
-      pool=qs||[];
+      pool=fullScopePool;
     } else {
       const catIds=[];
       selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>{if(scopeCatIds.includes(cid))catIds.push(cid);});});
-      const{data:catQs,error:e1}=catIds.length
-        ?await sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds)
-        :Promise.resolve({data:[],error:null});
-      if(e1)console.error('catQs error:',e1);
-      pool=catQs||[];
+      const catIdSet=new Set(catIds);
+      pool=fullScopePool.filter(q=>catIdSet.has(q.category_id));
     }
-    if(!allDiscsSelected&&selDisciplines.size>0){
-      pool=pool.filter(q=>!q.discipline_id||selDisciplines.has(q.discipline_id));
-    }
-    const allQIds=pool.map(q=>q.id);
+
     const{data:atts,error:e3}=await scopeAtts(sb.from('attempts').select('question_ids,answers').eq('user_id',CU.id));
     if(e3)console.error('attempts error:',e3);
     const answeredMap={};
@@ -3017,17 +3044,46 @@ async function refreshCounts(){
       const qIds=att.question_ids||[];const ans=att.answers||[];
       qIds.forEach((qid,i)=>{if(ans[i]!==null&&ans[i]!==undefined)answeredMap[qid]=ans[i];});
     });
+    var flaggedIds=Object.keys(loadFlaggedIds());
+
+    const allQIds=pool.map(q=>q.id);
     const newCount=allQIds.filter(id=>answeredMap[id]===undefined).length;
     const wrongCount=allQIds.filter(id=>answeredMap[id]===false).length;
-    var flaggedIds=Object.keys(loadFlaggedIds());
-    var flaggedCount=allQIds.filter(function(id){return flaggedIds.includes(id);}).length;
+    const flaggedCount=allQIds.filter(function(id){return flaggedIds.includes(id);}).length;
     qCounts={all:allQIds.length,new:newCount,wrong:wrongCount,flagged:flaggedCount};
     updateCountDisplay(allQIds.length,newCount,wrongCount,flaggedCount);
-    console.log('refreshCounts done:',allQIds.length,'questions');
+
+    // Per-topic counts for the accordion badges — computed for every topic in scope,
+    // regardless of whether that topic is currently checked, and re-run on every filter change.
+    categoryCounts={};
+    fullScopePool.forEach(q=>{
+      const cid=q.category_id;if(!cid)return;
+      if(!categoryCounts[cid])categoryCounts[cid]={all:0,new:0,wrong:0,flagged:0};
+      const c=categoryCounts[cid];
+      c.all++;
+      if(answeredMap[q.id]===undefined)c.new++;
+      if(answeredMap[q.id]===false)c.wrong++;
+      if(flaggedIds.includes(q.id))c.flagged++;
+    });
+    updateTopicBadges();
+
+    console.log('refreshCounts done:',allQIds.length,'questions (scope total:',fullScopePool.length,')');
   }catch(err){
     console.error('refreshCounts exception:',err);
     updateCountDisplay(0,0,0);
   }
+}
+
+// Updates the (N) badge next to every topic chip/lecture, based on the currently active
+// question filter (All/New/Wrong/Flagged). Called after refreshCounts() and on filter change.
+function updateTopicBadges(){
+  document.querySelectorAll('[data-cat-badge]').forEach(el=>{
+    const cid=el.getAttribute('data-cat-badge');
+    const c=categoryCounts[cid];
+    if(!c){el.textContent='';return;}
+    const n=qFilter==='new'?c.new:qFilter==='wrong'?c.wrong:qFilter==='flagged'?c.flagged:c.all;
+    el.textContent=`(${n})`;
+  });
 }
 
 async function generateSession(){
@@ -3036,17 +3092,19 @@ async function generateSession(){
   // Scope to subjects already filtered by track/year/rotation
   const genScopeCatIds=[];
   allSubjects.forEach(s=>{(subjectCategories[s.id]||[]).forEach(cat=>genScopeCatIds.push(cat.id));});
+  // Fetch lightweight rows only (id/category_id/discipline_id), fully paginated so a subject
+  // with more than 1000 questions doesn't get silently truncated by PostgREST's default page cap.
   if(randomMode){
     const{data:qs}=genScopeCatIds.length
-      ?await sb.from('questions').select('*').in('category_id',genScopeCatIds)
-      :await sb.from('questions').select('*').in('category_id',['00000000-0000-0000-0000-000000000000']);
+      ?await fetchAllRows(()=>sb.from('questions').select('id,category_id,discipline_id').in('category_id',genScopeCatIds))
+      :await fetchAllRows(()=>sb.from('questions').select('id,category_id,discipline_id').in('category_id',['00000000-0000-0000-0000-000000000000']));
     pool=qs||[];
   } else {
     const catIds=[];
     selSubjects.forEach(sid=>{(selCategories[sid]||new Set()).forEach(cid=>{if(genScopeCatIds.includes(cid)||genScopeCatIds.length===0)catIds.push(cid);});});
     const{data:catQs}=catIds.length
-      ?await sb.from('questions').select('*').in('category_id',catIds)
-      :Promise.resolve({data:[]});
+      ?await fetchAllRows(()=>sb.from('questions').select('id,category_id,discipline_id').in('category_id',catIds))
+      :{data:[]};
     pool=catQs||[];
   }
   if(!allDiscsSelected&&selDisciplines.size>0){
@@ -3064,11 +3122,17 @@ async function generateSession(){
     else if(qFilter==='flagged'){var fIds=Object.keys(loadFlaggedIds());pool=pool.filter(function(q){return fIds.includes(q.id);});}
   }
   if(!pool.length){toast('No questions match your selection. Try a different filter.');return;}
-  pool=pool.sort(()=>Math.random()-0.5).slice(0,qcount);
+  // Randomly sample from the FULL eligible pool (not just its first 1000 rows), then fetch
+  // full question data only for the sampled ids.
+  const sampledIds=pool.sort(()=>Math.random()-0.5).slice(0,qcount).map(q=>q.id);
+  const{data:fullQs,error:eGen}=await sb.from('questions').select('*').in('id',sampledIds);
+  if(eGen||!fullQs?.length){toast('Could not load the selected questions. Please try again.');return;}
+  const byId={};fullQs.forEach(q=>byId[q.id]=q);
+  const finalPool=sampledIds.map(id=>byId[id]).filter(Boolean);
   const title=randomMode?'Random Session':
     `${[...selSubjects].map(sid=>allSubjects.find(s=>s.id===sid)?.name||'').join(', ')} · ${qFilter==='all'?'All Qs':qFilter==='new'?'New Qs':qFilter==='flagged'?'Flagged Qs':'Wrong Qs'}`;
   var savedLimit=examTimeLimit;examTimeLimit=0;
-  await launchSession(pool,title);
+  await launchSession(finalPool,title);
   if(savedLimit)ES.examLimit=savedLimit*60;
 }
 
