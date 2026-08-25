@@ -25,7 +25,7 @@
 body{font-family:'DM Sans',sans-serif;background:var(--gray50);color:var(--gray800);min-height:100vh;}
 .page{display:none;min-height:100vh;}
 .page.active{display:block;}
-#examPage.active{display:flex;flex-direction:column;}
+#examPage.active{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
@@ -208,7 +208,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .esb-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;}
 .esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .esb-st{font-size:12px;flex-shrink:0;}
-.exam-main{flex:1;overflow-y:auto;padding:16px 20px 60px;}
+.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;}
+#exam-content{padding-bottom:20px;}
 .exam-main.drawing{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;overflow-y:hidden;}
 .toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
 .sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
@@ -282,7 +283,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .next-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:11px;font-family:'DM Sans',sans-serif;}
 .next-btn:hover{background:var(--navy);}
 mark{border-radius:2px;padding:0 1px;cursor:pointer;}
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid var(--gray200);padding:8px 16px;display:flex;justify-content:flex-end;gap:9px;z-index:100;}
+.bottom-bar{position:sticky;bottom:0;margin:0 -20px;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid var(--gray200);padding:8px 20px;display:flex;justify-content:flex-end;gap:9px;z-index:100;}
 .suspend-fab{background:#f59e0b;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .end-fab{background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .home-fab-btn{background:var(--navy2);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
@@ -813,8 +814,15 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   </div>
   <div class="exam-layout">
     <div class="exam-sb hidden" id="exam-sb"><div class="esb-inner"><div class="esb-title">Questions</div><div id="esb-list"></div></div></div>
-    <div style="flex:1;overflow:hidden;">
-      <div class="exam-main" id="exam-main"></div>
+    <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
+      <div class="exam-main" id="exam-main">
+        <div id="exam-content"></div>
+        <div class="bottom-bar" id="exam-bb">
+          <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">🏠 Home</button>
+          <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">⏸ Suspend</button>
+          <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">■ End Exam</button>
+        </div>
+      </div>
     </div>
     <!-- Canvas is fixed-position overlay, outside any clipping container -->
     <canvas id="draw-canvas" style="position:fixed;pointer-events:none;z-index:150;touch-action:none;display:none;"></canvas>
@@ -834,11 +842,6 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="draw-sep"></div>
     <button class="draw-tool-btn" onclick="clearDrawing()" title="Clear all">🗑</button>
     <button class="draw-tool-btn" onclick="undoDrawing()" title="Undo">↩</button>
-  </div>
-  <div class="bottom-bar" id="exam-bb">
-    <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">🏠 Home</button>
-    <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">⏸ Suspend</button>
-    <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">■ End Exam</button>
   </div>
 </div>
 
@@ -1242,7 +1245,7 @@ Educational objective: Aortic regurgitation presents with..."></textarea>
 body{font-family:'DM Sans',sans-serif;background:var(--gray50);color:var(--gray800);min-height:100vh;}
 .page{display:none;min-height:100vh;}
 .page.active{display:block;}
-#examPage.active{display:flex;flex-direction:column;}
+#examPage.active{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
@@ -1419,7 +1422,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .esb-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;}
 .esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .esb-st{font-size:12px;flex-shrink:0;}
-.exam-main{flex:1;overflow-y:auto;padding:16px 20px 60px;}
+.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;}
+#exam-content{padding-bottom:20px;}
 .toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
 .sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
 .bc0{background:#eff6ff;color:#1d4ed8;}.bc1{background:#fdf2f8;color:#9d174d;}.bc2{background:#f0fdf4;color:#15803d;}
@@ -1492,7 +1496,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .next-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:11px;font-family:'DM Sans',sans-serif;}
 .next-btn:hover{background:var(--navy);}
 mark{border-radius:2px;padding:0 1px;cursor:pointer;}
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid var(--gray200);padding:8px 16px;display:flex;justify-content:flex-end;gap:9px;z-index:100;}
+.bottom-bar{position:sticky;bottom:0;margin:0 -20px;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid var(--gray200);padding:8px 20px;display:flex;justify-content:flex-end;gap:9px;z-index:100;}
 .suspend-fab{background:#f59e0b;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .end-fab{background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .home-fab-btn{background:var(--navy2);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
@@ -1858,12 +1862,14 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   </div>
   <div class="exam-layout">
     <div class="exam-sb hidden" id="exam-sb"><div class="esb-inner"><div class="esb-title">Questions</div><div id="esb-list"></div></div></div>
-    <div class="exam-main" id="exam-main"></div>
-  </div>
-  <div class="bottom-bar" id="exam-bb">
-    <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">🏠 Home</button>
-    <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">⏸ Suspend</button>
-    <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">■ End Exam</button>
+    <div class="exam-main" id="exam-main">
+      <div id="exam-content"></div>
+      <div class="bottom-bar" id="exam-bb">
+        <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">🏠 Home</button>
+        <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">⏸ Suspend</button>
+        <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">■ End Exam</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3519,7 +3525,7 @@ async function eRenderQ(){
   }
   const qTV=isAns?efmt(ES.qTimes[cur]):efmt(qSec);
   const catLabel=q.category||q.category_id||'General';
-  document.getElementById('exam-main').innerHTML=`
+  document.getElementById('exam-content').innerHTML=`
     <div class="toolbar">
       <span class="sec-badge ${eSecBadge(q)}">${catLabel}</span>
       <div class="hl-panel${eHLMode?' on':''}" id="ehlp">
@@ -3705,7 +3711,7 @@ function eRenderResults(){
   else if(pct>=50){msg='Keep Going!';sub='Review the missed questions below.';col='#d97706';emoji='💪';}
   else{msg="Don't Give Up!";sub='Practice makes perfect. Review and retry!';col='#dc2626';emoji='📖';}
   const avgT=ES.qTimes.filter(t=>t>0).length>0?Math.round(ES.qTimes.filter(t=>t>0).reduce((a,b)=>a+b,0)/ES.qTimes.filter(t=>t>0).length):0;
-  document.getElementById('exam-main').innerHTML=`
+  document.getElementById('exam-content').innerHTML=`
     <div class="res-card">
       <div class="res-top">
         <div style="font-size:52px;margin-bottom:4px;">${emoji}</div>
