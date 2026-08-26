@@ -484,7 +484,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
   --uw-edu-border:#4a5a9e;
 }
 
-#examPage[data-theme="uworld"] .topbar{background:var(--uw-header-bg);padding:10px 18px;flex-wrap:wrap;row-gap:4px;}
+#examPage[data-theme="uworld"] .topbar{background:var(--uw-header-bg);padding:13px 20px;flex-wrap:wrap;row-gap:4px;}
 #examPage[data-theme="uworld"] .tb-title{color:var(--uw-header-text);font-weight:700;font-size:14px;}
 #examPage[data-theme="uworld"] .score-chip{display:none;}
 /* Old dual Exam/Question timer boxes are replaced by the single Block Time Elapsed
@@ -523,13 +523,13 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
    now sits inline inside the single topbar row instead of its own full-width bar — hidden entirely outside uworld */
 .uw-toolrow{display:none;}
 #examPage[data-theme="uworld"] .uw-toolrow{display:flex;align-items:center;gap:2px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
-.uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text);font-weight:700;cursor:pointer;padding:3px 7px;border-radius:5px;font-size:10.5px;font-family:'DM Sans',sans-serif;line-height:1.15;white-space:nowrap;}
+.uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text);font-weight:400;cursor:pointer;padding:3px 7px;border-radius:5px;font-size:10.5px;font-family:'DM Sans',sans-serif;line-height:1.15;white-space:nowrap;}
 .uw-tool-btn:hover,.uw-tool-btn.on{background:rgba(255,255,255,0.14);color:var(--uw-header-text);}
 .uw-tool-icon{font-size:18px;line-height:1;font-weight:700;}
 /* The abacus/calculator emoji renders visually smaller than the other toolbar glyphs at
    the same font-size, so it needs a larger size (and a touch of negative margin to keep
    the row's baseline alignment tidy) to actually LOOK the same size as its neighbors. */
-.uw-tool-icon-calc{font-size:27px;margin-top:-5px;margin-bottom:-4px;}
+.uw-tool-icon-calc{font-size:27px;font-weight:400;margin-top:-5px;margin-bottom:-4px;}
 
 /* Compact question sidebar, toggled via the new header hamburger (.uw-hamburger) —
    collapses to 0 width with the same transition the base .exam-sb rule already
