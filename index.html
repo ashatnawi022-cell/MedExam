@@ -3896,6 +3896,15 @@ document.addEventListener('touchend',doHighlight);
 function eTogExcl(i,ev){
   if(ev){ev.stopPropagation();ev.preventDefault();}
   if(ES.results[ES.cur]!==null)return;
+  // A click that's really the tail end of a text-selecting drag (the user dragging across
+  // this choice's text to highlight it) still fires a click on this element's mouseup --
+  // and since eTogExcl re-renders the whole choice for UWorld, that click would silently
+  // wipe out the selection/highlight the user was just making. doHighlight() (bound to the
+  // same mouseup) only clears window.getSelection() inside its own setTimeout, so at click
+  // time a real drag-selection is still non-collapsed here; a plain press-to-strike never
+  // leaves one behind. Bail out rather than striking in that case.
+  const sel=window.getSelection();
+  if(sel&&!sel.isCollapsed&&sel.toString().trim())return;
   const excl=ES.excluded[ES.cur];
   const wasSel=ES.mySelections[ES.cur]===i;
   if(excl.has(i))excl.delete(i);
