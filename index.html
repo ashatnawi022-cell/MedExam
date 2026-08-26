@@ -501,8 +501,9 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 /* Flag/Mark moved up next to the Item ID, matching the mockup — the bottom-row Flag
    button (#flag-btn-q) is hidden for this theme instead of duplicated. */
 .uw-flag-header-btn{display:none;}
-#examPage[data-theme="uworld"] .uw-flag-header-btn{display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text-dim);padding:0;flex-shrink:0;}
+#examPage[data-theme="uworld"] .uw-flag-header-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text-dim);padding:0;flex-shrink:0;}
 #examPage[data-theme="uworld"] .uw-flag-header-btn.flagged{color:var(--uw-flag);}
+.uw-flag-icon{font-size:17px;line-height:1;}
 #examPage[data-theme="uworld"] #flag-btn-q{display:none;}
 
 /* The header is one compact row for UWorld: hamburger + Item X of Y (topbar-left) —
@@ -511,7 +512,8 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
    that ate up page space. */
 .uw-topbar-center{display:none;}
 #examPage[data-theme="uworld"] .uw-topbar-center{display:flex;align-items:center;gap:10px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);}
-.uw-nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;color:var(--uw-header-text);padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:0.2px;}
+.uw-nav-btn{display:flex;flex-direction:column;align-items:center;gap:1px;background:transparent;border:none;border-radius:5px;color:var(--uw-header-text);padding:2px 14px;font-size:10.5px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:0.2px;}
+.uw-nav-triangle{font-size:19px;line-height:1;}
 .uw-nav-btn:hover:not(:disabled){background:rgba(255,255,255,0.14);}
 .uw-nav-btn:disabled{opacity:0.35;cursor:default;}
 #examPage[data-theme="uworld"] .nav-strip{display:none;}
@@ -532,7 +534,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 /* Compact question sidebar, toggled via the new header hamburger (.uw-hamburger) —
    collapses to 0 width with the same transition the base .exam-sb rule already
    defines, rather than being forced permanently open. */
-#examPage[data-theme="uworld"] .exam-sb{width:64px;background:var(--uw-sidebar-bg);border-right:1px solid var(--uw-border);padding:4px 0;}
+#examPage[data-theme="uworld"] .exam-sb{width:76px;background:var(--uw-sidebar-bg);border-right:1px solid var(--uw-border);padding:4px 0;}
 #examPage[data-theme="uworld"] .exam-sb.hidden{width:0;padding:0;overflow:hidden;}
 #examPage[data-theme="uworld"] .esb-inner{padding:0;min-width:0;}
 #examPage[data-theme="uworld"] .esb-title{display:none;}
@@ -1005,12 +1007,12 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
     <div class="topbar-left">
       <button class="uw-hamburger" onclick="toggleESB()" title="Show/hide question list">☰</button>
       <div class="tb-title" id="tb-title">Exam</div>
-      <button class="uw-flag-header-btn" id="uw-flag-btn" onclick="flagQ(ES.cur)" title="Bookmark for later">⚑</button>
+      <button class="uw-flag-header-btn" id="uw-flag-btn" onclick="flagQ(ES.cur)" title="Bookmark for later"><span class="uw-flag-icon">⚑</span><span>Mark</span></button>
       <span class="score-chip" id="score-chip">Score: 0 / 0</span>
     </div>
     <div class="uw-topbar-center" id="uw-topbar-center">
-      <button class="uw-nav-btn" id="uw-prev-btn" onclick="eNav(ES.cur-1)" disabled>← Previous</button>
-      <button class="uw-nav-btn" id="uw-next-btn" onclick="eNav(ES.cur+1)">Next →</button>
+      <button class="uw-nav-btn" id="uw-prev-btn" onclick="eNav(ES.cur-1)" disabled><span class="uw-nav-triangle">◀</span><span>Previous</span></button>
+      <button class="uw-nav-btn" id="uw-next-btn" onclick="eNav(ES.cur+1)"><span class="uw-nav-triangle">▶</span><span>Next</span></button>
     </div>
     <div class="uw-toolrow" id="uw-toolrow">
       <button class="uw-tool-btn" onclick="uwToggleFullscreen()" title="Full Screen"><span class="uw-tool-icon">⛶</span><span>Full Screen</span></button>
