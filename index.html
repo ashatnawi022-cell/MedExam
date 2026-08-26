@@ -498,6 +498,13 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 .uw-hamburger{display:none;}
 #examPage[data-theme="uworld"] .uw-hamburger{display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text);padding:0;flex-shrink:0;}
 
+/* Flag/Mark moved up next to the Item ID, matching the mockup — the bottom-row Flag
+   button (#flag-btn-q) is hidden for this theme instead of duplicated. */
+.uw-flag-header-btn{display:none;}
+#examPage[data-theme="uworld"] .uw-flag-header-btn{display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text-dim);padding:0;flex-shrink:0;}
+#examPage[data-theme="uworld"] .uw-flag-header-btn.flagged{color:var(--uw-flag);}
+#examPage[data-theme="uworld"] #flag-btn-q{display:none;}
+
 /* The header is one compact row for UWorld: hamburger + Item X of Y (topbar-left) —
    Prev/Next (uw-topbar-center, true-centered on the bar) — icon toolbar (uw-toolrow),
    replacing the old stacked topbar+nav-strip+toolrow (three separate full-width bars)
@@ -604,6 +611,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 #examPage[data-theme="uworld"] .verdict-ok{background:var(--uw-correct-bg);color:var(--uw-correct);border:1px solid #bfe3c4;}
 #examPage[data-theme="uworld"] .verdict-bad{background:var(--uw-incorrect-bg);color:var(--uw-incorrect);border:1px solid #f3c6c1;}
 #examPage[data-theme="uworld"] .exp-sec-title{color:var(--uw-text-secondary);}
+#examPage[data-theme="uworld"] .hl-hint{display:none!important;}
 #examPage[data-theme="uworld"] .exp-body{color:var(--uw-text-primary);}
 #examPage[data-theme="uworld"] .oa-item.oa-right{background:rgba(47,158,68,0.08);}
 #examPage[data-theme="uworld"] .oa-item.oa-bad{background:transparent;}
@@ -997,6 +1005,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
     <div class="topbar-left">
       <button class="uw-hamburger" onclick="toggleESB()" title="Show/hide question list">☰</button>
       <div class="tb-title" id="tb-title">Exam</div>
+      <button class="uw-flag-header-btn" id="uw-flag-btn" onclick="flagQ(ES.cur)" title="Bookmark for later">⚑</button>
       <span class="score-chip" id="score-chip">Score: 0 / 0</span>
     </div>
     <div class="uw-topbar-center" id="uw-topbar-center">
@@ -3909,25 +3918,58 @@ function eTogExcl(i,ev){
   const wasSel=ES.mySelections[ES.cur]===i;
   if(excl.has(i))excl.delete(i);
   else{excl.add(i);if(wasSel)ES.mySelections[ES.cur]=null;}
-  // UWorld's strike-through badge/line-through are only inserted into the choice markup
-  // at render time (not toggled by a CSS class alone), so re-render there; the default
-  // theme keeps the original lightweight DOM patch (no full re-render on every click).
-  if(examTheme==='uworld'){eRenderQ();return;}
   const opt=document.getElementById('eopt'+i);
-  opt.classList.toggle('excl',excl.has(i));
-  const btn=opt.querySelector('.excl-btn');if(btn)btn.textContent=excl.has(i)?'↩':'✕';
-  if(excl.has(i)&&wasSel){opt.classList.remove('sel-opt');const sb=document.getElementById('esubBtn');if(sb)sb.disabled=true;}
+  const isExcl=excl.has(i);
+  opt.classList.toggle('excl',isExcl);
+  // UWorld's strike-through/badge are patched directly here (instead of a full eRenderQ())
+  // so striking one choice never wipes out highlights the user has made anywhere else on
+  // the question — a full re-render throws away every <mark> since none of this content is
+  // re-diffed, just replaced wholesale.
+  if(examTheme==='uworld'){
+    const choiceText=opt.querySelector('.uw-choice-text');
+    const optTxt=choiceText.querySelector('.opt-txt');
+    optTxt.style.textDecoration=isExcl?'line-through':'none';
+    let badge=choiceText.querySelector('.uw-strike-badge');
+    if(isExcl&&!badge){
+      badge=document.createElement('span');
+      badge.className='uw-strike-badge';
+      badge.textContent='✕';
+      choiceText.appendChild(badge);
+    }else if(!isExcl&&badge){
+      badge.remove();
+    }
+    if(isExcl&&wasSel){
+      opt.classList.remove('sel-opt');
+      const radio=opt.querySelector('.uw-radio');if(radio)radio.innerHTML='';
+      const sb=document.getElementById('esubBtn');if(sb)sb.disabled=true;
+    }
+    return;
+  }
+  const btn=opt.querySelector('.excl-btn');if(btn)btn.textContent=isExcl?'↩':'✕';
+  if(isExcl&&wasSel){opt.classList.remove('sel-opt');const sb=document.getElementById('esubBtn');if(sb)sb.disabled=true;}
 }
 
 function ePickOpt(i,ev){
   if(ES.results[ES.cur]!==null)return;
   const excl=ES.excluded[ES.cur];if(excl.has(i))return;
   ES.mySelections[ES.cur]=i;
-  // UWorld shows selection via the dedicated radio dot, which — like the strike badge
-  // above — only exists in the rendered markup when the choice is actually selected, so
-  // it needs a re-render rather than a class toggle.
-  if(examTheme==='uworld'){eRenderQ();return;}
-  document.querySelectorAll('.opt').forEach((el,idx)=>{if(!excl.has(idx))el.classList.toggle('sel-opt',idx===i);});
+  // Same reasoning as eTogExcl above: patch the radio dot directly for UWorld rather than
+  // a full re-render, so selecting a choice never wipes out existing highlights.
+  if(examTheme==='uworld'){
+    document.querySelectorAll('.opt').forEach((el,idx)=>{
+      const radio=el.querySelector('.uw-radio');
+      if(!radio)return;
+      if(idx===i){
+        el.classList.add('sel-opt');
+        radio.innerHTML='<span class="uw-radio-dot" style="background:var(--uw-radio-fill);"></span>';
+      }else if(!excl.has(idx)){
+        el.classList.remove('sel-opt');
+        radio.innerHTML='';
+      }
+    });
+  }else{
+    document.querySelectorAll('.opt').forEach((el,idx)=>{if(!excl.has(idx))el.classList.toggle('sel-opt',idx===i);});
+  }
   const subBtn=document.getElementById('esubBtn');
   if(subBtn){
     subBtn.disabled=false;
@@ -4111,7 +4153,7 @@ async function eRenderQ(){
     }
   }
   const qTV=isAns?efmt(ES.qTimes[cur]):efmt(qSec);
-  const catLabel=q.category||q.category_id||'General';
+  const catLabel=q.category||'General'; // never fall back to the raw category_id UUID
   document.getElementById('exam-content').innerHTML=`
     <div class="toolbar">
       <span class="sec-badge ${eSecBadge(q)}">${catLabel}</span>
@@ -4132,7 +4174,7 @@ async function eRenderQ(){
       <div class="qtext hlable" id="qtext-content"></div>
       <div class="opts">${optsHtml}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-        ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>Submit Answer</button>`:'<div></div>'}
+        ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>${uw?'Submit':'Submit Answer'}</button>`:'<div></div>'}
         <div style="display:flex;gap:6px;align-items:center;">
           <button class="flag-btn" id="flag-btn-q" onclick="flagQ(${cur})" title="Bookmark for later">🚩 Flag</button>
           ${isAns?`<button class="flag-btn" onclick="reportQ(${cur})" title="Report an issue with this question" style="font-size:11px;">⚑ Report</button>`:''}
@@ -4151,11 +4193,16 @@ async function eRenderQ(){
   const qtEl=document.getElementById('qtext-content');
   if(qtEl)qtEl.innerHTML=formatQuestionText(q.question_text||'');
   // Update flag button state
+  const isFlagged=ES.flagged&&ES.flagged[cur]===true;
   const flagBtn=document.getElementById('flag-btn-q');
   if(flagBtn){
-    const isFlagged=ES.flagged&&ES.flagged[cur]===true;
     flagBtn.className='flag-btn'+(isFlagged?' flagged':'');
     flagBtn.textContent=isFlagged?'🚩 Flagged':'🚩 Flag';
+  }
+  const uwFlagBtn=document.getElementById('uw-flag-btn');
+  if(uwFlagBtn){
+    uwFlagBtn.className='uw-flag-header-btn'+(isFlagged?' flagged':'');
+    uwFlagBtn.title=isFlagged?'Bookmarked — click to remove':'Bookmark for later';
   }
   // Start (or, on a same-question re-render, just resume displaying) the timed countdown.
   if(ES.timed&&ES.results[cur]===null){resumeOrStartTimedCountdown();}
@@ -4410,6 +4457,8 @@ async function flagQ(qIdx){
   eBuildSB();
   var flagBtn=document.getElementById('flag-btn-q');
   if(flagBtn){flagBtn.className='flag-btn'+(ES.flagged[qIdx]===true?' flagged':'');flagBtn.textContent=ES.flagged[qIdx]===true?'🚩 Flagged':'🚩 Flag';}
+  var uwFlagBtn=document.getElementById('uw-flag-btn');
+  if(uwFlagBtn){uwFlagBtn.className='uw-flag-header-btn'+(ES.flagged[qIdx]===true?' flagged':'');uwFlagBtn.title=ES.flagged[qIdx]===true?'Bookmarked — click to remove':'Bookmark for later';}
 }
 // Load flagged questions from localStorage for current user
 function loadFlaggedIds(){
