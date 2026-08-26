@@ -217,8 +217,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .esb-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;}
 .esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .esb-st{font-size:12px;flex-shrink:0;}
-.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;}
-#exam-content{padding-bottom:20px;}
+.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;display:flex;flex-direction:column;}
+#exam-content{padding-bottom:20px;flex:1;}
 .exam-main.drawing{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;overflow-y:hidden;}
 .toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
 .sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
@@ -291,7 +291,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .takehome{background:#fffbeb;border-radius:8px;padding:9px 12px;font-size:15px;line-height:1.7;color:#78350f;border-left:3px solid #fbbf24;}
 .next-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:11px;font-family:'DM Sans',sans-serif;}
 .next-btn:hover{background:var(--navy);}
-mark{border-radius:2px;padding:0 1px;cursor:pointer;}
+mark{border-radius:2px;padding:0;cursor:pointer;}
 .bottom-bar{position:sticky;bottom:0;margin:0 -20px;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid var(--gray200);padding:8px 20px;display:flex;justify-content:flex-end;gap:9px;z-index:100;}
 .suspend-fab{background:#f59e0b;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .end-fab{background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
@@ -464,6 +464,9 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   --uw-incorrect-bg:#fbebeb;
   --uw-flag:#d97706;
   --uw-neutral:#9aa0ae;
+  --uw-radio-border:#8890a0;
+  --uw-radio-fill:#1f2430;
+  --uw-highlight-bg:#fff3a3;
   --uw-percent-bg:#f1f2f6;
   --uw-percent-text:#6b7280;
   --uw-metric-result-bg:#fbebeb;
@@ -488,12 +491,19 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
    so this pair of elements no longer needs to render at all under this theme. */
 #examPage[data-theme="uworld"] .timers{display:none;}
 
-/* The header is one compact row for UWorld: Item X of Y (topbar-left) — Prev/Next
-   (uw-topbar-center) — icon toolbar (uw-toolrow), replacing the old stacked
-   topbar+nav-strip+toolrow (three separate full-width bars) that ate up page space. */
+/* Hamburger next to "Item X of Y": toggles the question-list sidebar open/closed,
+   reusing the same toggleESB()/#exam-sb.hidden mechanism the default theme's
+   "☰ List" button already drives, just styled/positioned to match the mockup. */
+.uw-hamburger{display:none;}
+#examPage[data-theme="uworld"] .uw-hamburger{display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text);padding:0;flex-shrink:0;}
+
+/* The header is one compact row for UWorld: hamburger + Item X of Y (topbar-left) —
+   Prev/Next (uw-topbar-center, true-centered on the bar) — icon toolbar (uw-toolrow),
+   replacing the old stacked topbar+nav-strip+toolrow (three separate full-width bars)
+   that ate up page space. */
 .uw-topbar-center{display:none;}
-#examPage[data-theme="uworld"] .uw-topbar-center{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.uw-nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;color:var(--uw-header-text);padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.2px;}
+#examPage[data-theme="uworld"] .uw-topbar-center{display:flex;align-items:center;gap:10px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);}
+.uw-nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;color:var(--uw-header-text);padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:0.2px;}
 .uw-nav-btn:hover:not(:disabled){background:rgba(255,255,255,0.14);}
 .uw-nav-btn:disabled{opacity:0.35;cursor:default;}
 #examPage[data-theme="uworld"] .nav-strip{display:none;}
@@ -507,10 +517,11 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .uw-tool-btn:hover,.uw-tool-btn.on{background:rgba(255,255,255,0.14);color:var(--uw-header-text);}
 .uw-tool-icon{font-size:14px;line-height:1;}
 
-/* always-visible compact question sidebar (UWorld never lets you collapse it) — now
-   a light sidebar with a border, matching the user's second design pass */
-#examPage[data-theme="uworld"] .exam-sb{width:64px!important;background:var(--uw-sidebar-bg);border-right:1px solid var(--uw-border);padding:4px 0;}
-#examPage[data-theme="uworld"] .exam-sb.hidden{width:64px!important;overflow-y:auto;}
+/* Compact question sidebar, toggled via the new header hamburger (.uw-hamburger) —
+   collapses to 0 width with the same transition the base .exam-sb rule already
+   defines, rather than being forced permanently open. */
+#examPage[data-theme="uworld"] .exam-sb{width:64px;background:var(--uw-sidebar-bg);border-right:1px solid var(--uw-border);padding:4px 0;}
+#examPage[data-theme="uworld"] .exam-sb.hidden{width:0;padding:0;overflow:hidden;}
 #examPage[data-theme="uworld"] .esb-inner{padding:0;min-width:0;}
 #examPage[data-theme="uworld"] .esb-title{display:none;}
 .uw-sb-item{display:flex;align-items:center;gap:6px;padding:5px 9px;font-size:12px;font-weight:600;cursor:pointer;border-left:3px solid transparent;color:var(--uw-sidebar-text);}
@@ -523,24 +534,40 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 
 #examPage[data-theme="uworld"] .exam-main{background:var(--uw-page-bg);}
 #examPage[data-theme="uworld"] .qcard{background:var(--uw-page-bg);border:none;border-radius:0;box-shadow:none;}
-#examPage[data-theme="uworld"] .qnum{color:var(--uw-text-secondary);}
-#examPage[data-theme="uworld"] .q-t-chip{background:#eef2f5;color:var(--uw-text-secondary);border-radius:4px;}
+/* "Q# of ##" and the plain running per-question timer duplicate what's already shown
+   in the header ("Item X of Y") and the bottom block bar (Block Time Elapsed) — hidden
+   here. The timed-mode countdown chip is NOT part of that duplication (it exists nowhere
+   else), so it's kept, just moved to sit directly under the stem instead of inside this. */
+#examPage[data-theme="uworld"] .qnum{display:none;}
+#examPage[data-theme="uworld"] .q-t-chip{display:none;}
+#examPage[data-theme="uworld"] .uw-timed-countdown-wrap{display:block;margin-bottom:10px;}
 #examPage[data-theme="uworld"] .qtext{color:var(--uw-text-primary);}
 #examPage[data-theme="uworld"] .sec-badge{background:#eef2f5!important;color:var(--uw-text-secondary)!important;border-radius:4px;}
 
 #examPage[data-theme="uworld"] .opts{gap:2px;}
 #examPage[data-theme="uworld"] .opt{border:none;border-radius:4px;background:transparent;}
 #examPage[data-theme="uworld"] .opt:hover:not(:disabled){background:#f4f5f9;}
-/* Plain "A." style letters — no circle/border, matching the revised mockup */
-#examPage[data-theme="uworld"] .opt .L{width:22px;height:auto;min-width:22px;border-radius:0;border:none;display:inline-flex;align-items:center;justify-content:center;color:var(--uw-text-secondary);font-size:14px;font-weight:600;background:transparent;}
+/* Plain "A." style letters — no circle/border, matching the revised mockup. Selection is
+   shown only by the dedicated radio circle (.uw-radio) now, never by recoloring the letter
+   or filling the row — so no .sel-opt override is needed here at all. */
+#examPage[data-theme="uworld"] .opt .L{width:20px;height:auto;min-width:20px;border-radius:0;border:none;display:inline-flex;align-items:center;justify-content:center;color:var(--uw-text-secondary);font-size:14px;font-weight:600;background:transparent;flex-shrink:0;}
 #examPage[data-theme="uworld"] .opt .L::after{content:'.';}
-#examPage[data-theme="uworld"] .opt.sel-opt{background:#eef1fa;}
-#examPage[data-theme="uworld"] .opt.sel-opt .L{color:var(--uw-header-bg);font-weight:700;}
-#examPage[data-theme="uworld"] .opt.correct,#examPage[data-theme="uworld"] .opt.show-ans{background:transparent!important;border-color:transparent!important;}
-#examPage[data-theme="uworld"] .opt.correct .L,#examPage[data-theme="uworld"] .opt.show-ans .L{color:var(--uw-correct)!important;background:transparent!important;}
-#examPage[data-theme="uworld"] .opt.wrong{background:transparent!important;border-color:transparent!important;}
-#examPage[data-theme="uworld"] .opt.wrong .L{color:var(--uw-text-secondary)!important;background:transparent!important;}
-#examPage[data-theme="uworld"] .opt.excl{background:transparent;border-color:transparent;}
+#examPage[data-theme="uworld"] .opt.correct,#examPage[data-theme="uworld"] .opt.show-ans,#examPage[data-theme="uworld"] .opt.wrong,#examPage[data-theme="uworld"] .opt.sel-opt,#examPage[data-theme="uworld"] .opt.excl{background:transparent!important;border-color:transparent!important;}
+/* Item A: never dim/gray answer text once a question is answered (disabled) — some
+   browsers apply default opacity/graying to disabled buttons and their descendants. */
+#examPage[data-theme="uworld"] .opt:disabled,
+#examPage[data-theme="uworld"] .opt:disabled .opt-txt,
+#examPage[data-theme="uworld"] .opt:disabled .L,
+#examPage[data-theme="uworld"] .opt:disabled .uw-choice-text{opacity:1!important;-webkit-text-fill-color:currentColor!important;}
+#examPage[data-theme="uworld"] .opt-txt{color:var(--uw-text-primary)!important;}
+
+/* Item C/D: dedicated selection radio (left of the letter) — filled with a plain dark
+   dot while choosing, recolored green/red once graded; separate from the letter/text
+   click target below, which toggles a strike-through instead of selecting. */
+.uw-radio{width:20px;height:20px;border-radius:50%;flex-shrink:0;border:1.5px solid var(--uw-radio-border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+.uw-radio-dot{width:10px;height:10px;border-radius:50%;display:block;}
+.uw-choice-text{flex:1;display:flex;align-items:center;gap:8px;cursor:pointer;min-width:0;}
+.uw-strike-badge{width:14px;height:14px;border-radius:50%;background:var(--uw-incorrect);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .uw-opt-mark{width:18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
 .uw-opt-mark.uw-check{color:var(--uw-correct);}
 .uw-opt-mark.uw-x{color:var(--uw-incorrect);}
@@ -589,6 +616,12 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .uw-block-tutor{font-size:9px;color:var(--uw-header-text-dim);letter-spacing:0.06em;margin-top:1px;}
 .uw-block-actions{display:flex;align-items:center;gap:6px;}
 .uw-block-end{color:#ff9b9b;}
+
+/* Item H: official UWorld-style typography stack for every element under this theme —
+   !important + the #id[attr] specificity beats every explicit 'DM Sans' declaration
+   elsewhere in the base stylesheet regardless of source order. */
+#examPage[data-theme="uworld"],#examPage[data-theme="uworld"] *{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif!important;}
+
 /* -- END EXAM THEMES -- */
 /* -- END CSS -- */
 /* -- SUPPORT CHAT -- */
@@ -953,6 +986,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 <div id="examPage" class="page">
   <div class="topbar">
     <div class="topbar-left">
+      <button class="uw-hamburger" onclick="toggleESB()" title="Show/hide question list">☰</button>
       <div class="tb-title" id="tb-title">Exam</div>
       <span class="score-chip" id="score-chip">Score: 0 / 0</span>
     </div>
@@ -1632,8 +1666,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .esb-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;}
 .esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .esb-st{font-size:12px;flex-shrink:0;}
-.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;}
-#exam-content{padding-bottom:20px;}
+.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;display:flex;flex-direction:column;}
+#exam-content{padding-bottom:20px;flex:1;}
 .toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
 .sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
 .bc0{background:#eff6ff;color:#1d4ed8;}.bc1{background:#fdf2f8;color:#9d174d;}.bc2{background:#f0fdf4;color:#15803d;}
@@ -1705,7 +1739,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .takehome{background:#fffbeb;border-radius:8px;padding:9px 12px;font-size:15px;line-height:1.7;color:#78350f;border-left:3px solid #fbbf24;}
 .next-btn{background:var(--navy2);color:white;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:11px;font-family:'DM Sans',sans-serif;}
 .next-btn:hover{background:var(--navy);}
-mark{border-radius:2px;padding:0 1px;cursor:pointer;}
+mark{border-radius:2px;padding:0;cursor:pointer;}
 .bottom-bar{position:sticky;bottom:0;margin:0 -20px;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid var(--gray200);padding:8px 20px;display:flex;justify-content:flex-end;gap:9px;z-index:100;}
 .suspend-fab{background:#f59e0b;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .end-fab{background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
@@ -3577,6 +3611,14 @@ function applyExamTheme(){
     b.classList.toggle('btn-primary',on);
     b.classList.toggle('btn-secondary',!on);
   });
+  // UWorld's sidebar starts open (toggled via the header hamburger, not the default
+  // theme's collapsible-overlay "☰ List" button) — this only runs once, at page entry,
+  // since mid-exam theme switching no longer exists.
+  if(examTheme==='uworld'){
+    eSBOpen=true;
+    const sb=document.getElementById('exam-sb');
+    if(sb)sb.classList.remove('hidden');
+  }
   // Sidebar layout and choice-row markup (check/X icons, % tags) differ between
   // themes, so if an exam is already on screen, re-render it live on switch.
   if(typeof ES!=='undefined'&&ES){
@@ -3750,40 +3792,123 @@ function eToggleHL(){
   const p=document.getElementById('ehlp');if(p)p.classList.toggle('on',eHLMode);
   const h=document.getElementById('ehlhint');if(h)h.classList.toggle('on',eHLMode);
   const uwHl=document.getElementById('uw-tool-hl');if(uwHl)uwHl.classList.toggle('on',eHLMode);
-  document.querySelectorAll('mark').forEach(m=>m.style.backgroundColor=eHLMode?(m.dataset.c||HLCOLS[0]):'transparent');
+  document.querySelectorAll('mark').forEach(m=>{
+    const c=eHLMode?(m.dataset.c||HLCOLS[0]):'transparent';
+    m.style.backgroundColor=c;
+    m.style.boxShadow=eHLMode?('2px 0 0 '+c+', -2px 0 0 '+c):'none';
+  });
 }
 function eSetSwatch(c,i){eHLC=c;document.querySelectorAll('.swatch').forEach((s,j)=>s.classList.toggle('sel',j===i));}
+// Character offset within `container`'s flattened text, right at (node,offset) — works
+// uniformly whether node is a text node or an element, by measuring how much plain text
+// a Range from the very start of the container up to that point serializes to.
+function hlOffsetBefore(container,node,offset){
+  const r=document.createRange();
+  r.selectNodeContents(container);
+  try{r.setEnd(node,offset);}catch(e){return null;}
+  return r.toString().length;
+}
+// Same idea, but for locating an existing element (a <mark>) by its position rather than
+// a Range boundary — the offset right before `node` starts.
+function hlOffsetOfNode(container,node){
+  const r=document.createRange();
+  r.selectNodeContents(container);
+  r.setEndBefore(node);
+  return r.toString().length;
+}
+// Walks only the text nodes (ignores element boundaries, so it works regardless of any
+// <mark>/<strong>/<em>/etc nesting) to turn a character offset back into a DOM position.
+function hlPositionAtOffset(container,targetOffset){
+  const walker=document.createTreeWalker(container,NodeFilter.SHOW_TEXT);
+  let total=0,n=null,last=null;
+  while(n=walker.nextNode()){
+    const len=n.textContent.length;
+    if(total+len>=targetOffset)return{node:n,offset:targetOffset-total};
+    total+=len;last=n;
+  }
+  return last?{node:last,offset:last.textContent.length}:null;
+}
+function hlRemoveMark(ev){
+  if(!eHLMode)return;ev.stopPropagation();
+  const m=this,p=m.parentNode;
+  while(m.firstChild)p.insertBefore(m.firstChild,m);
+  p.removeChild(m);p.normalize();
+}
+function hlRemoveMarkTouch(ev){ev.preventDefault();hlRemoveMark.call(this,ev);}
+function hlPaint(m){m.dataset.c=eHLC;m.style.backgroundColor=eHLC;m.style.cursor='pointer';
+  // Box-shadow "bleed" instead of padding, so painting/removing a highlight never changes
+  // a word's box width (the text-stretching distortion this replaces).
+  m.style.boxShadow='2px 0 0 '+eHLC+', -2px 0 0 '+eHLC;
+  m.addEventListener('click',hlRemoveMark);
+  m.addEventListener('touchend',hlRemoveMarkTouch);
+}
 function doHighlight(ev){
   if(!eHLMode)return;
   if(ev.target.closest('.swatch')||ev.target.closest('.hl-label')||ev.target.closest('.hl-dot'))return;
   setTimeout(function(){
     const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.toString().trim())return;
-    const r=sel.getRangeAt(0);const anc=r.commonAncestorContainer;
-    const inHl=anc.nodeType===3?anc.parentElement.closest('.hlable'):anc.closest&&anc.closest('.hlable');
-    if(!inHl)return;
-    const m=document.createElement('mark');m.dataset.c=eHLC;m.style.backgroundColor=eHLC;m.style.cursor='pointer';
-    try{r.surroundContents(m);}catch(e){sel.removeAllRanges();return;}
-    m.addEventListener('click',function(ev2){if(!eHLMode)return;ev2.stopPropagation();const p=this.parentNode;while(this.firstChild)p.insertBefore(this.firstChild,this);p.removeChild(this);p.normalize();});
-    m.addEventListener('touchend',function(ev2){if(!eHLMode)return;ev2.preventDefault();ev2.stopPropagation();const p=this.parentNode;while(this.firstChild)p.insertBefore(this.firstChild,this);p.removeChild(this);p.normalize();});
+    const r=sel.getRangeAt(0);
+    const startEl=r.startContainer.nodeType===3?r.startContainer.parentElement:r.startContainer;
+    const container=startEl&&startEl.closest?startEl.closest('.hlable'):null;
+    const startContainer=r.startContainer,startOffset=r.startOffset,endContainer=r.endContainer,endOffset=r.endOffset;
     sel.removeAllRanges();
+    if(!container)return;
+    let lo=hlOffsetBefore(container,startContainer,startOffset);
+    let hi=hlOffsetBefore(container,endContainer,endOffset);
+    if(lo==null||hi==null)return;
+    if(lo>hi){const t=lo;lo=hi;hi=t;}
+    if(lo===hi)return;
+    // Dissolve any existing highlight overlapping the new selection first, so dragging
+    // from inside one highlighted word to inside (or past) another automatically merges
+    // the gap between them into one continuous highlight, instead of surroundContents()
+    // throwing on a range that crosses an existing <mark>'s boundary.
+    Array.from(container.querySelectorAll('mark')).forEach(m=>{
+      const mStart=hlOffsetOfNode(container,m);
+      const mEnd=mStart+m.textContent.length;
+      if(mStart<hi&&mEnd>lo){
+        const p=m.parentNode;
+        while(m.firstChild)p.insertBefore(m.firstChild,m);
+        p.removeChild(m);p.normalize();
+      }
+    });
+    const startPos=hlPositionAtOffset(container,lo),endPos=hlPositionAtOffset(container,hi);
+    if(!startPos||!endPos)return;
+    const range=document.createRange();
+    range.setStart(startPos.node,startPos.offset);
+    range.setEnd(endPos.node,endPos.offset);
+    const m=document.createElement('mark');
+    try{range.surroundContents(m);}catch(e){return;}
+    hlPaint(m);
   },10);
 }
 document.addEventListener('mouseup',doHighlight);
 document.addEventListener('touchend',doHighlight);
 
 function eTogExcl(i,ev){
-  ev.stopPropagation();ev.preventDefault();
+  if(ev){ev.stopPropagation();ev.preventDefault();}
   if(ES.results[ES.cur]!==null)return;
-  const excl=ES.excluded[ES.cur];const opt=document.getElementById('eopt'+i);
-  if(excl.has(i)){excl.delete(i);opt.classList.remove('excl');opt.querySelector('.excl-btn').textContent=' ';}
-  else{excl.add(i);opt.classList.add('excl');opt.querySelector('.excl-btn').textContent=' ';
-    if(ES.mySelections[ES.cur]===i){ES.mySelections[ES.cur]=null;opt.classList.remove('sel-opt');const sb=document.getElementById('esubBtn');if(sb)sb.disabled=true;}}
+  const excl=ES.excluded[ES.cur];
+  const wasSel=ES.mySelections[ES.cur]===i;
+  if(excl.has(i))excl.delete(i);
+  else{excl.add(i);if(wasSel)ES.mySelections[ES.cur]=null;}
+  // UWorld's strike-through badge/line-through are only inserted into the choice markup
+  // at render time (not toggled by a CSS class alone), so re-render there; the default
+  // theme keeps the original lightweight DOM patch (no full re-render on every click).
+  if(examTheme==='uworld'){eRenderQ();return;}
+  const opt=document.getElementById('eopt'+i);
+  opt.classList.toggle('excl',excl.has(i));
+  const btn=opt.querySelector('.excl-btn');if(btn)btn.textContent=excl.has(i)?'↩':'✕';
+  if(excl.has(i)&&wasSel){opt.classList.remove('sel-opt');const sb=document.getElementById('esubBtn');if(sb)sb.disabled=true;}
 }
 
 function ePickOpt(i,ev){
   if(ES.results[ES.cur]!==null)return;
   const excl=ES.excluded[ES.cur];if(excl.has(i))return;
   ES.mySelections[ES.cur]=i;
+  // UWorld shows selection via the dedicated radio dot, which — like the strike badge
+  // above — only exists in the rendered markup when the choice is actually selected, so
+  // it needs a re-render rather than a class toggle.
+  if(examTheme==='uworld'){eRenderQ();return;}
   document.querySelectorAll('.opt').forEach((el,idx)=>{if(!excl.has(idx))el.classList.toggle('sel-opt',idx===i);});
   const subBtn=document.getElementById('esubBtn');
   if(subBtn){
@@ -3870,8 +3995,28 @@ async function eRenderQ(){
     const uwMark=uw&&isAns?(i===q.correct_answer?'<span class="uw-opt-mark uw-check">✓</span>':(i===myI?'<span class="uw-opt-mark uw-x">✕</span>':'<span class="uw-opt-mark"></span>')):'';
     const pv=uw&&isAns?pctOf(i):null;
     const uwPct=uw&&isAns?`<span class="uw-opt-pct">${pv!==null?pv+'%':'—'}</span>`:'';
+    if(uw){
+      // Item C/D: the radio circle (left of the letter) is its own click target that
+      // selects the answer; clicking the letter/text instead toggles a strike-through
+      // "eliminate this choice" state — same underlying ES.excluded/eTogExcl feature the
+      // default theme exposes via a separate small ✕ button, just a different click target.
+      let dotHtml='';
+      if(isAns){
+        if(i===q.correct_answer)dotHtml='<span class="uw-radio-dot" style="background:var(--uw-correct);"></span>';
+        else if(i===myI)dotHtml='<span class="uw-radio-dot" style="background:var(--uw-incorrect);"></span>';
+      }else if(myI===i){
+        dotHtml='<span class="uw-radio-dot" style="background:var(--uw-radio-fill);"></span>';
+      }
+      const radioClick=!isAns?` onclick="event.stopPropagation();ePickOpt(${i},event)"`:'';
+      const textClick=!isAns?` onclick="event.stopPropagation();eTogExcl(${i},event)"`:'';
+      const struck=!isAns&&excl.has(i);
+      return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
+        ${uwMark}<span class="uw-radio"${radioClick}>${dotHtml}</span><span class="uw-choice-text"${textClick}><span class="L">${LTRS[i]}</span><span class="opt-txt" style="text-decoration:${struck?'line-through':'none'};">${mdFmtInline(o)}</span>${struck?'<span class="uw-strike-badge">✕</span>':''}</span>${uwPct}
+        ${mediaHtml}
+      </button>`;
+    }
     return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i},event)" ontouchend="if(!this.disabled)ePickOpt(${i},event)" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
-      ${uwMark}<span class="L">${LTRS[i]}</span><span class="opt-txt">${mdFmtInline(o)}</span>${uwPct}
+      <span class="L">${LTRS[i]}</span><span class="opt-txt">${mdFmtInline(o)}</span>
       ${!isAns?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
       ${mediaHtml}
     </button>`;
@@ -3879,7 +4024,7 @@ async function eRenderQ(){
   let expHtml='';
   if(isAns){
     const ok=ES.results[cur];
-    const oaHtml=analysis.map((txt,i)=>txt?`<div class="oa-item ${i===q.correct_answer?'oa-right':'oa-bad'}"><div class="oa-tag">${LTRS[i]}</div><div>${mdFmt(txt)}</div></div>`:'').join('');
+    const oaHtml=analysis.map((txt,i)=>txt?`<div class="oa-item ${i===q.correct_answer?'oa-right':'oa-bad'}"><div class="oa-tag">${LTRS[i]}</div><div class="hlable">${mdFmt(txt)}</div></div>`:'').join('');
     let statsHtml='';
     if(statTotal>0){
       statsHtml=`<div class="exp-sec">
@@ -3929,7 +4074,7 @@ async function eRenderQ(){
       <div class="uw-explain-wrap">
         ${q.explanation?`<div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Explanation</div><div class="exp-body hlable" style="font-size:14px;line-height:1.7;">${mdFmt(q.explanation)}</div>`:''}
         ${oaHtml?`<div class="uw-oa-wrap"><div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
-        ${q.take_home_message?`<div class="uw-edu-card"><div class="uw-edu-title">Educational Objective</div><div class="uw-edu-body">${mdFmt(q.take_home_message)}</div></div>`:''}
+        ${q.take_home_message?`<div class="uw-edu-card"><div class="uw-edu-title">Educational Objective</div><div class="uw-edu-body hlable">${mdFmt(q.take_home_message)}</div></div>`:''}
       </div>
       ${navBtnHtml}`;
     }else{
@@ -3938,7 +4083,7 @@ async function eRenderQ(){
       ${statsHtml}
       ${q.explanation?`<div class="exp-sec"><div class="exp-sec-title">Explanation</div><div class="exp-body hlable">${mdFmt(q.explanation)}</div></div>`:''}
       ${oaHtml?`<div class="exp-sec"><div class="exp-sec-title">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
-      ${q.take_home_message?`<div class="exp-sec"><div class="exp-sec-title">Take-Home Message</div><div class="takehome">${mdFmt(q.take_home_message)}</div></div>`:''}
+      ${q.take_home_message?`<div class="exp-sec"><div class="exp-sec-title">Take-Home Message</div><div class="takehome hlable">${mdFmt(q.take_home_message)}</div></div>`:''}
     </div>
     ${navBtnHtml}`;
     }
@@ -3957,10 +4102,11 @@ async function eRenderQ(){
     <div class="hl-hint${eHLMode?' on':''}" id="ehlhint">Select text to highlight   Click to remove</div>
     <div class="qcard">
       <div class="qnum">Q${cur+1} of ${Q.length}</div>
-      <div class="q-t-chip" style="display:flex;align-items:center;gap:8px;">
+      <div class="q-t-chip">
         <span id="qtinline">${qTV}</span>
-        ${ES.timed&&!isAns?`<span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span>`:''}
+        ${(!uw&&ES.timed&&!isAns)?`<span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span>`:''}
       </div>
+      ${(uw&&ES.timed&&!isAns)?`<div class="uw-timed-countdown-wrap"><span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span></div>`:''}
       <div class="qtext hlable" id="qtext-content"></div>
       <div class="opts">${optsHtml}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
@@ -3973,8 +4119,11 @@ async function eRenderQ(){
       ${expHtml}
     </div>`;
   document.querySelectorAll('mark').forEach(m=>{
-    m.style.backgroundColor=eHLMode?(m.dataset.c||HLCOLS[0]):'transparent';
-    m.addEventListener('click',function(ev){if(!eHLMode)return;ev.stopPropagation();const p=this.parentNode;while(this.firstChild)p.insertBefore(this.firstChild,this);p.removeChild(this);p.normalize();});
+    const c=eHLMode?(m.dataset.c||HLCOLS[0]):'transparent';
+    m.style.backgroundColor=c;
+    m.style.boxShadow=eHLMode?('2px 0 0 '+c+', -2px 0 0 '+c):'none';
+    m.addEventListener('click',hlRemoveMark);
+    m.addEventListener('touchend',hlRemoveMarkTouch);
   });
   // render question text as HTML (supports tables and images)
   const qtEl=document.getElementById('qtext-content');
