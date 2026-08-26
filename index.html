@@ -439,64 +439,142 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .theme-select{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:white;border-radius:6px;padding:4px 8px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;}
 .theme-select option{color:var(--gray800);background:white;}
 
-/* UWorld theme — reskins colors/borders/fonts only; never touches display/position/flex
-   properties so the Phase 1/2 spacing and sticky-bottom-bar fixes stay fully intact. */
-#examPage[data-theme="uworld"] .topbar{background:#13293d;}
-#examPage[data-theme="uworld"] .tb-title{color:#e8edf2;font-weight:600;}
-#examPage[data-theme="uworld"] .score-chip{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);}
-#examPage[data-theme="uworld"] .timer-box{background:#ffffff;border-radius:4px;}
-#examPage[data-theme="uworld"] .t-val{color:#13293d;font-family:'Courier New',monospace;}
-#examPage[data-theme="uworld"] .t-label{color:#5a7185;opacity:1;}
-#examPage[data-theme="uworld"] .theme-select{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25);}
+/* UWorld theme — colors/tokens ported directly from the Claude Design handoff
+   (uworld-exam-interface-mockup, "USMLE Exam Interface.dc.html"). Reskins
+   colors/borders/fonts and adds a few genuinely new pieces (toolbar icon row,
+   always-visible compact sidebar, per-choice check/percent, metrics grid,
+   educational-objective card) that don't exist in the default theme at all —
+   it never touches the qtext font-size/line-height or #exam-bb's sticky
+   positioning, so the Phase 1/2 spacing and sticky-bottom-bar fixes stay
+   fully intact under this theme. */
+#examPage[data-theme="uworld"]{
+  --uw-header-bg:#3d4a80;
+  --uw-header-text:#ffffff;
+  --uw-header-text-dim:rgba(255,255,255,0.72);
+  --uw-page-bg:#ffffff;
+  --uw-text-primary:#1f2430;
+  --uw-text-secondary:#5b6270;
+  --uw-border:#e2e4ea;
+  --uw-sidebar-bg:#3d4a80;
+  --uw-sidebar-text:#d7dcf2;
+  --uw-sidebar-active-bg:#ffe07a;
+  --uw-sidebar-active-text:#3d3416;
+  --uw-sidebar-active-border:#e8a800;
+  --uw-correct:#2f9e44;
+  --uw-correct-bg:#eaf6ec;
+  --uw-incorrect:#d64545;
+  --uw-incorrect-bg:#fbebeb;
+  --uw-flag:#d97706;
+  --uw-neutral:#9aa0ae;
+  --uw-percent-bg:#f1f2f6;
+  --uw-percent-text:#6b7280;
+  --uw-metric-result-bg:#fbebeb;
+  --uw-metric-result-text:#c73b3b;
+  --uw-metric-result-correct-bg:#eaf6ec;
+  --uw-metric-result-correct-text:#2f9e44;
+  --uw-metric-rate-bg:#eaf0fb;
+  --uw-metric-rate-text:#3a63c2;
+  --uw-metric-time-bg:#f2ecfb;
+  --uw-metric-time-text:#7c4fc4;
+  --uw-metric-id-bg:#fdf3e0;
+  --uw-metric-id-text:#b8790f;
+  --uw-edu-bg:#f3f5fb;
+  --uw-edu-border:#3d4a80;
+}
 
-#examPage[data-theme="uworld"] .nav-strip{background:#1c3d5a;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);}
-#examPage[data-theme="uworld"] .sb-tog{background:transparent;border:1px solid rgba(255,255,255,0.3);border-radius:4px;}
+#examPage[data-theme="uworld"] .topbar{background:var(--uw-header-bg);}
+#examPage[data-theme="uworld"] .tb-title{color:var(--uw-header-text);font-weight:600;}
+#examPage[data-theme="uworld"] .score-chip{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:var(--uw-header-text);}
+#examPage[data-theme="uworld"] .timer-box{background:#ffffff;border-radius:4px;}
+#examPage[data-theme="uworld"] .t-val{color:var(--uw-header-bg);font-family:'Courier New',monospace;}
+#examPage[data-theme="uworld"] .t-label{color:var(--uw-text-secondary);opacity:1;}
+#examPage[data-theme="uworld"] .theme-select{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);}
+
+#examPage[data-theme="uworld"] .nav-strip{background:var(--uw-header-bg);border-top:1px solid rgba(255,255,255,0.1);border-bottom:none;}
+#examPage[data-theme="uworld"] #esb-toggle-btn{display:none;}
+#examPage[data-theme="uworld"] .sb-tog{background:transparent;border:1px solid rgba(255,255,255,0.3);border-radius:4px;color:var(--uw-header-text);}
 #examPage[data-theme="uworld"] .sb-tog:hover{background:rgba(255,255,255,0.12);}
-#examPage[data-theme="uworld"] .nav-ebtn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;letter-spacing:0.3px;}
+#examPage[data-theme="uworld"] .nav-ebtn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;letter-spacing:0.3px;color:var(--uw-header-text);}
 #examPage[data-theme="uworld"] .nav-ebtn:hover:not(:disabled){background:rgba(255,255,255,0.12);}
 #examPage[data-theme="uworld"] .nav-ebtn:disabled{border-color:rgba(255,255,255,0.15);}
-#examPage[data-theme="uworld"] .nav-lbl{color:#cdd8e2;font-weight:600;}
-#examPage[data-theme="uworld"] .pw{background:rgba(255,255,255,0.14);}
-#examPage[data-theme="uworld"] .pf{background:#5b9bd5;}
+#examPage[data-theme="uworld"] .nav-lbl{color:var(--uw-header-text-dim);font-weight:600;}
+#examPage[data-theme="uworld"] .pw{background:rgba(255,255,255,0.16);}
+#examPage[data-theme="uworld"] .pf{background:#ffe07a;}
 
-#examPage[data-theme="uworld"] .exam-main{background:#eef1f4;}
-#examPage[data-theme="uworld"] .qcard{background:#ffffff;border:1px solid #ccd4dc;border-radius:3px;box-shadow:none;}
-#examPage[data-theme="uworld"] .qnum{color:#5a7185;}
-#examPage[data-theme="uworld"] .q-t-chip{background:#eef2f5;color:#3d5266;border-radius:4px;}
-#examPage[data-theme="uworld"] .qtext{color:#1a1a1a;}
-#examPage[data-theme="uworld"] .sec-badge{background:#eef2f5!important;color:#3d5266!important;border-radius:4px;}
+/* new: icon toolbar row (Full Screen / Highlighter / Pencil / Lab Values / Notes / Calculator / Settings / Help) — hidden entirely outside the uworld theme */
+.uw-toolrow{display:none;}
+#examPage[data-theme="uworld"] .uw-toolrow{display:flex;align-items:center;justify-content:flex-end;gap:4px;background:var(--uw-header-bg);border-top:1px solid rgba(255,255,255,0.1);padding:4px 12px;flex-shrink:0;flex-wrap:wrap;}
+.uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text-dim);cursor:pointer;padding:4px 9px;border-radius:5px;font-size:10px;font-family:'DM Sans',sans-serif;line-height:1.2;}
+.uw-tool-btn:hover,.uw-tool-btn.on{background:rgba(255,255,255,0.14);color:var(--uw-header-text);}
+.uw-tool-icon{font-size:16px;line-height:1;}
+
+/* new: always-visible compact question sidebar (UWorld never lets you collapse it) */
+#examPage[data-theme="uworld"] .exam-sb{width:64px!important;background:var(--uw-sidebar-bg);border-right:none;padding:4px 0;}
+#examPage[data-theme="uworld"] .exam-sb.hidden{width:64px!important;overflow-y:auto;}
+#examPage[data-theme="uworld"] .esb-inner{padding:0;min-width:0;}
+#examPage[data-theme="uworld"] .esb-title{display:none;}
+.uw-sb-item{display:flex;align-items:center;gap:6px;padding:5px 9px;font-size:12px;font-weight:600;cursor:pointer;border-left:3px solid transparent;color:var(--uw-sidebar-text);}
+.uw-sb-item .uw-sb-icon{width:12px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;}
+.uw-sb-item.active{background:var(--uw-sidebar-active-bg);border-left-color:var(--uw-sidebar-active-border);color:var(--uw-sidebar-active-text);}
+.uw-sb-flag{position:relative;display:inline-block;width:10px;height:11px;}
+.uw-sb-flag i{position:absolute;left:0;top:0;width:1.5px;height:11px;background:var(--uw-neutral);font-style:normal;}
+.uw-sb-flag b{position:absolute;left:1.5px;top:0;width:0;height:0;border-top:4px solid var(--uw-flag);border-bottom:4px solid transparent;border-right:6px solid transparent;}
+.uw-sb-dot{width:5px;height:5px;border-radius:50%;background:var(--uw-neutral);display:inline-block;}
+
+#examPage[data-theme="uworld"] .exam-main{background:var(--uw-page-bg);}
+#examPage[data-theme="uworld"] .qcard{background:var(--uw-page-bg);border:none;border-radius:0;box-shadow:none;}
+#examPage[data-theme="uworld"] .qnum{color:var(--uw-text-secondary);}
+#examPage[data-theme="uworld"] .q-t-chip{background:#eef2f5;color:var(--uw-text-secondary);border-radius:4px;}
+#examPage[data-theme="uworld"] .qtext{color:var(--uw-text-primary);}
+#examPage[data-theme="uworld"] .sec-badge{background:#eef2f5!important;color:var(--uw-text-secondary)!important;border-radius:4px;}
 
 #examPage[data-theme="uworld"] .opts{gap:2px;}
-#examPage[data-theme="uworld"] .opt{border:1px solid transparent;border-radius:3px;background:transparent;}
-#examPage[data-theme="uworld"] .opt:hover:not(:disabled){background:#f0f4f8;}
-#examPage[data-theme="uworld"] .opt .L{width:22px;height:22px;min-width:22px;border-radius:50%;border:1.5px solid #a8b4c0;display:inline-flex;align-items:center;justify-content:center;color:#3d5266;font-size:12px;}
-#examPage[data-theme="uworld"] .opt.sel-opt{background:#e8effa;border-color:#a9c1e0;}
-#examPage[data-theme="uworld"] .opt.sel-opt .L{background:#3f6fb5;border-color:#3f6fb5;color:white;}
-#examPage[data-theme="uworld"] .opt.correct,#examPage[data-theme="uworld"] .opt.show-ans{background:#eaf7ec!important;border-color:#bfe3c4!important;}
-#examPage[data-theme="uworld"] .opt.correct .L,#examPage[data-theme="uworld"] .opt.show-ans .L{background:#2e8540!important;border-color:#2e8540!important;color:white!important;}
-#examPage[data-theme="uworld"] .opt.wrong{background:#fdecea!important;border-color:#f3c6c1!important;}
-#examPage[data-theme="uworld"] .opt.wrong .L{background:#c0392b!important;border-color:#c0392b!important;color:white!important;}
+#examPage[data-theme="uworld"] .opt{border:none;border-radius:4px;background:transparent;}
+#examPage[data-theme="uworld"] .opt:hover:not(:disabled){background:#f4f5f9;}
+#examPage[data-theme="uworld"] .opt .L{width:22px;height:22px;min-width:22px;border-radius:50%;border:1.5px solid #c7cad4;display:inline-flex;align-items:center;justify-content:center;color:var(--uw-text-secondary);font-size:12px;background:transparent;}
+#examPage[data-theme="uworld"] .opt.sel-opt{background:transparent;}
+#examPage[data-theme="uworld"] .opt.sel-opt .L{border-color:var(--uw-header-bg);color:var(--uw-header-bg);}
+#examPage[data-theme="uworld"] .opt.correct,#examPage[data-theme="uworld"] .opt.show-ans{background:transparent!important;border-color:transparent!important;}
+#examPage[data-theme="uworld"] .opt.correct .L,#examPage[data-theme="uworld"] .opt.show-ans .L{border-color:var(--uw-correct)!important;color:var(--uw-text-secondary)!important;background:transparent!important;}
+#examPage[data-theme="uworld"] .opt.wrong{background:transparent!important;border-color:transparent!important;}
+#examPage[data-theme="uworld"] .opt.wrong .L{border-color:#c7cad4!important;color:var(--uw-text-secondary)!important;background:transparent!important;}
 #examPage[data-theme="uworld"] .opt.excl{background:transparent;border-color:transparent;}
+.uw-opt-mark{width:18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.uw-opt-mark.uw-check{color:var(--uw-correct);}
+.uw-opt-mark.uw-x{color:var(--uw-incorrect);}
+.uw-opt-pct{font-size:11px;font-weight:600;color:var(--uw-percent-text);background:var(--uw-percent-bg);padding:2px 8px;border-radius:10px;flex-shrink:0;margin-left:6px;}
 
-#examPage[data-theme="uworld"] .sub-btn,#examPage[data-theme="uworld"] .next-btn{background:#3f6fb5;border-radius:3px;text-transform:uppercase;letter-spacing:0.4px;font-size:12px;}
-#examPage[data-theme="uworld"] .sub-btn:hover,#examPage[data-theme="uworld"] .next-btn:hover{background:#325a94;}
-#examPage[data-theme="uworld"] .flag-btn{border-color:#ccd4dc;color:#5a7185;}
+#examPage[data-theme="uworld"] .sub-btn,#examPage[data-theme="uworld"] .next-btn{background:var(--uw-header-bg);border-radius:3px;text-transform:uppercase;letter-spacing:0.4px;font-size:12px;}
+#examPage[data-theme="uworld"] .sub-btn:hover,#examPage[data-theme="uworld"] .next-btn:hover{filter:brightness(0.92);}
+#examPage[data-theme="uworld"] .flag-btn{border-color:var(--uw-border);color:var(--uw-text-secondary);}
 
-#examPage[data-theme="uworld"] .exp-box{background:#f7f9fb;border:1px solid #ccd4dc;border-radius:3px;}
+/* new: post-answer metrics grid (Result / Correct Rate / Time Spent / Question ID) */
+.uw-metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0 24px;}
+.uw-metric-card{border-radius:6px;padding:14px 16px;}
+.uw-metric-val{font-size:15px;font-weight:700;}
+.uw-metric-label{font-size:11px;opacity:0.85;margin-top:2px;}
+
+/* new: educational objective callout (mapped to take_home_message) */
+.uw-edu-card{background:var(--uw-edu-bg);border-left:4px solid var(--uw-edu-border);border-radius:4px;padding:14px 18px;margin-top:8px;}
+.uw-edu-title{font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--uw-edu-border);margin-bottom:6px;}
+.uw-edu-body{font-size:14px;line-height:1.6;color:var(--uw-text-primary);}
+.uw-explain-wrap{border-top:1px solid var(--uw-border);padding-top:20px;margin-top:4px;}
+.uw-oa-wrap{margin-top:20px;}
+
+#examPage[data-theme="uworld"] .exp-box{background:#f7f9fb;border:1px solid var(--uw-border);border-radius:3px;}
 #examPage[data-theme="uworld"] .exp-verdict{display:inline-flex;margin:12px 0 0 14px;padding:5px 14px;border-radius:20px;font-size:12px;}
-#examPage[data-theme="uworld"] .verdict-ok{background:#e5f3e8;color:#1e7e34;border:1px solid #bfe3c4;}
-#examPage[data-theme="uworld"] .verdict-bad{background:#fbe7e6;color:#a52a1f;border:1px solid #f3c6c1;}
-#examPage[data-theme="uworld"] .exp-sec-title{color:#5a7185;}
-#examPage[data-theme="uworld"] .exp-body{color:#2a2a2a;}
-#examPage[data-theme="uworld"] .oa-item.oa-right{background:#e5f3e8;}
+#examPage[data-theme="uworld"] .verdict-ok{background:var(--uw-correct-bg);color:var(--uw-correct);border:1px solid #bfe3c4;}
+#examPage[data-theme="uworld"] .verdict-bad{background:var(--uw-incorrect-bg);color:var(--uw-incorrect);border:1px solid #f3c6c1;}
+#examPage[data-theme="uworld"] .exp-sec-title{color:var(--uw-text-secondary);}
+#examPage[data-theme="uworld"] .exp-body{color:var(--uw-text-primary);}
+#examPage[data-theme="uworld"] .oa-item.oa-right{background:var(--uw-correct-bg);}
 #examPage[data-theme="uworld"] .oa-item.oa-bad{background:#f7f9fb;}
-#examPage[data-theme="uworld"] .oa-item.oa-right .oa-tag{background:#2e8540;}
+#examPage[data-theme="uworld"] .oa-item.oa-right .oa-tag{background:var(--uw-correct);}
 #examPage[data-theme="uworld"] .oa-item.oa-bad .oa-tag{background:#c7cfd6;color:#4a5865;}
-#examPage[data-theme="uworld"] .takehome{background:#eef2f5;border-left-color:#5b9bd5;color:#1a3350;}
-#examPage[data-theme="uworld"] .exam-sb{background:#f7f9fb;border-right:1px solid #ccd4dc;}
+#examPage[data-theme="uworld"] .takehome{background:var(--uw-edu-bg);border-left-color:var(--uw-edu-border);color:var(--uw-text-primary);}
 #examPage[data-theme="uworld"] .esb-item.active{background:#e8effa;}
 
-#examPage[data-theme="uworld"] .bottom-bar{background:#13293d;border-top:1px solid rgba(255,255,255,0.1);}
+#examPage[data-theme="uworld"] .bottom-bar{background:var(--uw-header-bg);border-top:1px solid rgba(255,255,255,0.1);}
 #examPage[data-theme="uworld"] .suspend-fab{background:transparent;border:1px solid #f0b756;color:#f0b756;}
 #examPage[data-theme="uworld"] .end-fab{background:transparent;border:1px solid #e0665c;color:#e0665c;}
 #examPage[data-theme="uworld"] .home-fab-btn{background:transparent;border:1px solid rgba(255,255,255,0.3);color:white;}
@@ -877,7 +955,7 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     </div>
   </div>
   <div class="nav-strip">
-    <div class="nav-left"><button class="sb-tog" onclick="toggleESB()">☰ List</button><div class="pw"><div class="pf" id="eprog"></div></div></div>
+    <div class="nav-left"><button class="sb-tog" id="esb-toggle-btn" onclick="toggleESB()">☰ List</button><div class="pw"><div class="pf" id="eprog"></div></div></div>
     <div class="nav-center">
       <button class="nav-ebtn" id="prev-btn" onclick="eNav(ES.cur-1)" disabled>← Prev</button>
       <span class="nav-lbl" id="enav-lbl">Q 1 / ?</span>
@@ -886,6 +964,16 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
     <div class="nav-right">
       <button class="sb-tog" id="draw-toggle-btn" onclick="toggleDrawMode()" title="Toggle drawing mode" style="display:none;">🖊 Draw</button>
     </div>
+  </div>
+  <div class="uw-toolrow" id="uw-toolrow">
+    <button class="uw-tool-btn" onclick="uwToggleFullscreen()" title="Full Screen"><span class="uw-tool-icon">⛶</span><span>Full Screen</span></button>
+    <button class="uw-tool-btn" id="uw-tool-hl" onclick="eToggleHL()" title="Highlighter"><span class="uw-tool-icon">🖊</span><span>Highlighter</span></button>
+    <button class="uw-tool-btn" id="uw-tool-pencil" onclick="toggleDrawMode()" title="Pencil"><span class="uw-tool-icon">✏</span><span>Pencil</span></button>
+    <button class="uw-tool-btn" onclick="uwComingSoon('Lab Values')" title="Lab Values"><span class="uw-tool-icon">🧪</span><span>Lab Values</span></button>
+    <button class="uw-tool-btn" onclick="uwComingSoon('Notes')" title="Notes"><span class="uw-tool-icon">📋</span><span>Notes</span></button>
+    <button class="uw-tool-btn" onclick="uwComingSoon('Calculator')" title="Calculator"><span class="uw-tool-icon">🖩</span><span>Calculator</span></button>
+    <button class="uw-tool-btn" onclick="uwComingSoon('Settings')" title="Settings"><span class="uw-tool-icon">⚙</span><span>Settings</span></button>
+    <button class="uw-tool-btn" onclick="uwComingSoon('Help')" title="Help"><span class="uw-tool-icon">?</span><span>Help</span></button>
   </div>
   <div class="exam-layout">
     <div class="exam-sb hidden" id="exam-sb"><div class="esb-inner"><div class="esb-title">Questions</div><div id="esb-list"></div></div></div>
@@ -3466,7 +3554,22 @@ function applyExamTheme(){
     b.classList.toggle('btn-primary',on);
     b.classList.toggle('btn-secondary',!on);
   });
+  // Sidebar layout and choice-row markup (check/X icons, % tags) differ between
+  // themes, so if an exam is already on screen, re-render it live on switch.
+  if(typeof ES!=='undefined'&&ES){
+    if(typeof eBuildSB==='function')eBuildSB();
+    if(typeof eRenderQ==='function')eRenderQ();
+  }
 }
+function uwToggleFullscreen(){
+  if(!document.fullscreenElement){
+    const el=document.getElementById('examPage')||document.documentElement;
+    (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
+  }else{
+    (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);
+  }
+}
+function uwComingSoon(name){toast(name+' — coming soon');}
 
 
 
@@ -3560,12 +3663,23 @@ function toggleESB(){eSBOpen=!eSBOpen;document.getElementById('exam-sb').classLi
 
 function eBuildSB(){
   const Q=ES.questions;let html='';
+  const uw=examTheme==='uworld';
   Q.forEach((q,i)=>{
     const r=ES.results[i];
-    const st=r===null?'<span style="color:var(--gray300);font-size:14px;">○</span>':r?'<span style="color:#16a34a;font-size:13px;">✓</span>':'<span style="color:#dc2626;font-size:13px;">✕</span>';
-    const flagged=ES.flagged&&ES.flagged[i]===true?'<span style="font-size:10px;margin-left:2px;">🚩</span>':'';
+    const flagged=ES.flagged&&ES.flagged[i]===true;
     const ac=i===ES.cur?' active':'';
-    html+=`<div class="esb-item${ac}" onclick="eNav(${i})" style="justify-content:space-between;"><span class="esb-num">Q${i+1}</span><span style="display:flex;align-items:center;gap:3px;">${flagged}${st}</span></div>`;
+    if(uw){
+      let icon;
+      if(r===true)icon='<span class="uw-sb-icon" style="color:var(--uw-correct);">✓</span>';
+      else if(r===false)icon='<span class="uw-sb-icon" style="color:var(--uw-incorrect);">✕</span>';
+      else if(flagged)icon='<span class="uw-sb-icon"><span class="uw-sb-flag"><i></i><b></b></span></span>';
+      else icon='<span class="uw-sb-icon"><span class="uw-sb-dot"></span></span>';
+      html+=`<div class="uw-sb-item${ac}" onclick="eNav(${i})">${icon}<span>${i+1}</span></div>`;
+    }else{
+      const st=r===null?'<span style="color:var(--gray300);font-size:14px;">○</span>':r?'<span style="color:#16a34a;font-size:13px;">✓</span>':'<span style="color:#dc2626;font-size:13px;">✕</span>';
+      const flagIcon=flagged?'<span style="font-size:10px;margin-left:2px;">🚩</span>':'';
+      html+=`<div class="esb-item${ac}" onclick="eNav(${i})" style="justify-content:space-between;"><span class="esb-num">Q${i+1}</span><span style="display:flex;align-items:center;gap:3px;">${flagIcon}${st}</span></div>`;
+    }
   });
   document.getElementById('esb-list').innerHTML=html;
 }
@@ -3589,6 +3703,7 @@ function eToggleHL(){
   eHLMode=!eHLMode;
   const p=document.getElementById('ehlp');if(p)p.classList.toggle('on',eHLMode);
   const h=document.getElementById('ehlhint');if(h)h.classList.toggle('on',eHLMode);
+  const uwHl=document.getElementById('uw-tool-hl');if(uwHl)uwHl.classList.toggle('on',eHLMode);
   document.querySelectorAll('mark').forEach(m=>m.style.backgroundColor=eHLMode?(m.dataset.c||HLCOLS[0]):'transparent');
 }
 function eSetSwatch(c,i){eHLC=c;document.querySelectorAll('.swatch').forEach((s,j)=>s.classList.toggle('sel',j===i));}
@@ -3665,12 +3780,31 @@ async function eRenderQ(){
   if(!ES)return;
   const Q=ES.questions;const cur=ES.cur;const q=Q[cur];
   const isAns=ES.results[cur]!==null;const myI=ES.mySelections[cur];const excl=ES.excluded[cur];
+  const uw=examTheme==='uworld';
+  const qid=q.custom_id&&String(q.custom_id).trim()?q.custom_id:('Q'+(cur+1));
   document.getElementById('prev-btn').disabled=cur===0;
   document.getElementById('next-btn').disabled=cur===Q.length-1;
   document.getElementById('enav-lbl').textContent='Q '+(cur+1)+' / '+Q.length;
   eBuildSB();
+  // Toolbar header: UWorld shows "Item X of Y / Question Id" instead of the exam title + score.
+  const tbTitleEl=document.getElementById('tb-title');const scoreChipEl=document.getElementById('score-chip');
+  if(uw){
+    if(tbTitleEl)tbTitleEl.innerHTML=`Item ${cur+1} of ${Q.length}<div style="font-size:11px;font-weight:400;opacity:0.72;margin-top:2px;">Question Id: ${qid}</div>`;
+    if(scoreChipEl)scoreChipEl.style.display='none';
+  }else{
+    if(tbTitleEl)tbTitleEl.textContent='Exam';
+    if(scoreChipEl)scoreChipEl.style.display='';
+  }
   const opts=q.options&&q.options.length?q.options:[q.option_a,q.option_b,q.option_c,q.option_d].filter(Boolean);
   const analysis=q.options_analysis&&q.options_analysis.length?q.options_analysis:[q.option_a_explanation,q.option_b_explanation,q.option_c_explanation,q.option_d_explanation];
+  // Real per-option selection stats (question_stats.option_counts/total_answers) — same table the
+  // default theme's "How others answered" bars already read from. Fetched once, before building the
+  // choice rows, so the UWorld theme can show a real per-choice % tag (never fabricated/randomized).
+  let stats=null;
+  if(isAns){const{data}=await sb.from('question_stats').select('*').eq('question_id',q.id).maybeSingle();stats=data;}
+  const statCounts=stats?.option_counts||[];
+  const statTotal=stats?.total_answers||0;
+  const pctOf=i=>statTotal>0?Math.round((statCounts[i]||0)/statTotal*100):null;
   const optsHtml=opts.map((o,i)=>{
     let cls='opt';
     if(isAns){if(i===myI&&ES.results[cur])cls+=' correct';else if(i===myI&&!ES.results[cur])cls+=' wrong';if(i===q.correct_answer&&!ES.results[cur])cls+=' show-ans';}
@@ -3683,8 +3817,11 @@ async function eRenderQ(){
       ?`<audio controls style="width:100%;margin-top:8px;height:36px;" src="${audioUrl}" onclick="event.stopPropagation()"></audio>`
       :imgSrc?`<img src="${imgSrc}" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;display:block;">`:'';
     const hasMedia=!!(imgSrc);
+    const uwMark=uw&&isAns?(i===q.correct_answer?'<span class="uw-opt-mark uw-check">✓</span>':(i===myI?'<span class="uw-opt-mark uw-x">✕</span>':'<span class="uw-opt-mark"></span>')):'';
+    const pv=uw&&isAns?pctOf(i):null;
+    const uwPct=uw&&isAns?`<span class="uw-opt-pct">${pv!==null?pv+'%':'—'}</span>`:'';
     return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i},event)" ontouchend="if(!this.disabled)ePickOpt(${i},event)" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
-      <span class="L">${LTRS[i]}</span><span class="opt-txt">${mdFmtInline(o)}</span>
+      ${uwMark}<span class="L">${LTRS[i]}</span><span class="opt-txt">${mdFmtInline(o)}</span>${uwPct}
       ${!isAns?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
       ${mediaHtml}
     </button>`;
@@ -3693,17 +3830,13 @@ async function eRenderQ(){
   if(isAns){
     const ok=ES.results[cur];
     const oaHtml=analysis.map((txt,i)=>txt?`<div class="oa-item ${i===q.correct_answer?'oa-right':'oa-bad'}"><div class="oa-tag">${LTRS[i]}</div><div>${mdFmt(txt)}</div></div>`:'').join('');
-    // fetch stats
     let statsHtml='';
-    const{data:stats}=await sb.from('question_stats').select('*').eq('question_id',q.id).maybeSingle();
-    if(stats&&stats.total_answers>0){
-      const counts=stats.option_counts||[];
-      const total=stats.total_answers||1;
+    if(statTotal>0){
       statsHtml=`<div class="exp-sec">
-        <div class="exp-sec-title">How others answered <span style="color:var(--gray400);font-weight:400;">(${total} answer${total!==1?'s':''})</span></div>
+        <div class="exp-sec-title">How others answered <span style="color:var(--gray400);font-weight:400;">(${statTotal} answer${statTotal!==1?'s':''})</span></div>
         <div class="ans-stats">
           ${opts.map((_,i)=>{
-            const cnt=counts[i]||0;const pct=Math.round(cnt/total*100);
+            const cnt=statCounts[i]||0;const pct=Math.round(cnt/statTotal*100);
             const isCorrect=i===q.correct_answer;const isUser=i===myI;
             const barCls=isCorrect?'correct-bar':isUser?'user-bar':'wrong-bar';
             const col=isCorrect?'#16a34a':isUser&&!ok?'#dc2626':'#94a3b8';
@@ -3719,16 +3852,46 @@ async function eRenderQ(){
         </div>
       </div>`;
     }
-    expHtml=`<div class="exp-box">
+    const navBtnHtml=`${cur<Q.length-1?`<button class="next-btn" onclick="${eCheckMode?'eNav(ES.cur+1)':'eGoNext()'}">Next Question →</button>`:''}
+    ${cur===Q.length-1&&!eCheckMode?`<button class="next-btn" onclick="eFinish()">See Final Results</button>`:''}
+    ${cur===Q.length-1&&eCheckMode?`<button class="next-btn" onclick="eGoHome()">  Go Home</button>`:''}`;
+    if(uw){
+      const correctRateTxt=statTotal>0?Math.round((statCounts[q.correct_answer]||0)/statTotal*100)+'%':'—';
+      const timeSpentTxt=efmt(ES.qTimes[cur]||0);
+      expHtml=`<div class="uw-metrics-grid">
+        <div class="uw-metric-card" style="background:${ok?'var(--uw-metric-result-correct-bg)':'var(--uw-metric-result-bg)'};">
+          <div class="uw-metric-val" style="color:${ok?'var(--uw-metric-result-correct-text)':'var(--uw-metric-result-text)'};">${ok?'Correct':'Incorrect'}</div>
+          <div class="uw-metric-label" style="color:${ok?'var(--uw-metric-result-correct-text)':'var(--uw-metric-result-text)'};">Correct: ${LTRS[q.correct_answer]}</div>
+        </div>
+        <div class="uw-metric-card" style="background:var(--uw-metric-rate-bg);">
+          <div class="uw-metric-val" style="color:var(--uw-metric-rate-text);">${correctRateTxt}</div>
+          <div class="uw-metric-label" style="color:var(--uw-metric-rate-text);">Correct Rate</div>
+        </div>
+        <div class="uw-metric-card" style="background:var(--uw-metric-time-bg);">
+          <div class="uw-metric-val" style="color:var(--uw-metric-time-text);">${timeSpentTxt}</div>
+          <div class="uw-metric-label" style="color:var(--uw-metric-time-text);">Time Spent</div>
+        </div>
+        <div class="uw-metric-card" style="background:var(--uw-metric-id-bg);">
+          <div class="uw-metric-val" style="color:var(--uw-metric-id-text);">${qid}</div>
+          <div class="uw-metric-label" style="color:var(--uw-metric-id-text);">Question ID</div>
+        </div>
+      </div>
+      <div class="uw-explain-wrap">
+        ${q.explanation?`<div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Explanation</div><div class="exp-body hlable" style="font-size:14px;line-height:1.7;">${mdFmt(q.explanation)}</div>`:''}
+        ${oaHtml?`<div class="uw-oa-wrap"><div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
+        ${q.take_home_message?`<div class="uw-edu-card"><div class="uw-edu-title">Educational Objective</div><div class="uw-edu-body">${mdFmt(q.take_home_message)}</div></div>`:''}
+      </div>
+      ${navBtnHtml}`;
+    }else{
+      expHtml=`<div class="exp-box">
       <div class="exp-verdict ${ok?'verdict-ok':'verdict-bad'}">${ok?'✓ Correct!':'✗ Incorrect — Correct answer: '+LTRS[q.correct_answer]}</div>
       ${statsHtml}
       ${q.explanation?`<div class="exp-sec"><div class="exp-sec-title">Explanation</div><div class="exp-body hlable">${mdFmt(q.explanation)}</div></div>`:''}
       ${oaHtml?`<div class="exp-sec"><div class="exp-sec-title">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
       ${q.take_home_message?`<div class="exp-sec"><div class="exp-sec-title">Take-Home Message</div><div class="takehome">${mdFmt(q.take_home_message)}</div></div>`:''}
     </div>
-    ${cur<Q.length-1?`<button class="next-btn" onclick="${eCheckMode?'eNav(ES.cur+1)':'eGoNext()'}">Next Question →</button>`:''}
-    ${cur===Q.length-1&&!eCheckMode?`<button class="next-btn" onclick="eFinish()">See Final Results</button>`:''}
-    ${cur===Q.length-1&&eCheckMode?`<button class="next-btn" onclick="eGoHome()">  Go Home</button>`:''}`;
+    ${navBtnHtml}`;
+    }
   }
   const qTV=isAns?efmt(ES.qTimes[cur]):efmt(qSec);
   const catLabel=q.category||q.category_id||'General';
@@ -3777,6 +3940,9 @@ async function eRenderQ(){
   clearTimedTick();
   if(ES.timed&&ES.results[cur]===null){startTimedCountdown();}
   else{stopTimedCountdown();}
+  // Keep the UWorld toolbar's Highlighter/Pencil buttons in sync with actual tool state
+  const uwHlBtn=document.getElementById('uw-tool-hl');if(uwHlBtn)uwHlBtn.classList.toggle('on',eHLMode);
+  const uwPencilBtn=document.getElementById('uw-tool-pencil');if(uwPencilBtn)uwPencilBtn.classList.toggle('on',typeof drawMode!=='undefined'&&drawMode);
 }
 
 // ---- Lightweight Markdown/Rich-Text helpers ----
@@ -4417,6 +4583,8 @@ function toggleDrawMode(){
     if(toolbar)toolbar.classList.remove('visible');
     if(btn){btn.textContent='🖊 Draw';btn.style.background='';btn.style.color='';}
   }
+  const uwPencil=document.getElementById('uw-tool-pencil');
+  if(uwPencil)uwPencil.classList.toggle('on',drawMode);
 }
 function setDrawTool(tool){
   drawTool=tool;
