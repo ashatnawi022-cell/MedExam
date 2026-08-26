@@ -2281,6 +2281,7 @@ async function doRegister(){
   }
 }
 async function doLogout(){
+  unsubscribeStudentSupport();unsubscribeAdminSupport();
   await sb.auth.signOut();CU=null;CP=null;showPage('authPage',false);showLogin();
 }
 
@@ -2302,6 +2303,7 @@ async function initApp(){
   if(isAdmin){
     document.getElementById('navAdminBadge').style.display='inline';
     document.getElementById('adminBtn').style.display='inline-flex';
+    subscribeAdminSupport();
   }
   showPage('homePage');renderDashboard();
   initSupportFab();
@@ -4427,15 +4429,21 @@ async function initSupportFab(){
   if(!CU)return;
   const fab=document.getElementById('support-fab');
   if(fab)fab.style.display='flex';
+  subscribeStudentSupport();
   // Load bookmarked questions from DB for cross-device sync
   loadFlaggedIdsFromDB();
   // On first load, mark all messages without a reply as already-read
-  // to avoid false "unread" notifications from old/default data
-  await sb.from('support_messages')
-    .update({is_read:true})
+  // to avoid false "unread" notifications from old/default data.
+  // Regular users have no UPDATE grant on this table (only SELECT/INSERT of their own
+  // rows), so this goes through the mark_own_support_messages_read() RPC instead.
+  const{data:noReplyRows}=await sb.from('support_messages')
+    .select('id')
     .eq('user_id',CU.id)
     .is('reply',null)
     .eq('is_read',false);
+  if(noReplyRows&&noReplyRows.length){
+    await Promise.all(noReplyRows.map(function(r){return sb.rpc('mark_own_support_messages_read',{target_id:r.id});}));
+  }
   checkUnreadReplies();
 }
 
@@ -4476,6 +4484,7 @@ async function loadSupportConv(){
       // User message
       const um=document.createElement('div');
       um.className='sup-msg user';
+      um.dataset.msgId=m.id;
       um.innerHTML='<div>'+escHtml(m.message)+'</div><div class="sup-msg-time">'+fmtSupTime(m.created_at)+'</div>';
       msgs.appendChild(um);
       // Admin reply if exists
@@ -4491,9 +4500,12 @@ async function loadSupportConv(){
           msgs.appendChild(am);
         });
       }
+      // Track how many reply segments are rendered for this row, so realtime UPDATE
+      // events know which segments are new and only append those.
+      supReplyCounts[m.id]=(m.reply||'').split('|||').filter(function(r){return r.trim();}).length;
     });
     // Mark ALL messages as read as soon as user opens the chat
-    await sb.from('support_messages').update({is_read:true}).eq('user_id',CU.id);
+    await sb.rpc('mark_own_support_messages_read');
     checkUnreadReplies();
   }
   msgs.scrollTop=msgs.scrollHeight;
@@ -4626,6 +4638,7 @@ async function openSupportConv(userId, userName){
       // User message bubble
       const um=document.createElement('div');
       um.className='sup-msg user';
+      um.dataset.msgId=m.id;
       um.innerHTML='<div><b style="font-size:11px;">'+escHtml(m.user_name||m.user_email||'User')+'</b><br>'+escHtml(m.message)+'</div>'
         +'<div class="sup-msg-time">'+fmtSupTime(m.created_at)+'</div>';
       msgsEl.appendChild(um);
@@ -4643,6 +4656,7 @@ async function openSupportConv(userId, userName){
           msgsEl.appendChild(am);
         });
       }
+      supReplyCounts[m.id]=(m.reply||'').split('|||').filter(function(r){return r.trim();}).length;
     });
     panel.dataset.latestMsgId=latestId;
   }
@@ -4651,6 +4665,7 @@ async function openSupportConv(userId, userName){
 
 function closeSupportReply(){
   document.getElementById('support-conv-wrap').style.display='block';
+  document.getElementById('support-reply-panel').style.display='none';
   document.getElementById('admin-reply-input').value='';
 }
 
@@ -4723,7 +4738,201 @@ function updateAdminSupportBadge(count){
   }
 }
 
-//    ADMIN   
+// ── REALTIME SUPPORT CHAT ──
+// support_messages stores one row per student message, with admin replies appended into
+// that same row's `reply`/`reply_times` columns (joined by '|||'). So a new student message
+// is always an INSERT; a new admin reply is always an UPDATE on an existing row.
+let supStudentChannel=null;
+let supAdminChannel=null;
+let supReplyCounts={}; // support_messages.id -> number of reply segments already rendered
+
+// Appends only the reply segments in m.reply beyond fromIndex to the given container,
+// and returns the new total so callers can update supReplyCounts. Used by both the
+// student and admin live-update handlers so a burst of replies never gets re-rendered.
+function appendReplyBubbles(containerId,m,fromIndex){
+  const el=document.getElementById(containerId);
+  if(!el||!m.reply)return fromIndex;
+  const replies=m.reply.split('|||');
+  const times=(m.reply_times||m.replied_at||'').toString().split('|||');
+  let rendered=fromIndex;
+  replies.forEach(function(r,ri){
+    if(ri<fromIndex||!r.trim())return;
+    const am=document.createElement('div');
+    am.className='sup-msg admin';
+    am.innerHTML='<div><b style="font-size:11px;color:var(--blue);">Admin</b><br>'+escHtml(r.trim())+'</div>'
+      +'<div class="sup-msg-time">'+(times[ri]?fmtSupTime(times[ri]):fmtSupTime(m.replied_at))+'</div>';
+    el.appendChild(am);
+    rendered=ri+1;
+  });
+  if(rendered>fromIndex)el.scrollTop=el.scrollHeight;
+  return rendered;
+}
+
+// One realtime channel per logged-in student, scoped server-side to their own rows.
+// Reconnects automatically if the socket drops or the channel errors out.
+//
+// supStudentGen is bumped every time we intentionally tear the channel down (including right
+// before re-subscribing). Removing a channel fires its own 'CLOSED' status through the same
+// .subscribe() callback used for real drops, so without this guard an intentional close would
+// look identical to an accidental one and immediately schedule a redundant reconnect — which,
+// if something else also resubscribes around the same time, cascades into overlapping channels
+// fighting each other. Every status callback checks its captured generation against the current
+// one first and no-ops if it's stale, so only the most recent subscribe attempt can ever react.
+let supStudentChannelUserId=null;
+let supStudentGen=0;
+function subscribeStudentSupport(){
+  if(!CU)return;
+  // If a channel already exists but for a different user (e.g. sign-out bypassed doLogout,
+  // or a session got swapped without a full page reload), tear it down and re-scope it —
+  // otherwise this user would silently listen on someone else's filtered channel.
+  if(supStudentChannel){
+    if(supStudentChannelUserId===CU.id)return;
+    unsubscribeStudentSupport();
+  }
+  const scopedUserId=CU.id;
+  supStudentChannelUserId=scopedUserId;
+  const myGen=++supStudentGen;
+  const setup=function(){
+    if(myGen!==supStudentGen)return;
+    supStudentChannel=sb.channel('support-student-'+scopedUserId+'-'+Date.now())
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages',filter:'user_id=eq.'+scopedUserId},function(payload){
+        handleStudentSupportInsert(payload.new);
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'support_messages',filter:'user_id=eq.'+scopedUserId},function(payload){
+        handleStudentSupportUpdate(payload.new);
+      })
+      .subscribe(function(status){
+        if(myGen!==supStudentGen)return; // superseded/intentionally closed — ignore
+        if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+          supStudentChannel=null;
+          setTimeout(function(){if(myGen===supStudentGen&&CU&&CU.id===scopedUserId)setup();},3000);
+        }
+      });
+  };
+  setup();
+}
+function unsubscribeStudentSupport(){
+  supStudentGen++;
+  const ch=supStudentChannel;
+  supStudentChannel=null;
+  supStudentChannelUserId=null;
+  removeChannelSafely(ch);
+}
+function handleStudentSupportInsert(m){
+  // Fires for the student's own inserts (this channel is filtered to user_id=theirs), which
+  // matters mainly when the same account has the chat open in more than one tab/device —
+  // the tab that actually sent it already rendered locally, so guard on data-msg-id.
+  const modal=document.getElementById('support-modal');
+  const isOpen=modal&&modal.style.display!=='none';
+  if(isOpen){
+    const msgs=document.getElementById('sup-msgs');
+    if(msgs&&!msgs.querySelector('[data-msg-id="'+m.id+'"]')){
+      const um=document.createElement('div');
+      um.className='sup-msg user';
+      um.dataset.msgId=m.id;
+      um.innerHTML='<div>'+escHtml(m.message)+'</div><div class="sup-msg-time">'+fmtSupTime(m.created_at)+'</div>';
+      msgs.appendChild(um);
+      msgs.scrollTop=msgs.scrollHeight;
+    }
+  }
+  if(!(m.id in supReplyCounts))supReplyCounts[m.id]=0;
+}
+function handleStudentSupportUpdate(m){
+  const priorCount=supReplyCounts[m.id]||0;
+  const modal=document.getElementById('support-modal');
+  const isOpen=modal&&modal.style.display!=='none';
+  if(isOpen){
+    supReplyCounts[m.id]=appendReplyBubbles('sup-msgs',m,priorCount);
+    // Actively viewing — mark read immediately so the badge doesn't fire for what's on screen
+    sb.rpc('mark_own_support_messages_read',{target_id:m.id}).then(function(){});
+  } else {
+    supReplyCounts[m.id]=(m.reply||'').split('|||').filter(function(r){return r.trim();}).length;
+    checkUnreadReplies();
+  }
+}
+
+// One shared realtime channel for the admin side, watching every support_messages row so the
+// unread badge, conversation list, and any currently-open conversation all stay live regardless
+// of which admin tab is active. See supStudentGen above for why the generation guard exists.
+let supAdminGen=0;
+function subscribeAdminSupport(){
+  if(supAdminChannel)return;
+  const myGen=++supAdminGen;
+  const setup=function(){
+    if(myGen!==supAdminGen)return;
+    supAdminChannel=sb.channel('support-admin-'+Date.now())
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'},function(payload){
+        handleAdminSupportInsert(payload.new);
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'support_messages'},function(payload){
+        handleAdminSupportUpdate(payload.new);
+      })
+      .subscribe(function(status){
+        if(myGen!==supAdminGen)return; // superseded/intentionally closed — ignore
+        if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+          supAdminChannel=null;
+          setTimeout(function(){if(myGen===supAdminGen&&CP?.is_admin)setup();},3000);
+        }
+      });
+  };
+  setup();
+}
+function unsubscribeAdminSupport(){
+  supAdminGen++;
+  const ch=supAdminChannel;
+  supAdminChannel=null;
+  removeChannelSafely(ch);
+}
+// removeChannel() returns a promise — a bare try/catch only guards the synchronous call itself,
+// not a later rejection, which otherwise surfaces as an unhandled promise rejection.
+function removeChannelSafely(channel){
+  if(!channel)return;
+  try{
+    const p=sb.removeChannel(channel);
+    if(p&&typeof p.catch==='function')p.catch(function(){});
+  }catch(e){}
+}
+function isSupportListVisible(){
+  const sec=document.getElementById('asec-support');
+  const panel=document.getElementById('support-reply-panel');
+  return !!(sec&&sec.classList.contains('active')&&(!panel||panel.style.display==='none'));
+}
+function handleAdminSupportInsert(m){
+  updateAdminSupportBadge();
+  const panel=document.getElementById('support-reply-panel');
+  const isThisConvOpen=panel&&panel.style.display!=='none'&&panel.dataset.userId===m.user_id;
+  if(isThisConvOpen){
+    const msgsEl=document.getElementById('sup-admin-msgs');
+    if(msgsEl&&!msgsEl.querySelector('[data-msg-id="'+m.id+'"]')){
+      const um=document.createElement('div');
+      um.className='sup-msg user';
+      um.dataset.msgId=m.id;
+      um.innerHTML='<div><b style="font-size:11px;">'+escHtml(m.user_name||m.user_email||'User')+'</b><br>'+escHtml(m.message)+'</div>'
+        +'<div class="sup-msg-time">'+fmtSupTime(m.created_at)+'</div>';
+      msgsEl.appendChild(um);
+      msgsEl.scrollTop=msgsEl.scrollHeight;
+    }
+    panel.dataset.latestMsgId=m.id;
+    supReplyCounts[m.id]=0;
+    // Admin is actively looking at this conversation — mark it read immediately
+    sb.from('support_messages').update({conv_read:true}).eq('id',m.id).then(function(){});
+  } else if(isSupportListVisible()){
+    loadSupportTable();
+  }
+}
+function handleAdminSupportUpdate(m){
+  updateAdminSupportBadge();
+  const panel=document.getElementById('support-reply-panel');
+  const isThisConvOpen=panel&&panel.style.display!=='none'&&panel.dataset.userId===m.user_id;
+  if(isThisConvOpen){
+    const priorCount=supReplyCounts[m.id]||0;
+    supReplyCounts[m.id]=appendReplyBubbles('sup-admin-msgs',m,priorCount);
+  } else if(isSupportListVisible()){
+    loadSupportTable();
+  }
+}
+
+//    ADMIN
 let aSubjects=[];
 
 function aNav(sec,ev){
