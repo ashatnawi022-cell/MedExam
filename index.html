@@ -436,27 +436,25 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .flag-btn:hover{border-color:#fca5a5;color:var(--red);background:#fff5f5;}
 .flag-btn.flagged{border-color:#fca5a5;color:var(--red);background:#fff5f5;}
 /* -- EXAM THEMES -- */
-.theme-select{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:white;border-radius:6px;padding:4px 8px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;}
-.theme-select option{color:var(--gray800);background:white;}
-
 /* UWorld theme — colors/tokens ported directly from the Claude Design handoff
-   (uworld-exam-interface-mockup, "USMLE Exam Interface.dc.html"). Reskins
-   colors/borders/fonts and adds a few genuinely new pieces (toolbar icon row,
-   always-visible compact sidebar, per-choice check/percent, metrics grid,
-   educational-objective card) that don't exist in the default theme at all —
-   it never touches the qtext font-size/line-height or #exam-bb's sticky
-   positioning, so the Phase 1/2 spacing and sticky-bottom-bar fixes stay
-   fully intact under this theme. */
+   (uworld-exam-interface-mockup, "USMLE Exam Interface.dc.html"), incorporating
+   the user's second-pass edits: lighter header/white sidebar, plain "A."-style
+   choice letters (no circle), a single-row header, a bottom "block bar" with
+   one Block Time Elapsed readout replacing the old dual Exam/Question timers,
+   and no mid-exam theme switch. Reskins colors/borders/fonts and adds pieces
+   that don't exist in the default theme at all — it never touches the qtext
+   font-size/line-height or #exam-bb's sticky positioning, so the Phase 1/2
+   spacing and sticky-bottom-bar fixes stay fully intact under this theme. */
 #examPage[data-theme="uworld"]{
-  --uw-header-bg:#3d4a80;
+  --uw-header-bg:#4a5a9e;
   --uw-header-text:#ffffff;
   --uw-header-text-dim:rgba(255,255,255,0.72);
   --uw-page-bg:#ffffff;
   --uw-text-primary:#1f2430;
   --uw-text-secondary:#5b6270;
   --uw-border:#e2e4ea;
-  --uw-sidebar-bg:#3d4a80;
-  --uw-sidebar-text:#d7dcf2;
+  --uw-sidebar-bg:#ffffff;
+  --uw-sidebar-text:#333846;
   --uw-sidebar-active-bg:#ffe07a;
   --uw-sidebar-active-text:#3d3416;
   --uw-sidebar-active-border:#e8a800;
@@ -479,37 +477,39 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
   --uw-metric-id-bg:#fdf3e0;
   --uw-metric-id-text:#b8790f;
   --uw-edu-bg:#f3f5fb;
-  --uw-edu-border:#3d4a80;
+  --uw-edu-border:#4a5a9e;
 }
 
-#examPage[data-theme="uworld"] .topbar{background:var(--uw-header-bg);}
+#examPage[data-theme="uworld"] .topbar{background:var(--uw-header-bg);padding:8px 16px;flex-wrap:wrap;row-gap:4px;}
 #examPage[data-theme="uworld"] .tb-title{color:var(--uw-header-text);font-weight:600;}
-#examPage[data-theme="uworld"] .score-chip{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:var(--uw-header-text);}
-#examPage[data-theme="uworld"] .timer-box{background:#ffffff;border-radius:4px;}
-#examPage[data-theme="uworld"] .t-val{color:var(--uw-header-bg);font-family:'Courier New',monospace;}
-#examPage[data-theme="uworld"] .t-label{color:var(--uw-text-secondary);opacity:1;}
-#examPage[data-theme="uworld"] .theme-select{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);}
+#examPage[data-theme="uworld"] .score-chip{display:none;}
+/* Old dual Exam/Question timer boxes are replaced by the single Block Time Elapsed
+   readout in the bottom block bar — mid-exam theme switching has also been removed,
+   so this pair of elements no longer needs to render at all under this theme. */
+#examPage[data-theme="uworld"] .timers{display:none;}
 
-#examPage[data-theme="uworld"] .nav-strip{background:var(--uw-header-bg);border-top:1px solid rgba(255,255,255,0.1);border-bottom:none;}
-#examPage[data-theme="uworld"] #esb-toggle-btn{display:none;}
-#examPage[data-theme="uworld"] .sb-tog{background:transparent;border:1px solid rgba(255,255,255,0.3);border-radius:4px;color:var(--uw-header-text);}
-#examPage[data-theme="uworld"] .sb-tog:hover{background:rgba(255,255,255,0.12);}
-#examPage[data-theme="uworld"] .nav-ebtn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;letter-spacing:0.3px;color:var(--uw-header-text);}
-#examPage[data-theme="uworld"] .nav-ebtn:hover:not(:disabled){background:rgba(255,255,255,0.12);}
-#examPage[data-theme="uworld"] .nav-ebtn:disabled{border-color:rgba(255,255,255,0.15);}
-#examPage[data-theme="uworld"] .nav-lbl{color:var(--uw-header-text-dim);font-weight:600;}
-#examPage[data-theme="uworld"] .pw{background:rgba(255,255,255,0.16);}
-#examPage[data-theme="uworld"] .pf{background:#ffe07a;}
+/* The header is one compact row for UWorld: Item X of Y (topbar-left) — Prev/Next
+   (uw-topbar-center) — icon toolbar (uw-toolrow), replacing the old stacked
+   topbar+nav-strip+toolrow (three separate full-width bars) that ate up page space. */
+.uw-topbar-center{display:none;}
+#examPage[data-theme="uworld"] .uw-topbar-center{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.uw-nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;color:var(--uw-header-text);padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.2px;}
+.uw-nav-btn:hover:not(:disabled){background:rgba(255,255,255,0.14);}
+.uw-nav-btn:disabled{opacity:0.35;cursor:default;}
+#examPage[data-theme="uworld"] .nav-strip{display:none;}
+#examPage[data-theme="uworld"] #draw-toggle-btn{display:none!important;}
 
-/* new: icon toolbar row (Full Screen / Highlighter / Pencil / Lab Values / Notes / Calculator / Settings / Help) — hidden entirely outside the uworld theme */
+/* icon toolbar row (Full Screen / Highlighter / Pencil / Lab Values / Notes / Calculator / Settings / Help)
+   now sits inline inside the single topbar row instead of its own full-width bar — hidden entirely outside uworld */
 .uw-toolrow{display:none;}
-#examPage[data-theme="uworld"] .uw-toolrow{display:flex;align-items:center;justify-content:flex-end;gap:4px;background:var(--uw-header-bg);border-top:1px solid rgba(255,255,255,0.1);padding:4px 12px;flex-shrink:0;flex-wrap:wrap;}
-.uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text-dim);cursor:pointer;padding:4px 9px;border-radius:5px;font-size:10px;font-family:'DM Sans',sans-serif;line-height:1.2;}
+#examPage[data-theme="uworld"] .uw-toolrow{display:flex;align-items:center;gap:2px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text-dim);cursor:pointer;padding:3px 7px;border-radius:5px;font-size:9.5px;font-family:'DM Sans',sans-serif;line-height:1.15;white-space:nowrap;}
 .uw-tool-btn:hover,.uw-tool-btn.on{background:rgba(255,255,255,0.14);color:var(--uw-header-text);}
-.uw-tool-icon{font-size:16px;line-height:1;}
+.uw-tool-icon{font-size:14px;line-height:1;}
 
-/* new: always-visible compact question sidebar (UWorld never lets you collapse it) */
-#examPage[data-theme="uworld"] .exam-sb{width:64px!important;background:var(--uw-sidebar-bg);border-right:none;padding:4px 0;}
+/* always-visible compact question sidebar (UWorld never lets you collapse it) — now
+   a light sidebar with a border, matching the user's second design pass */
+#examPage[data-theme="uworld"] .exam-sb{width:64px!important;background:var(--uw-sidebar-bg);border-right:1px solid var(--uw-border);padding:4px 0;}
 #examPage[data-theme="uworld"] .exam-sb.hidden{width:64px!important;overflow-y:auto;}
 #examPage[data-theme="uworld"] .esb-inner{padding:0;min-width:0;}
 #examPage[data-theme="uworld"] .esb-title{display:none;}
@@ -531,13 +531,15 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 #examPage[data-theme="uworld"] .opts{gap:2px;}
 #examPage[data-theme="uworld"] .opt{border:none;border-radius:4px;background:transparent;}
 #examPage[data-theme="uworld"] .opt:hover:not(:disabled){background:#f4f5f9;}
-#examPage[data-theme="uworld"] .opt .L{width:22px;height:22px;min-width:22px;border-radius:50%;border:1.5px solid #c7cad4;display:inline-flex;align-items:center;justify-content:center;color:var(--uw-text-secondary);font-size:12px;background:transparent;}
-#examPage[data-theme="uworld"] .opt.sel-opt{background:transparent;}
-#examPage[data-theme="uworld"] .opt.sel-opt .L{border-color:var(--uw-header-bg);color:var(--uw-header-bg);}
+/* Plain "A." style letters — no circle/border, matching the revised mockup */
+#examPage[data-theme="uworld"] .opt .L{width:22px;height:auto;min-width:22px;border-radius:0;border:none;display:inline-flex;align-items:center;justify-content:center;color:var(--uw-text-secondary);font-size:14px;font-weight:600;background:transparent;}
+#examPage[data-theme="uworld"] .opt .L::after{content:'.';}
+#examPage[data-theme="uworld"] .opt.sel-opt{background:#eef1fa;}
+#examPage[data-theme="uworld"] .opt.sel-opt .L{color:var(--uw-header-bg);font-weight:700;}
 #examPage[data-theme="uworld"] .opt.correct,#examPage[data-theme="uworld"] .opt.show-ans{background:transparent!important;border-color:transparent!important;}
-#examPage[data-theme="uworld"] .opt.correct .L,#examPage[data-theme="uworld"] .opt.show-ans .L{border-color:var(--uw-correct)!important;color:var(--uw-text-secondary)!important;background:transparent!important;}
+#examPage[data-theme="uworld"] .opt.correct .L,#examPage[data-theme="uworld"] .opt.show-ans .L{color:var(--uw-correct)!important;background:transparent!important;}
 #examPage[data-theme="uworld"] .opt.wrong{background:transparent!important;border-color:transparent!important;}
-#examPage[data-theme="uworld"] .opt.wrong .L{border-color:#c7cad4!important;color:var(--uw-text-secondary)!important;background:transparent!important;}
+#examPage[data-theme="uworld"] .opt.wrong .L{color:var(--uw-text-secondary)!important;background:transparent!important;}
 #examPage[data-theme="uworld"] .opt.excl{background:transparent;border-color:transparent;}
 .uw-opt-mark{width:18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
 .uw-opt-mark.uw-check{color:var(--uw-correct);}
@@ -548,13 +550,13 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 #examPage[data-theme="uworld"] .sub-btn:hover,#examPage[data-theme="uworld"] .next-btn:hover{filter:brightness(0.92);}
 #examPage[data-theme="uworld"] .flag-btn{border-color:var(--uw-border);color:var(--uw-text-secondary);}
 
-/* new: post-answer metrics grid (Result / Correct Rate / Time Spent / Question ID) */
+/* post-answer metrics grid (Result / Correct Rate / Time Spent / Question ID) */
 .uw-metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0 24px;}
 .uw-metric-card{border-radius:6px;padding:14px 16px;}
 .uw-metric-val{font-size:15px;font-weight:700;}
 .uw-metric-label{font-size:11px;opacity:0.85;margin-top:2px;}
 
-/* new: educational objective callout (mapped to take_home_message) */
+/* educational objective callout (mapped to take_home_message) */
 .uw-edu-card{background:var(--uw-edu-bg);border-left:4px solid var(--uw-edu-border);border-radius:4px;padding:14px 18px;margin-top:8px;}
 .uw-edu-title{font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--uw-edu-border);margin-bottom:6px;}
 .uw-edu-body{font-size:14px;line-height:1.6;color:var(--uw-text-primary);}
@@ -574,10 +576,19 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 #examPage[data-theme="uworld"] .takehome{background:var(--uw-edu-bg);border-left-color:var(--uw-edu-border);color:var(--uw-text-primary);}
 #examPage[data-theme="uworld"] .esb-item.active{background:#e8effa;}
 
-#examPage[data-theme="uworld"] .bottom-bar{background:var(--uw-header-bg);border-top:1px solid rgba(255,255,255,0.1);}
-#examPage[data-theme="uworld"] .suspend-fab{background:transparent;border:1px solid #f0b756;color:#f0b756;}
-#examPage[data-theme="uworld"] .end-fab{background:transparent;border:1px solid #e0665c;color:#e0665c;}
-#examPage[data-theme="uworld"] .home-fab-btn{background:transparent;border:1px solid rgba(255,255,255,0.3);color:white;}
+/* Bottom block bar: the old floating pill-shaped Suspend/End Exam/Home buttons are
+   replaced for this theme by a full-width bar (Block Time Elapsed left, Medical
+   Library/Flashcards/Suspend/End Block right) living inside the SAME sticky
+   #exam-bb element — so the Phase 1/2 sticky-bottom-bar fix is never touched,
+   only which of its children are visible changes per theme. */
+#examPage[data-theme="uworld"] .bottom-bar{background:var(--uw-header-bg);border-top:none;padding:0;flex-direction:column;align-items:stretch;height:auto;}
+#examPage[data-theme="uworld"] .home-fab-btn,#examPage[data-theme="uworld"] .suspend-fab,#examPage[data-theme="uworld"] .end-fab{display:none!important;}
+.uw-block-bar{display:none;}
+#examPage[data-theme="uworld"] .uw-block-bar{display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px 20px;font-size:12px;color:var(--uw-header-text);}
+.uw-block-time{display:flex;align-items:center;gap:8px;}
+.uw-block-tutor{font-size:9px;color:var(--uw-header-text-dim);letter-spacing:0.06em;margin-top:1px;}
+.uw-block-actions{display:flex;align-items:center;gap:6px;}
+.uw-block-end{color:#ff9b9b;}
 /* -- END EXAM THEMES -- */
 /* -- END CSS -- */
 /* -- SUPPORT CHAT -- */
@@ -945,11 +956,21 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <div class="tb-title" id="tb-title">Exam</div>
       <span class="score-chip" id="score-chip">Score: 0 / 0</span>
     </div>
+    <div class="uw-topbar-center" id="uw-topbar-center">
+      <button class="uw-nav-btn" id="uw-prev-btn" onclick="eNav(ES.cur-1)" disabled>← Previous</button>
+      <button class="uw-nav-btn" id="uw-next-btn" onclick="eNav(ES.cur+1)">Next →</button>
+    </div>
+    <div class="uw-toolrow" id="uw-toolrow">
+      <button class="uw-tool-btn" onclick="uwToggleFullscreen()" title="Full Screen"><span class="uw-tool-icon">⛶</span><span>Full Screen</span></button>
+      <button class="uw-tool-btn" id="uw-tool-hl" onclick="eToggleHL()" title="Highlighter"><span class="uw-tool-icon">🖊</span><span>Highlighter</span></button>
+      <button class="uw-tool-btn" id="uw-tool-pencil" onclick="toggleDrawMode()" title="Pencil"><span class="uw-tool-icon">✏</span><span>Pencil</span></button>
+      <button class="uw-tool-btn" onclick="uwComingSoon('Lab Values')" title="Lab Values"><span class="uw-tool-icon">🧪</span><span>Lab Values</span></button>
+      <button class="uw-tool-btn" onclick="uwComingSoon('Notes')" title="Notes"><span class="uw-tool-icon">📋</span><span>Notes</span></button>
+      <button class="uw-tool-btn" onclick="uwComingSoon('Calculator')" title="Calculator"><span class="uw-tool-icon">🖩</span><span>Calculator</span></button>
+      <button class="uw-tool-btn" onclick="uwComingSoon('Settings')" title="Settings"><span class="uw-tool-icon">⚙</span><span>Settings</span></button>
+      <button class="uw-tool-btn" onclick="uwComingSoon('Help')" title="Help"><span class="uw-tool-icon">?</span><span>Help</span></button>
+    </div>
     <div class="timers">
-      <select class="theme-select" id="exam-theme-live" onchange="setExamTheme(this.value)" title="Exam theme">
-        <option value="default">Default Theme</option>
-        <option value="uworld">UWorld Theme</option>
-      </select>
       <div class="timer-box"><div class="t-label">Exam</div><div class="t-val" id="exam-t">00:00</div></div>
       <div class="timer-box"><div class="t-label">Question</div><div class="t-val" id="q-t">00:00</div></div>
     </div>
@@ -965,16 +986,6 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <button class="sb-tog" id="draw-toggle-btn" onclick="toggleDrawMode()" title="Toggle drawing mode" style="display:none;">🖊 Draw</button>
     </div>
   </div>
-  <div class="uw-toolrow" id="uw-toolrow">
-    <button class="uw-tool-btn" onclick="uwToggleFullscreen()" title="Full Screen"><span class="uw-tool-icon">⛶</span><span>Full Screen</span></button>
-    <button class="uw-tool-btn" id="uw-tool-hl" onclick="eToggleHL()" title="Highlighter"><span class="uw-tool-icon">🖊</span><span>Highlighter</span></button>
-    <button class="uw-tool-btn" id="uw-tool-pencil" onclick="toggleDrawMode()" title="Pencil"><span class="uw-tool-icon">✏</span><span>Pencil</span></button>
-    <button class="uw-tool-btn" onclick="uwComingSoon('Lab Values')" title="Lab Values"><span class="uw-tool-icon">🧪</span><span>Lab Values</span></button>
-    <button class="uw-tool-btn" onclick="uwComingSoon('Notes')" title="Notes"><span class="uw-tool-icon">📋</span><span>Notes</span></button>
-    <button class="uw-tool-btn" onclick="uwComingSoon('Calculator')" title="Calculator"><span class="uw-tool-icon">🖩</span><span>Calculator</span></button>
-    <button class="uw-tool-btn" onclick="uwComingSoon('Settings')" title="Settings"><span class="uw-tool-icon">⚙</span><span>Settings</span></button>
-    <button class="uw-tool-btn" onclick="uwComingSoon('Help')" title="Help"><span class="uw-tool-icon">?</span><span>Help</span></button>
-  </div>
   <div class="exam-layout">
     <div class="exam-sb hidden" id="exam-sb"><div class="esb-inner"><div class="esb-title">Questions</div><div id="esb-list"></div></div></div>
     <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
@@ -984,6 +995,22 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
           <button class="home-fab-btn" id="home-fab" onclick="eGoHome()" style="display:none;">🏠 Home</button>
           <button class="suspend-fab" id="sus-fab" onclick="showEModal('sus-modal')">⏸ Suspend</button>
           <button class="end-fab" id="end-fab" onclick="showEModal('end-modal')">■ End Exam</button>
+          <div class="uw-block-bar" id="uw-block-bar">
+            <div class="uw-block-time">
+              <span class="uw-tool-icon" style="font-size:14px;">⏱</span>
+              <div>
+                <div>Block Time Elapsed: <span id="uw-block-t">00:00:00</span></div>
+                <div class="uw-block-tutor">TUTOR</div>
+              </div>
+            </div>
+            <div class="uw-block-actions">
+              <button class="uw-tool-btn" onclick="uwComingSoon('Medical Library')" title="Medical Library"><span class="uw-tool-icon">📚</span><span>Medical Library</span></button>
+              <button class="uw-tool-btn" onclick="uwComingSoon('Flashcards')" title="Flashcards"><span class="uw-tool-icon">⚡</span><span>Flashcards</span></button>
+              <button class="uw-tool-btn" id="uw-home-fab" onclick="eGoHome()" style="display:none;" title="Home"><span class="uw-tool-icon">🏠</span><span>Home</span></button>
+              <button class="uw-tool-btn" id="uw-sus-fab" onclick="showEModal('sus-modal')" title="Suspend"><span class="uw-tool-icon">⏸</span><span>Suspend</span></button>
+              <button class="uw-tool-btn uw-block-end" id="uw-end-fab" onclick="showEModal('end-modal')" title="End Block"><span class="uw-tool-icon">■</span><span>End Block</span></button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2030,10 +2057,6 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <span class="score-chip" id="score-chip">Score: 0 / 0</span>
     </div>
     <div class="timers">
-      <select class="theme-select" id="exam-theme-live" onchange="setExamTheme(this.value)" title="Exam theme">
-        <option value="default">Default Theme</option>
-        <option value="uworld">UWorld Theme</option>
-      </select>
       <div class="timer-box"><div class="t-label">Exam</div><div class="t-val" id="exam-t">00:00</div></div>
       <div class="timer-box"><div class="t-label">Question</div><div class="t-val" id="q-t">00:00</div></div>
     </div>
@@ -3521,6 +3544,7 @@ async function launchSessionReview(questions,att){
   document.getElementById('home-fab').style.display='inline-block';
   document.getElementById('sus-fab').style.display='none';
   document.getElementById('end-fab').style.display='none';
+  uwSyncBlockBar();
   eRun=false;qRun=false;
   // No ticking timers in review mode
   eTick=null;qTick=null;
@@ -3548,7 +3572,6 @@ function setExamTheme(theme){
 function applyExamTheme(){
   const ep=document.getElementById('examPage');
   if(ep) ep.setAttribute('data-theme',examTheme);
-  document.querySelectorAll('.theme-select').forEach(s=>{s.value=examTheme;});
   document.querySelectorAll('[data-theme-btn]').forEach(b=>{
     const on=b.getAttribute('data-theme-btn')===examTheme;
     b.classList.toggle('btn-primary',on);
@@ -3570,6 +3593,28 @@ function uwToggleFullscreen(){
   }
 }
 function uwComingSoon(name){toast(name+' — coming soon');}
+// Mirrors home-fab/sus-fab/end-fab's current visibility (toggled in several places: exam
+// start, review/check mode, suspended-attempt resume) onto their UWorld block-bar counterparts,
+// so "Suspend"/"End Block"/"Home" stay correct in both themes without duplicating that logic.
+function uwSyncBlockBar(){
+  const map=[['home-fab','uw-home-fab'],['sus-fab','uw-sus-fab'],['end-fab','uw-end-fab']];
+  map.forEach(([srcId,dstId])=>{
+    const src=document.getElementById(srcId),dst=document.getElementById(dstId);
+    if(src&&dst)dst.style.display=src.style.display==='none'?'none':'flex';
+  });
+}
+function efmtHMS(s){s=Math.max(0,s|0);const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return[h,m,sec].map(n=>String(n).padStart(2,'0')).join(':');}
+// Real "time actively spent answering" total: sums each question's frozen ES.qTimes once it's
+// been left, plus the live in-progress qSec for whichever question is on screen now. Since qSec
+// already pauses the moment a question is answered (see eNav/eSubmit) and resumes only when
+// landing on a still-unanswered one, this needs no separate ticking state of its own.
+function uwBlockTimeStr(){
+  if(!ES)return'00:00:00';
+  let sum=0;
+  ES.qTimes.forEach((t,i)=>{sum+=(i===ES.cur?qSec:(t||0));});
+  return efmtHMS(sum);
+}
+function uwUpdateBlockTime(){const el=document.getElementById('uw-block-t');if(el)el.textContent=uwBlockTimeStr();}
 
 
 
@@ -3619,6 +3664,7 @@ async function launchSession(questions,title,existingAtt=null){
   document.getElementById('home-fab').style.display='none';
   document.getElementById('sus-fab').style.display='inline-block';
   document.getElementById('end-fab').style.display='inline-block';
+  uwSyncBlockBar();uwUpdateBlockTime();
   const isAns=ES.results[ES.cur]!==null;
   eRun=!isAns;qRun=!isAns;
   var examLimitSecs=ES.examLimit||0;
@@ -3640,7 +3686,7 @@ async function launchSession(questions,title,existingAtt=null){
       }
     }
   },1000);
-  qTick=setInterval(()=>{if(qRun){qSec++;document.getElementById('q-t').textContent=efmt(qSec);const el=document.getElementById('qtinline');if(el)el.textContent=efmt(qSec);}},1000);
+  qTick=setInterval(()=>{if(qRun){qSec++;document.getElementById('q-t').textContent=efmt(qSec);const el=document.getElementById('qtinline');if(el)el.textContent=efmt(qSec);uwUpdateBlockTime();}},1000);
   // Load user's bookmarked question IDs and mark in ES
   var storedFlags=loadFlaggedIds();
   ES.questions.forEach(function(q,i){if(storedFlags[q.id])ES.flagged[i]=true;});
@@ -3785,6 +3831,10 @@ async function eRenderQ(){
   document.getElementById('prev-btn').disabled=cur===0;
   document.getElementById('next-btn').disabled=cur===Q.length-1;
   document.getElementById('enav-lbl').textContent='Q '+(cur+1)+' / '+Q.length;
+  const uwPrevBtn=document.getElementById('uw-prev-btn'),uwNextBtn=document.getElementById('uw-next-btn');
+  if(uwPrevBtn)uwPrevBtn.disabled=cur===0;
+  if(uwNextBtn)uwNextBtn.disabled=cur===Q.length-1;
+  uwUpdateBlockTime();
   eBuildSB();
   // Toolbar header: UWorld shows "Item X of Y / Question Id" instead of the exam title + score.
   const tbTitleEl=document.getElementById('tb-title');const scoreChipEl=document.getElementById('score-chip');
@@ -4107,7 +4157,7 @@ function eRenderResults(){
     </div>`;
 }
 function eCheckAt(i){eStartCheck();eNav(i);}
-function eStartCheck(){eCheckMode=true;document.getElementById('exam-bb').style.display='flex';document.getElementById('home-fab').style.display='inline-block';document.getElementById('sus-fab').style.display='none';document.getElementById('end-fab').style.display='none';ES.cur=0;eRenderQ();}
+function eStartCheck(){eCheckMode=true;document.getElementById('exam-bb').style.display='flex';document.getElementById('home-fab').style.display='inline-block';document.getElementById('sus-fab').style.display='none';document.getElementById('end-fab').style.display='none';uwSyncBlockBar();ES.cur=0;eRenderQ();}
 async function eRetake(){eCheckMode=false;if(eAttId){const{data:att}=await sb.from('attempts').select('*').eq('id',eAttId).single();if(att){const qIds=att.question_ids||[];const{data:qs}=await sb.from('questions').select('*').in('id',qIds);const qMap={};(qs||[]).forEach(q=>qMap[q.id]=q);const ordered=qIds.map(id=>qMap[id]).filter(Boolean);await launchSession(ordered,att.filter_type||'Session');}}}
 function eGoHome(){
   clearInterval(eTick);clearInterval(qTick);clearTimedTick();
