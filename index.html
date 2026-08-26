@@ -217,8 +217,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .esb-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;}
 .esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .esb-st{font-size:12px;flex-shrink:0;}
-.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;display:flex;flex-direction:column;}
-#exam-content{padding-bottom:20px;flex:1;}
+.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;}
+#exam-content{padding-bottom:20px;}
 .exam-main.drawing{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;overflow-y:hidden;}
 .toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
 .sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
@@ -449,15 +449,16 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
   --uw-header-bg:#4a5a9e;
   --uw-header-text:#ffffff;
   --uw-header-text-dim:rgba(255,255,255,0.72);
-  --uw-page-bg:#ffffff;
+  --uw-page-bg:#f5f8fd;
   --uw-text-primary:#1f2430;
   --uw-text-secondary:#5b6270;
   --uw-border:#e2e4ea;
   --uw-sidebar-bg:#ffffff;
   --uw-sidebar-text:#333846;
-  --uw-sidebar-active-bg:#ffe07a;
-  --uw-sidebar-active-text:#3d3416;
-  --uw-sidebar-active-border:#e8a800;
+  --uw-sidebar-active-bg:rgba(2,132,199,0.15);
+  --uw-sidebar-active-text:#0c4a6e;
+  --uw-sidebar-active-border:#0284c7;
+  --uw-sb-divider:#eef0f4;
   --uw-correct:#2f9e44;
   --uw-correct-bg:#eaf6ec;
   --uw-incorrect:#d64545;
@@ -524,7 +525,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 #examPage[data-theme="uworld"] .exam-sb.hidden{width:0;padding:0;overflow:hidden;}
 #examPage[data-theme="uworld"] .esb-inner{padding:0;min-width:0;}
 #examPage[data-theme="uworld"] .esb-title{display:none;}
-.uw-sb-item{display:flex;align-items:center;gap:6px;padding:5px 9px;font-size:12px;font-weight:600;cursor:pointer;border-left:3px solid transparent;color:var(--uw-sidebar-text);}
+.uw-sb-item{display:flex;align-items:center;gap:6px;padding:5px 9px;font-size:12px;font-weight:600;cursor:pointer;border-left:3px solid transparent;border-bottom:1px solid var(--uw-sb-divider,#eef0f4);color:var(--uw-sidebar-text);}
 .uw-sb-item .uw-sb-icon{width:12px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;}
 .uw-sb-item.active{background:var(--uw-sidebar-active-bg);border-left-color:var(--uw-sidebar-active-border);color:var(--uw-sidebar-active-text);}
 .uw-sb-flag{position:relative;display:inline-block;width:10px;height:11px;}
@@ -546,7 +547,6 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 
 #examPage[data-theme="uworld"] .opts{gap:2px;}
 #examPage[data-theme="uworld"] .opt{border:none;border-radius:4px;background:transparent;}
-#examPage[data-theme="uworld"] .opt:hover:not(:disabled){background:#f4f5f9;}
 /* Plain "A." style letters — no circle/border, matching the revised mockup. Selection is
    shown only by the dedicated radio circle (.uw-radio) now, never by recoloring the letter
    or filling the row — so no .sel-opt override is needed here at all. */
@@ -559,7 +559,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 #examPage[data-theme="uworld"] .opt:disabled .opt-txt,
 #examPage[data-theme="uworld"] .opt:disabled .L,
 #examPage[data-theme="uworld"] .opt:disabled .uw-choice-text{opacity:1!important;-webkit-text-fill-color:currentColor!important;}
-#examPage[data-theme="uworld"] .opt-txt{color:var(--uw-text-primary)!important;}
+#examPage[data-theme="uworld"] .opt-txt{color:var(--uw-text-primary)!important;font-weight:500;}
 
 /* Item C/D: dedicated selection radio (left of the letter) — filled with a plain dark
    dot while choosing, recolored green/red once graded; separate from the letter/text
@@ -596,8 +596,8 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 #examPage[data-theme="uworld"] .verdict-bad{background:var(--uw-incorrect-bg);color:var(--uw-incorrect);border:1px solid #f3c6c1;}
 #examPage[data-theme="uworld"] .exp-sec-title{color:var(--uw-text-secondary);}
 #examPage[data-theme="uworld"] .exp-body{color:var(--uw-text-primary);}
-#examPage[data-theme="uworld"] .oa-item.oa-right{background:var(--uw-correct-bg);}
-#examPage[data-theme="uworld"] .oa-item.oa-bad{background:#f7f9fb;}
+#examPage[data-theme="uworld"] .oa-item.oa-right{background:rgba(47,158,68,0.08);}
+#examPage[data-theme="uworld"] .oa-item.oa-bad{background:transparent;}
 #examPage[data-theme="uworld"] .oa-item.oa-right .oa-tag{background:var(--uw-correct);}
 #examPage[data-theme="uworld"] .oa-item.oa-bad .oa-tag{background:#c7cfd6;color:#4a5865;}
 #examPage[data-theme="uworld"] .takehome{background:var(--uw-edu-bg);border-left-color:var(--uw-edu-border);color:var(--uw-text-primary);}
@@ -1666,8 +1666,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .esb-num{font-size:11px;font-weight:700;color:var(--navy2);min-width:20px;}
 .esb-txt{font-size:11px;color:var(--gray500);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .esb-st{font-size:12px;flex-shrink:0;}
-.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;display:flex;flex-direction:column;}
-#exam-content{padding-bottom:20px;flex:1;}
+.exam-main{flex:1;min-height:0;overflow-y:auto;padding:16px 20px 0;}
+#exam-content{padding-bottom:20px;}
 .toolbar{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
 .sec-badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700;}
 .bc0{background:#eff6ff;color:#1d4ed8;}.bc1{background:#fdf2f8;color:#9d174d;}.bc2{background:#f0fdf4;color:#15803d;}
@@ -3425,13 +3425,13 @@ async function goMyExams(){
             const cor=ans.filter(a=>a===true).length;
             const pct=done>0?Math.round(cor/done*100):0;
             const badge=att.status==='done'?`<span class="att-badge badge-done">✓ ${pct}%</span>`:
-                        att.status==='suspended'?`<span class="att-badge badge-sus">⏸ Suspended</span>`:
+                        att.status==='suspended'?`<span class="att-badge badge-sus">⏸ Suspended · ${pct}%</span>`:
                         `<span class="att-badge badge-prog">In Progress</span>`;
             const qIds=att.question_ids||[];
             return `<div class="att-row">
               <div style="flex:1;cursor:pointer;" onclick="resumeSession('${att.id}')">
                 <div class="att-title">${att.filter_type||'Session'}   ${done}/${qIds.length} answered</div>
-                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${att.status==='done'?pct+'% score':'continue where you left off'}</div>
+                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${att.status==='done'?pct+'% score':att.status==='suspended'?(done>0?pct+'% so far':'no answers yet'):'continue where you left off'}</div>
               </div>
               ${badge}
               <button onclick="deleteAtt('${att.id}')" style="background:var(--red-light);color:var(--red);border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-left:8px;">  Delete</button>
@@ -4002,8 +4002,12 @@ async function eRenderQ(){
       // default theme exposes via a separate small ✕ button, just a different click target.
       let dotHtml='';
       if(isAns){
-        if(i===q.correct_answer)dotHtml='<span class="uw-radio-dot" style="background:var(--uw-correct);"></span>';
-        else if(i===myI)dotHtml='<span class="uw-radio-dot" style="background:var(--uw-incorrect);"></span>';
+        // Only the user's OWN pick gets a filled dot: soft light green if it was correct,
+        // solid red if it was wrong. The correct answer, when the user got it wrong, is
+        // NOT also solid-filled here — the green check badge in the gutter already marks
+        // it, so its circle stays empty.
+        if(i===myI&&ES.results[cur])dotHtml='<span class="uw-radio-dot" style="background:rgba(34,197,94,0.2);"></span>';
+        else if(i===myI&&!ES.results[cur])dotHtml='<span class="uw-radio-dot" style="background:var(--uw-incorrect);"></span>';
       }else if(myI===i){
         dotHtml='<span class="uw-radio-dot" style="background:var(--uw-radio-fill);"></span>';
       }
@@ -4011,12 +4015,12 @@ async function eRenderQ(){
       const textClick=!isAns?` onclick="event.stopPropagation();eTogExcl(${i},event)"`:'';
       const struck=!isAns&&excl.has(i);
       return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
-        ${uwMark}<span class="uw-radio"${radioClick}>${dotHtml}</span><span class="uw-choice-text"${textClick}><span class="L">${LTRS[i]}</span><span class="opt-txt" style="text-decoration:${struck?'line-through':'none'};">${mdFmtInline(o)}</span>${struck?'<span class="uw-strike-badge">✕</span>':''}</span>${uwPct}
+        ${uwMark}<span class="uw-radio"${radioClick}>${dotHtml}</span><span class="uw-choice-text"${textClick}><span class="L">${LTRS[i]}</span><span class="opt-txt hlable" style="text-decoration:${struck?'line-through':'none'};">${mdFmtInline(o)}</span>${struck?'<span class="uw-strike-badge">✕</span>':''}</span>${uwPct}
         ${mediaHtml}
       </button>`;
     }
     return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i},event)" ontouchend="if(!this.disabled)ePickOpt(${i},event)" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
-      <span class="L">${LTRS[i]}</span><span class="opt-txt">${mdFmtInline(o)}</span>
+      <span class="L">${LTRS[i]}</span><span class="opt-txt hlable">${mdFmtInline(o)}</span>
       ${!isAns?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
       ${mediaHtml}
     </button>`;
@@ -4135,9 +4139,8 @@ async function eRenderQ(){
     flagBtn.className='flag-btn'+(isFlagged?' flagged':'');
     flagBtn.textContent=isFlagged?'🚩 Flagged':'🚩 Flag';
   }
-  // Start timed countdown if in timed mode and question unanswered
-  clearTimedTick();
-  if(ES.timed&&ES.results[cur]===null){startTimedCountdown();}
+  // Start (or, on a same-question re-render, just resume displaying) the timed countdown.
+  if(ES.timed&&ES.results[cur]===null){resumeOrStartTimedCountdown();}
   else{stopTimedCountdown();}
   // Keep the UWorld toolbar's Highlighter/Pencil buttons in sync with actual tool state
   const uwHlBtn=document.getElementById('uw-tool-hl');if(uwHlBtn)uwHlBtn.classList.toggle('on',eHLMode);
@@ -4319,12 +4322,14 @@ function eGoHome(){
 // ── TIMED MODE ──
 var timedTick=null;
 var timedSecsLeft=0;
+var timedCountdownQIdx=-1; // which question index the running countdown belongs to
 function toggleTimedMode(){timedMode=!timedMode;showCreateExam();}
 function setExamTimeLimit(mins){examTimeLimit=mins;showCreateExam();}
 function clearTimedTick(){if(timedTick){clearInterval(timedTick);timedTick=null;}}
 function startTimedCountdown(){
   clearTimedTick();
   if(!timedMode||ES.results[ES.cur]!==null)return;
+  timedCountdownQIdx=ES.cur;
   timedSecsLeft=timedPerQ;
   updateTimedDisplay();
   timedTick=setInterval(function(){
@@ -4337,6 +4342,16 @@ function startTimedCountdown(){
     }
   },1000);
 }
+// UWorld re-renders the whole question on every choice click (so the radio dot / strike
+// badge can appear), which would otherwise call startTimedCountdown() again on every click
+// and reset the timer back to full. This only (re)starts the countdown when landing on a
+// genuinely new/different question; a same-question re-render just refreshes the display
+// text (the DOM node was just replaced) without touching timedSecsLeft or the interval.
+function resumeOrStartTimedCountdown(){
+  if(!timedMode||ES.results[ES.cur]!==null)return;
+  if(timedTick&&timedCountdownQIdx===ES.cur){updateTimedDisplay();return;}
+  startTimedCountdown();
+}
 function updateTimedDisplay(){
   var el=document.getElementById('timed-countdown');
   if(!el)return;
@@ -4345,7 +4360,7 @@ function updateTimedDisplay(){
   if(timedSecsLeft<=10)el.className='q-timer-countdown danger';
   else if(timedSecsLeft<=20)el.className='q-timer-countdown warn';
 }
-function stopTimedCountdown(){clearTimedTick();var el=document.getElementById('timed-countdown');if(el)el.style.display='none';}
+function stopTimedCountdown(){clearTimedTick();timedCountdownQIdx=-1;var el=document.getElementById('timed-countdown');if(el)el.style.display='none';}
 
 // ── FLAGGING ──
 async function flagQ(qIdx){
