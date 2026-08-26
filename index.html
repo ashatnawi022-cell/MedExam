@@ -435,6 +435,72 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
 .flag-btn{background:none;border:1px solid var(--gray200);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--gray400);transition:all 0.15s;}
 .flag-btn:hover{border-color:#fca5a5;color:var(--red);background:#fff5f5;}
 .flag-btn.flagged{border-color:#fca5a5;color:var(--red);background:#fff5f5;}
+/* -- EXAM THEMES -- */
+.theme-select{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:white;border-radius:6px;padding:4px 8px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.theme-select option{color:var(--gray800);background:white;}
+
+/* UWorld theme — reskins colors/borders/fonts only; never touches display/position/flex
+   properties so the Phase 1/2 spacing and sticky-bottom-bar fixes stay fully intact. */
+#examPage[data-theme="uworld"] .topbar{background:#13293d;}
+#examPage[data-theme="uworld"] .tb-title{color:#e8edf2;font-weight:600;}
+#examPage[data-theme="uworld"] .score-chip{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);}
+#examPage[data-theme="uworld"] .timer-box{background:#ffffff;border-radius:4px;}
+#examPage[data-theme="uworld"] .t-val{color:#13293d;font-family:'Courier New',monospace;}
+#examPage[data-theme="uworld"] .t-label{color:#5a7185;opacity:1;}
+#examPage[data-theme="uworld"] .theme-select{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25);}
+
+#examPage[data-theme="uworld"] .nav-strip{background:#1c3d5a;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);}
+#examPage[data-theme="uworld"] .sb-tog{background:transparent;border:1px solid rgba(255,255,255,0.3);border-radius:4px;}
+#examPage[data-theme="uworld"] .sb-tog:hover{background:rgba(255,255,255,0.12);}
+#examPage[data-theme="uworld"] .nav-ebtn{background:transparent;border:1px solid rgba(255,255,255,0.35);border-radius:4px;letter-spacing:0.3px;}
+#examPage[data-theme="uworld"] .nav-ebtn:hover:not(:disabled){background:rgba(255,255,255,0.12);}
+#examPage[data-theme="uworld"] .nav-ebtn:disabled{border-color:rgba(255,255,255,0.15);}
+#examPage[data-theme="uworld"] .nav-lbl{color:#cdd8e2;font-weight:600;}
+#examPage[data-theme="uworld"] .pw{background:rgba(255,255,255,0.14);}
+#examPage[data-theme="uworld"] .pf{background:#5b9bd5;}
+
+#examPage[data-theme="uworld"] .exam-main{background:#eef1f4;}
+#examPage[data-theme="uworld"] .qcard{background:#ffffff;border:1px solid #ccd4dc;border-radius:3px;box-shadow:none;}
+#examPage[data-theme="uworld"] .qnum{color:#5a7185;}
+#examPage[data-theme="uworld"] .q-t-chip{background:#eef2f5;color:#3d5266;border-radius:4px;}
+#examPage[data-theme="uworld"] .qtext{color:#1a1a1a;}
+#examPage[data-theme="uworld"] .sec-badge{background:#eef2f5!important;color:#3d5266!important;border-radius:4px;}
+
+#examPage[data-theme="uworld"] .opts{gap:2px;}
+#examPage[data-theme="uworld"] .opt{border:1px solid transparent;border-radius:3px;background:transparent;}
+#examPage[data-theme="uworld"] .opt:hover:not(:disabled){background:#f0f4f8;}
+#examPage[data-theme="uworld"] .opt .L{width:22px;height:22px;min-width:22px;border-radius:50%;border:1.5px solid #a8b4c0;display:inline-flex;align-items:center;justify-content:center;color:#3d5266;font-size:12px;}
+#examPage[data-theme="uworld"] .opt.sel-opt{background:#e8effa;border-color:#a9c1e0;}
+#examPage[data-theme="uworld"] .opt.sel-opt .L{background:#3f6fb5;border-color:#3f6fb5;color:white;}
+#examPage[data-theme="uworld"] .opt.correct,#examPage[data-theme="uworld"] .opt.show-ans{background:#eaf7ec!important;border-color:#bfe3c4!important;}
+#examPage[data-theme="uworld"] .opt.correct .L,#examPage[data-theme="uworld"] .opt.show-ans .L{background:#2e8540!important;border-color:#2e8540!important;color:white!important;}
+#examPage[data-theme="uworld"] .opt.wrong{background:#fdecea!important;border-color:#f3c6c1!important;}
+#examPage[data-theme="uworld"] .opt.wrong .L{background:#c0392b!important;border-color:#c0392b!important;color:white!important;}
+#examPage[data-theme="uworld"] .opt.excl{background:transparent;border-color:transparent;}
+
+#examPage[data-theme="uworld"] .sub-btn,#examPage[data-theme="uworld"] .next-btn{background:#3f6fb5;border-radius:3px;text-transform:uppercase;letter-spacing:0.4px;font-size:12px;}
+#examPage[data-theme="uworld"] .sub-btn:hover,#examPage[data-theme="uworld"] .next-btn:hover{background:#325a94;}
+#examPage[data-theme="uworld"] .flag-btn{border-color:#ccd4dc;color:#5a7185;}
+
+#examPage[data-theme="uworld"] .exp-box{background:#f7f9fb;border:1px solid #ccd4dc;border-radius:3px;}
+#examPage[data-theme="uworld"] .exp-verdict{display:inline-flex;margin:12px 0 0 14px;padding:5px 14px;border-radius:20px;font-size:12px;}
+#examPage[data-theme="uworld"] .verdict-ok{background:#e5f3e8;color:#1e7e34;border:1px solid #bfe3c4;}
+#examPage[data-theme="uworld"] .verdict-bad{background:#fbe7e6;color:#a52a1f;border:1px solid #f3c6c1;}
+#examPage[data-theme="uworld"] .exp-sec-title{color:#5a7185;}
+#examPage[data-theme="uworld"] .exp-body{color:#2a2a2a;}
+#examPage[data-theme="uworld"] .oa-item.oa-right{background:#e5f3e8;}
+#examPage[data-theme="uworld"] .oa-item.oa-bad{background:#f7f9fb;}
+#examPage[data-theme="uworld"] .oa-item.oa-right .oa-tag{background:#2e8540;}
+#examPage[data-theme="uworld"] .oa-item.oa-bad .oa-tag{background:#c7cfd6;color:#4a5865;}
+#examPage[data-theme="uworld"] .takehome{background:#eef2f5;border-left-color:#5b9bd5;color:#1a3350;}
+#examPage[data-theme="uworld"] .exam-sb{background:#f7f9fb;border-right:1px solid #ccd4dc;}
+#examPage[data-theme="uworld"] .esb-item.active{background:#e8effa;}
+
+#examPage[data-theme="uworld"] .bottom-bar{background:#13293d;border-top:1px solid rgba(255,255,255,0.1);}
+#examPage[data-theme="uworld"] .suspend-fab{background:transparent;border:1px solid #f0b756;color:#f0b756;}
+#examPage[data-theme="uworld"] .end-fab{background:transparent;border:1px solid #e0665c;color:#e0665c;}
+#examPage[data-theme="uworld"] .home-fab-btn{background:transparent;border:1px solid rgba(255,255,255,0.3);color:white;}
+/* -- END EXAM THEMES -- */
 /* -- END CSS -- */
 /* -- SUPPORT CHAT -- */
 /* -- LOADING OVERLAY -- */
@@ -802,6 +868,10 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <span class="score-chip" id="score-chip">Score: 0 / 0</span>
     </div>
     <div class="timers">
+      <select class="theme-select" id="exam-theme-live" onchange="setExamTheme(this.value)" title="Exam theme">
+        <option value="default">Default Theme</option>
+        <option value="uworld">UWorld Theme</option>
+      </select>
       <div class="timer-box"><div class="t-label">Exam</div><div class="t-val" id="exam-t">00:00</div></div>
       <div class="timer-box"><div class="t-label">Question</div><div class="t-val" id="q-t">00:00</div></div>
     </div>
@@ -1872,6 +1942,10 @@ mark{border-radius:2px;padding:0 1px;cursor:pointer;}
       <span class="score-chip" id="score-chip">Score: 0 / 0</span>
     </div>
     <div class="timers">
+      <select class="theme-select" id="exam-theme-live" onchange="setExamTheme(this.value)" title="Exam theme">
+        <option value="default">Default Theme</option>
+        <option value="uworld">UWorld Theme</option>
+      </select>
       <div class="timer-box"><div class="t-label">Exam</div><div class="t-val" id="exam-t">00:00</div></div>
       <div class="timer-box"><div class="t-label">Question</div><div class="t-val" id="q-t">00:00</div></div>
     </div>
@@ -2175,6 +2249,7 @@ function showPage(id,pushHistory=true){
   if(!el)return;
   el.classList.add('active');
   el.style.display=id==='examPage'?'flex':'block';
+  if(id==='examPage'&&typeof applyExamTheme==='function')applyExamTheme();
   // Update URL hash
   const route=PAGE_ROUTES[id];
   if(route&&pushHistory){
@@ -2647,6 +2722,13 @@ function renderJUCreateExamHTML(){
           </div>
           ${examTimeLimit>0?`<div style="font-size:12px;color:var(--amber);margin-top:8px;">⚠️ Exam will auto-submit when ${examTimeLimit} minutes are up.</div>`:''}
         </div>
+        <div style="background:var(--gray50);border:1.5px solid var(--gray200);border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--gray700);margin-bottom:10px;">🎨 Exam Theme</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" data-theme-btn="default" onclick="setExamTheme('default')" class="btn btn-sm${examTheme==='default'?' btn-primary':' btn-secondary'}">Default Theme</button>
+            <button type="button" data-theme-btn="uworld" onclick="setExamTheme('uworld')" class="btn btn-sm${examTheme==='uworld'?' btn-primary':' btn-secondary'}">UWorld Theme</button>
+          </div>
+        </div>
         <button class="btn btn-primary btn-lg" id="gen-btn" onclick="generateSession()" disabled>Generate Session →</button>
       </div>
     </div>
@@ -2793,6 +2875,7 @@ function showCreateExam(fresh=false){
   updateCountDisplay(0,0,0,0);
   if(appTrack!=='ju')renderCatAccordion();
   if(selSubjects.size>0||randomMode)refreshCounts();
+  if(typeof applyExamTheme==='function')applyExamTheme();
 }
 
 function renderCreateExamHTML(){
@@ -2909,6 +2992,13 @@ function renderCreateExamHTML(){
             ${[0,30,60,90,120,180].map(m=>`<button type="button" onclick="setExamTimeLimit(${m})" class="btn btn-sm${examTimeLimit===m?' btn-primary':' btn-secondary'}" style="min-width:52px;">${m===0?'None':m+'min'}</button>`).join('')}
           </div>
           ${examTimeLimit>0?`<div style="font-size:12px;color:var(--amber);margin-top:8px;">⚠️ Exam will auto-submit when ${examTimeLimit} minutes are up.</div>`:''}
+        </div>
+        <div style="background:var(--gray50);border:1.5px solid var(--gray200);border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--gray700);margin-bottom:10px;">🎨 Exam Theme</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" data-theme-btn="default" onclick="setExamTheme('default')" class="btn btn-sm${examTheme==='default'?' btn-primary':' btn-secondary'}">Default Theme</button>
+            <button type="button" data-theme-btn="uworld" onclick="setExamTheme('uworld')" class="btn btn-sm${examTheme==='uworld'?' btn-primary':' btn-secondary'}">UWorld Theme</button>
+          </div>
         </div>
         <button class="btn btn-primary btn-lg" id="gen-btn" onclick="generateSession()" disabled>Generate Session  </button>
       </div>
@@ -3359,6 +3449,24 @@ const HLNAMES=['Yellow','Green','Blue','Pink','Orange'];
 let ES=null,eAttId=null,eSBOpen=false,eHLMode=false,eHLC=HLCOLS[0],eCheckMode=false;
 let eTick=null,qTick=null,eRun=false,qRun=false,eSec=0,qSec=0;
 const efmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+
+// -- EXAM THEMES --
+let examTheme=localStorage.getItem('examTheme')||'default';
+function setExamTheme(theme){
+  examTheme=theme;
+  try{localStorage.setItem('examTheme',theme);}catch(e){}
+  applyExamTheme();
+}
+function applyExamTheme(){
+  const ep=document.getElementById('examPage');
+  if(ep) ep.setAttribute('data-theme',examTheme);
+  document.querySelectorAll('.theme-select').forEach(s=>{s.value=examTheme;});
+  document.querySelectorAll('[data-theme-btn]').forEach(b=>{
+    const on=b.getAttribute('data-theme-btn')===examTheme;
+    b.classList.toggle('btn-primary',on);
+    b.classList.toggle('btn-secondary',!on);
+  });
+}
 
 
 
