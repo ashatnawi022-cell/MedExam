@@ -484,8 +484,8 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
   --uw-edu-border:#4a5a9e;
 }
 
-#examPage[data-theme="uworld"] .topbar{background:var(--uw-header-bg);padding:8px 16px;flex-wrap:wrap;row-gap:4px;}
-#examPage[data-theme="uworld"] .tb-title{color:var(--uw-header-text);font-weight:600;}
+#examPage[data-theme="uworld"] .topbar{background:var(--uw-header-bg);padding:10px 18px;flex-wrap:wrap;row-gap:4px;}
+#examPage[data-theme="uworld"] .tb-title{color:var(--uw-header-text);font-weight:700;font-size:14px;}
 #examPage[data-theme="uworld"] .score-chip{display:none;}
 /* Old dual Exam/Question timer boxes are replaced by the single Block Time Elapsed
    readout in the bottom block bar — mid-exam theme switching has also been removed,
@@ -496,14 +496,14 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
    reusing the same toggleESB()/#exam-sb.hidden mechanism the default theme's
    "☰ List" button already drives, just styled/positioned to match the mockup. */
 .uw-hamburger{display:none;}
-#examPage[data-theme="uworld"] .uw-hamburger{display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text);padding:0;flex-shrink:0;}
+#examPage[data-theme="uworld"] .uw-hamburger{display:inline-flex;align-items:center;justify-content:center;font-size:20px;line-height:1;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text);font-weight:700;padding:0;flex-shrink:0;}
 
 /* Flag/Mark moved up next to the Item ID, matching the mockup — the bottom-row Flag
    button (#flag-btn-q) is hidden for this theme instead of duplicated. */
 .uw-flag-header-btn{display:none;}
-#examPage[data-theme="uworld"] .uw-flag-header-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text-dim);padding:0;flex-shrink:0;}
+#examPage[data-theme="uworld"] .uw-flag-header-btn{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700;cursor:pointer;background:transparent;border:none;color:var(--uw-header-text);padding:0;flex-shrink:0;}
 #examPage[data-theme="uworld"] .uw-flag-header-btn.flagged{color:var(--uw-flag);}
-.uw-flag-icon{font-size:17px;line-height:1;}
+.uw-flag-icon{font-size:18px;line-height:1;font-weight:700;}
 #examPage[data-theme="uworld"] #flag-btn-q{display:none;}
 
 /* The header is one compact row for UWorld: hamburger + Item X of Y (topbar-left) —
@@ -512,8 +512,8 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
    that ate up page space. */
 .uw-topbar-center{display:none;}
 #examPage[data-theme="uworld"] .uw-topbar-center{display:flex;align-items:center;gap:10px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);}
-.uw-nav-btn{display:flex;flex-direction:column;align-items:center;gap:1px;background:transparent;border:none;border-radius:5px;color:var(--uw-header-text);padding:2px 14px;font-size:10.5px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:0.2px;}
-.uw-nav-triangle{font-size:19px;line-height:1;}
+.uw-nav-btn{display:flex;flex-direction:column;align-items:center;gap:1px;background:transparent;border:none;border-radius:5px;color:var(--uw-header-text);padding:2px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.2px;}
+.uw-nav-triangle{font-size:20px;line-height:1;font-weight:700;}
 .uw-nav-btn:hover:not(:disabled){background:rgba(255,255,255,0.14);}
 .uw-nav-btn:disabled{opacity:0.35;cursor:default;}
 #examPage[data-theme="uworld"] .nav-strip{display:none;}
@@ -523,13 +523,13 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
    now sits inline inside the single topbar row instead of its own full-width bar — hidden entirely outside uworld */
 .uw-toolrow{display:none;}
 #examPage[data-theme="uworld"] .uw-toolrow{display:flex;align-items:center;gap:2px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
-.uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text-dim);cursor:pointer;padding:3px 7px;border-radius:5px;font-size:9.5px;font-family:'DM Sans',sans-serif;line-height:1.15;white-space:nowrap;}
+.uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text);font-weight:700;cursor:pointer;padding:3px 7px;border-radius:5px;font-size:10.5px;font-family:'DM Sans',sans-serif;line-height:1.15;white-space:nowrap;}
 .uw-tool-btn:hover,.uw-tool-btn.on{background:rgba(255,255,255,0.14);color:var(--uw-header-text);}
-.uw-tool-icon{font-size:17px;line-height:1;}
+.uw-tool-icon{font-size:18px;line-height:1;font-weight:700;}
 /* The abacus/calculator emoji renders visually smaller than the other toolbar glyphs at
    the same font-size, so it needs a larger size (and a touch of negative margin to keep
    the row's baseline alignment tidy) to actually LOOK the same size as its neighbors. */
-.uw-tool-icon-calc{font-size:26px;margin-top:-5px;margin-bottom:-4px;}
+.uw-tool-icon-calc{font-size:27px;margin-top:-5px;margin-bottom:-4px;}
 
 /* Compact question sidebar, toggled via the new header hamburger (.uw-hamburger) —
    collapses to 0 width with the same transition the base .exam-sb rule already
@@ -610,6 +610,13 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 .uw-edu-title{font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--uw-edu-border);margin-bottom:6px;}
 .uw-edu-body{font-size:14px;line-height:1.6;color:var(--uw-text-primary);}
 .uw-explain-wrap{border-top:1px solid var(--uw-border);padding-top:20px;margin-top:4px;}
+/* Explanation gets its own thin-grey box, matching the choices box, with the "EXPLANATION"
+   label sitting right on the top border line -- a real <fieldset>/<legend> pair renders
+   exactly that "border breaks open to hold the label" look natively, no manual positioning
+   needed (the global *{margin:0;padding:0} reset already clears the browser's default
+   fieldset chrome, so only the look below applies). */
+.uw-explain-fieldset{min-width:0;border:1px solid var(--uw-border);border-radius:4px;padding:2px 14px 14px;margin:0 0 20px;}
+.uw-explain-fieldset legend{padding:0 8px;margin-left:6px;font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--uw-text-secondary);}
 .uw-oa-wrap{margin-top:20px;}
 
 #examPage[data-theme="uworld"] .exp-box{background:#f7f9fb;border:1px solid var(--uw-border);border-radius:3px;}
@@ -4142,7 +4149,7 @@ async function eRenderQ(){
         </div>
       </div>
       <div class="uw-explain-wrap">
-        ${q.explanation?`<div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Explanation</div><div class="exp-body hlable" style="font-size:14px;line-height:1.7;">${mdFmt(q.explanation)}</div>`:''}
+        ${q.explanation?`<fieldset class="uw-explain-fieldset"><legend>Explanation</legend><div class="exp-body hlable" style="font-size:14px;line-height:1.7;">${mdFmt(q.explanation)}</div></fieldset>`:''}
         ${oaHtml?`<div class="uw-oa-wrap"><div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
         ${q.take_home_message?`<div class="uw-edu-card"><div class="uw-edu-title">Educational Objective</div><div class="uw-edu-body hlable">${mdFmt(q.take_home_message)}</div></div>`:''}
       </div>
