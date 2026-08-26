@@ -253,7 +253,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:15.5px;line-height:1.55;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
 .opt .L{font-weight:700;min-width:18px;color:var(--navy2);flex-shrink:0;}
-.opt-txt{flex:1;}
+.opt-txt{flex:1;user-select:text;}
 .opt.sel-opt{border-color:var(--navy2);background:#eff6ff;}
 .opt.correct{border-color:var(--green)!important;background:var(--green-light)!important;}
 .opt.correct .L{color:var(--green)!important;}
@@ -261,7 +261,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt.wrong .L{color:var(--red)!important;}
 .opt.show-ans{border-color:var(--green)!important;background:var(--green-light)!important;}
 .opt.show-ans .L{color:var(--green)!important;}
-.opt.excl .opt-txt{text-decoration:line-through;color:var(--gray300);}
+.opt.excl .opt-txt{text-decoration:line-through;color:var(--gray300);user-select:none;}
 .opt.excl .L{color:var(--gray300)!important;}
 .opt.excl{border-color:var(--gray100);background:var(--gray50);}
 .excl-btn{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:none;background:none;font-size:11px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;}
@@ -516,7 +516,11 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 #examPage[data-theme="uworld"] .uw-toolrow{display:flex;align-items:center;gap:2px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
 .uw-tool-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--uw-header-text-dim);cursor:pointer;padding:3px 7px;border-radius:5px;font-size:9.5px;font-family:'DM Sans',sans-serif;line-height:1.15;white-space:nowrap;}
 .uw-tool-btn:hover,.uw-tool-btn.on{background:rgba(255,255,255,0.14);color:var(--uw-header-text);}
-.uw-tool-icon{font-size:14px;line-height:1;}
+.uw-tool-icon{font-size:17px;line-height:1;}
+/* The abacus/calculator emoji renders visually smaller than the other toolbar glyphs at
+   the same font-size, so it needs a larger size (and a touch of negative margin to keep
+   the row's baseline alignment tidy) to actually LOOK the same size as its neighbors. */
+.uw-tool-icon-calc{font-size:26px;margin-top:-5px;margin-bottom:-4px;}
 
 /* Compact question sidebar, toggled via the new header hamburger (.uw-hamburger) —
    collapses to 0 width with the same transition the base .exam-sb rule already
@@ -533,7 +537,12 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 .uw-sb-flag b{position:absolute;left:1.5px;top:0;width:0;height:0;border-top:4px solid var(--uw-flag);border-bottom:4px solid transparent;border-right:6px solid transparent;}
 .uw-sb-dot{width:5px;height:5px;border-radius:50%;background:var(--uw-neutral);display:inline-block;}
 
-#examPage[data-theme="uworld"] .exam-main{background:var(--uw-page-bg);}
+/* Keeps the navy bottom bar pinned to the true bottom of the viewport on a short/
+   unanswered question, instead of sitting right after the qcard with plain page
+   background visible below it all the way to the bottom of the screen. Scoped to this
+   theme only — the default theme's bottom bar was never reported to have this issue. */
+#examPage[data-theme="uworld"] .exam-main{background:var(--uw-page-bg);display:flex;flex-direction:column;}
+#examPage[data-theme="uworld"] #exam-content{flex:1;}
 #examPage[data-theme="uworld"] .qcard{background:var(--uw-page-bg);border:none;border-radius:0;box-shadow:none;}
 /* "Q# of ##" and the plain running per-question timer duplicate what's already shown
    in the header ("Item X of Y") and the bottom block bar (Block Time Elapsed) — hidden
@@ -1000,7 +1009,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
       <button class="uw-tool-btn" id="uw-tool-pencil" onclick="toggleDrawMode()" title="Pencil"><span class="uw-tool-icon">✏</span><span>Pencil</span></button>
       <button class="uw-tool-btn" onclick="uwComingSoon('Lab Values')" title="Lab Values"><span class="uw-tool-icon">🧪</span><span>Lab Values</span></button>
       <button class="uw-tool-btn" onclick="uwComingSoon('Notes')" title="Notes"><span class="uw-tool-icon">📋</span><span>Notes</span></button>
-      <button class="uw-tool-btn" onclick="uwComingSoon('Calculator')" title="Calculator"><span class="uw-tool-icon">🖩</span><span>Calculator</span></button>
+      <button class="uw-tool-btn" onclick="uwComingSoon('Calculator')" title="Calculator"><span class="uw-tool-icon uw-tool-icon-calc">🖩</span><span>Calculator</span></button>
       <button class="uw-tool-btn" onclick="uwComingSoon('Settings')" title="Settings"><span class="uw-tool-icon">⚙</span><span>Settings</span></button>
       <button class="uw-tool-btn" onclick="uwComingSoon('Help')" title="Help"><span class="uw-tool-icon">?</span><span>Help</span></button>
     </div>
@@ -1701,7 +1710,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray200);cursor:pointer;font-size:15.5px;line-height:1.55;background:white;text-align:left;width:100%;position:relative;font-family:'DM Sans',sans-serif;transition:all 0.12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .opt:hover:not([disabled]):not(.excl){border-color:var(--navy2);background:var(--gray50);}
 .opt .L{font-weight:700;min-width:18px;color:var(--navy2);flex-shrink:0;}
-.opt-txt{flex:1;}
+.opt-txt{flex:1;user-select:text;}
 .opt.sel-opt{border-color:var(--navy2);background:#eff6ff;}
 .opt.correct{border-color:var(--green)!important;background:var(--green-light)!important;}
 .opt.correct .L{color:var(--green)!important;}
@@ -1709,7 +1718,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .opt.wrong .L{color:var(--red)!important;}
 .opt.show-ans{border-color:var(--green)!important;background:var(--green-light)!important;}
 .opt.show-ans .L{color:var(--green)!important;}
-.opt.excl .opt-txt{text-decoration:line-through;color:var(--gray300);}
+.opt.excl .opt-txt{text-decoration:line-through;color:var(--gray300);user-select:none;}
 .opt.excl .L{color:var(--gray300)!important;}
 .opt.excl{border-color:var(--gray100);background:var(--gray50);}
 .excl-btn{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:none;background:none;font-size:11px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;}
