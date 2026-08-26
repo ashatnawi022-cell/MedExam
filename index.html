@@ -1241,7 +1241,13 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
     </div>
     <div class="qform-grid">
       <div class="form-group"><label class="form-label">Subject <span style="color:var(--gray400);font-weight:400;">(e.g. Pathology, Physiology)</span></label><select class="form-input form-select" id="qm-disc"><option value="">— None —</option></select></div>
-      <div class="form-group"><label class="form-label">Question ID <span style="color:var(--gray400);font-weight:400;">(optional, e.g. CARD-001)</span></label><input type="text" class="form-input" id="qm-cid" placeholder="e.g. CARD-001"></div>
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label class="form-label" style="margin:0;">Question ID <span style="color:var(--gray400);font-weight:400;">(optional, e.g. CARD-001)</span></label>
+          <button type="button" onclick="autoFillQuestionId()" class="btn btn-sm" style="background:#eff6ff;color:var(--blue);border:1px solid #93c5fd;font-size:11px;padding:3px 9px;" title="Fill in the next Year+Rotation+Topic+Sequence id for the selected topic">🔢 Auto</button>
+        </div>
+        <input type="text" class="form-input" id="qm-cid" placeholder="e.g. CARD-001">
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Question text</label>
@@ -2235,7 +2241,13 @@ Take-home: Aortic regurgitation presents with bounding pulses and head bobbing."
     </div>
     <div class="qform-grid">
       <div class="form-group"><label class="form-label">Subject <span style="color:var(--gray400);font-weight:400;">(e.g. Pathology, Physiology)</span></label><select class="form-input form-select" id="qm-disc"><option value="">— None —</option></select></div>
-      <div class="form-group"><label class="form-label">Question ID <span style="color:var(--gray400);font-weight:400;">(optional, e.g. CARD-001)</span></label><input type="text" class="form-input" id="qm-cid" placeholder="e.g. CARD-001"></div>
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label class="form-label" style="margin:0;">Question ID <span style="color:var(--gray400);font-weight:400;">(optional, e.g. CARD-001)</span></label>
+          <button type="button" onclick="autoFillQuestionId()" class="btn btn-sm" style="background:#eff6ff;color:var(--blue);border:1px solid #93c5fd;font-size:11px;padding:3px 9px;" title="Fill in the next Year+Rotation+Topic+Sequence id for the selected topic">🔢 Auto</button>
+        </div>
+        <input type="text" class="form-input" id="qm-cid" placeholder="e.g. CARD-001">
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Question text</label>
@@ -6023,6 +6035,30 @@ async function confirmQuickAddTopic(){
   document.getElementById('qm-cat').value=data.id;
   cancelQuickAddTopic();
   toast('Topic "'+name+'" added! ✓');
+}
+
+// -- QUESTION ID SCHEME: <year:1><rotation:2><topic:2><sequence:4> = 9 digits, e.g. 500010001
+// for Year 5 (all content is Y5 for now) + rotation 00 (Obstetrics and Gynecology, the only
+// rotation this scheme covers so far) + a topic code (each topic's fixed rank among this
+// rotation's categories, ordered by created_at/id so it never shifts for existing topics) +
+// a 4-digit sequence that's shared/continuous across the WHOLE rotation, not per topic.
+const OBGYN_SUBJECT_ID='ddfa98f1-b644-4550-a1c0-d9d0da7b79b4';
+async function autoFillQuestionId(){
+  const catId=document.getElementById('qm-cat')?.value;
+  const subjId=document.getElementById('qm-subj')?.value;
+  if(!catId){toast('Pick a Topic first.');return;}
+  if(subjId!==OBGYN_SUBJECT_ID){toast('Auto-ID is only set up for Obstetrics and Gynecology (Year 5) so far — enter an id manually for other rotations.',3500);return;}
+  const{data:cats,error:e1}=await sb.from('categories').select('id,created_at').eq('subject_id',OBGYN_SUBJECT_ID).order('created_at').order('id');
+  if(e1){toast('Error: '+e1.message);return;}
+  const idx=(cats||[]).findIndex(c=>c.id===catId);
+  if(idx===-1){toast('Could not find that topic in this rotation.');return;}
+  const topicNum=idx+1;
+  const{data:top,error:e2}=await sb.from('questions').select('custom_id').like('custom_id','500%').order('custom_id',{ascending:false}).limit(1);
+  if(e2){toast('Error: '+e2.message);return;}
+  const lastSeq=top&&top[0]&&top[0].custom_id?parseInt(top[0].custom_id.slice(-4),10)||0:0;
+  const newId='500'+String(topicNum).padStart(2,'0')+String(lastSeq+1).padStart(4,'0');
+  document.getElementById('qm-cid').value=newId;
+  toast('Filled: '+newId);
 }
 
 async function openQModal(id=null){
