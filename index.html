@@ -563,7 +563,11 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 #examPage[data-theme="uworld"] .qtext{color:var(--uw-text-primary);}
 #examPage[data-theme="uworld"] .sec-badge{background:#eef2f5!important;color:var(--uw-text-secondary)!important;border-radius:4px;}
 
-#examPage[data-theme="uworld"] .opts{gap:2px;}
+/* Thin grey rectangle around the whole choice list — .opts naturally shares .qtext's
+   width (both are plain children of the padded .qcard), so its right edge lines up with
+   the question stem's without reaching the actual page edge; the padding here is just
+   breathing room between the border and the option rows inside it. */
+#examPage[data-theme="uworld"] .opts{gap:2px;border:1px solid var(--uw-border);border-radius:4px;padding:10px 14px;margin-top:14px;}
 #examPage[data-theme="uworld"] .opt{border:none;border-radius:4px;background:transparent;}
 /* Plain "A." style letters — no circle/border, matching the revised mockup. Selection is
    shown only by the dedicated radio circle (.uw-radio) now, never by recoloring the letter
