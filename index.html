@@ -917,12 +917,12 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
     <select id="adm-year-top" onchange="admYearTopChange()">
       <option value="">-- Select Year --</option>
       <option value="usmle">USMLE (Step 1)</option>
-      <option value="ju-1">JU — Year 1</option>
-      <option value="ju-2">JU — Year 2</option>
-      <option value="ju-3">JU — Year 3</option>
-      <option value="ju-4">JU — Year 4</option>
-      <option value="ju-5">JU — Year 5</option>
-      <option value="ju-6">JU — Year 6</option>
+      <option value="ju-1">UJ — Year 1</option>
+      <option value="ju-2">UJ — Year 2</option>
+      <option value="ju-3">UJ — Year 3</option>
+      <option value="ju-4">UJ — Year 4</option>
+      <option value="ju-5">UJ — Year 5</option>
+      <option value="ju-6">UJ — Year 6</option>
     </select>
     <select id="adm-rotation" style="display:none;" onchange="admRotationChange()">
       <option value="">-- All Rotations --</option>
@@ -1126,12 +1126,12 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
       <div class="form-group"><label class="form-label">Track</label>
         <select class="form-input form-select" id="sm-track" onchange="document.getElementById('sm-ju-fields').style.display=this.value==='ju'?'block':'none'">
           <option value="usmle">USMLE Step 1</option>
-          <option value="ju">Med JU</option>
+          <option value="ju">Med UJ</option>
         </select>
       </div>
     </div>
     <div id="sm-ju-fields" style="display:none;background:var(--gray50);border-radius:8px;padding:14px;margin-bottom:4px;">
-      <div style="font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px;">JU Settings</div>
+      <div style="font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px;">UJ Settings</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="form-group" style="margin-bottom:0;"><label class="form-label">Year</label>
           <select class="form-input form-select" id="sm-year">
@@ -2049,12 +2049,12 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
     <select id="adm-year-top" onchange="admYearTopChange()">
       <option value="">-- Select Year --</option>
       <option value="usmle">USMLE (Step 1)</option>
-      <option value="ju-1">JU — Year 1</option>
-      <option value="ju-2">JU — Year 2</option>
-      <option value="ju-3">JU — Year 3</option>
-      <option value="ju-4">JU — Year 4</option>
-      <option value="ju-5">JU — Year 5</option>
-      <option value="ju-6">JU — Year 6</option>
+      <option value="ju-1">UJ — Year 1</option>
+      <option value="ju-2">UJ — Year 2</option>
+      <option value="ju-3">UJ — Year 3</option>
+      <option value="ju-4">UJ — Year 4</option>
+      <option value="ju-5">UJ — Year 5</option>
+      <option value="ju-6">UJ — Year 6</option>
     </select>
     <select id="adm-rotation" style="display:none;" onchange="admRotationChange()">
       <option value="">-- All Rotations --</option>
@@ -2642,13 +2642,13 @@ async function renderDashboard(){
   const name=CP?.full_name?.split(' ')[0]||'Student';
 
   const _rotLabel=juRotation&&juRotation!=='all'?juRotation.replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase()):juRotation==='all'?'All Rotations':'';
-  const _bc=appTrack==='ju'?`<div class="ju-breadcrumb" style="margin-bottom:8px;"><span class="bc-item" onclick="appTrack=null;juYear=null;juRotation=null;renderDashboard()">🏠 Home</span><span class="bc-sep">›</span><span class="bc-item" onclick="appTrack=null;renderDashboard()">Med JU</span><span class="bc-sep">›</span><span class="bc-item" onclick="juRotation=null;showJURotationSelect()">Year ${juYear}</span>${_rotLabel?`<span class="bc-sep">›</span><span class="bc-current">${_rotLabel}</span>`:''}</div>`:'';
+  const _bc=appTrack==='ju'?`<div class="ju-breadcrumb" style="margin-bottom:8px;"><span class="bc-item" onclick="appTrack=null;juYear=null;juRotation=null;renderDashboard()">🏠 Home</span><span class="bc-sep">›</span><span class="bc-item" onclick="appTrack=null;renderDashboard()">Med UJ</span><span class="bc-sep">›</span><span class="bc-item" onclick="juRotation=null;showJURotationSelect()">Year ${juYear}</span>${_rotLabel?`<span class="bc-sep">›</span><span class="bc-current">${_rotLabel}</span>`:''}</div>`:'';
   body.innerHTML=`
     <div class="dash-wrap">
       <div class="dash-greeting">
         ${_bc}
         <h1>Welcome back, ${name} 👋</h1>
-        <p>${appTrack==='usmle'?'USMLE Step 1 · '+allSubjects.length+' systems':appTrack==='ju'?'JU Year '+juYear+(_rotLabel?' · '+_rotLabel:''):''}</p>
+        <p>${appTrack==='usmle'?'USMLE Step 1 · '+allSubjects.length+' systems':appTrack==='ju'?'UJ Year '+juYear+(_rotLabel?' · '+_rotLabel:''):''}</p>
       </div>
       <div class="dash-cards">
         <!-- Create Exam -->
@@ -2720,7 +2720,7 @@ function showTrackSelector(){
           </div>
           <div class="track-card tc-ju" onclick="selectTrack('ju')">
             <div class="tc-icon">🏛️</div>
-            <div class="tc-title">Med JU</div>
+            <div class="tc-title">Med UJ</div>
             <div class="tc-desc">University of Jordan curriculum — rotation-based clinical questions</div>
           </div>
         </div>
@@ -2746,7 +2746,7 @@ function showJUYearSelect(){
       <div class="ju-breadcrumb">
         <span class="bc-item" onclick="appTrack=null;juYear=null;juRotation=null;renderDashboard()">🏠 Home</span>
         <span class="bc-sep">›</span>
-        <span class="bc-item" onclick="appTrack=null;renderDashboard()">Med JU</span>
+        <span class="bc-item" onclick="appTrack=null;renderDashboard()">Med UJ</span>
         <span class="bc-sep">›</span>
         <span class="bc-current">Select Year</span>
       </div>
@@ -2791,7 +2791,7 @@ function showJURotationSelect(){
       <div class="ju-breadcrumb">
         <span class="bc-item" onclick="appTrack=null;juYear=null;juRotation=null;renderDashboard()">🏠 Home</span>
         <span class="bc-sep">›</span>
-        <span class="bc-item" onclick="appTrack=null;renderDashboard()">Med JU</span>
+        <span class="bc-item" onclick="appTrack=null;renderDashboard()">Med UJ</span>
         <span class="bc-sep">›</span>
         <span class="bc-item" onclick="juYear=null;showJUYearSelect()">Year ${juYear}</span>
         <span class="bc-sep">›</span>
@@ -2827,7 +2827,7 @@ function renderJUCreateExamHTML(){
   return `
     <div class="gen-card">
       <h2>🩺 Generate Practice Session</h2>
-      <div class="sub">JU — Year ${juYear} · ${rotLabel}</div>
+      <div class="sub">UJ — Year ${juYear} · ${rotLabel}</div>
 
       <div style="display:flex;align-items:center;gap:12px;background:${randomMode?'#eff6ff':'var(--gray50)'};border:1.5px solid ${randomMode?'var(--blue)':'var(--gray200)'};border-radius:10px;padding:12px 16px;margin-bottom:20px;cursor:pointer;" onclick="toggleRandomMode()">
         <div style="font-size:24px;">🎲</div>
@@ -3053,7 +3053,7 @@ function showCreateExam(fresh=false){
     <div class="page-body" style="max-width:1000px;margin:0 auto;padding:28px 24px 80px;">
       <div class="back-header">
         <button onclick="renderDashboard()">← Back</button>
-        <h2>✏️ Create Exam${appTrack==='ju'?' — JU Year '+juYear+(_rl?' · '+_rl:''):''}</h2>
+        <h2>✏️ Create Exam${appTrack==='ju'?' — UJ Year '+juYear+(_rl?' · '+_rl:''):''}</h2>
       </div>
       ${appTrack==='ju'?renderJUCreateExamHTML():renderCreateExamHTML()}
     </div>`;
@@ -5566,7 +5566,7 @@ function admRotationChange(){
 function applyAdminScope(){
   const badge=document.getElementById('adm-scope-badge');
   if(!adminTrack){badge.style.display='none';return;}
-  const trackLabel=adminTrack==='usmle'?'USMLE':'JU';
+  const trackLabel=adminTrack==='usmle'?'USMLE':'UJ';
   const yearLabel=adminYear?` · Year ${adminYear}`:'';
   const rotMap={internal_medicine:'Internal Medicine',surgery:'Surgery',anesthesia:'Anesthesia',neurology:'Neurology',special_surgeries:'Special Surgeries',selected_medical_specialties:'Selected Medical Specialties',psychiatry:'Psychiatry',pediatrics:'Pediatrics',obstetrics_gynecology:'Obstetrics and Gynecology'};
   const rotLabel=adminRotation?` · ${rotMap[adminRotation]||adminRotation}`:(adminTrack==='ju'&&adminYear>=4?' · All Rotations':'');
@@ -5618,8 +5618,8 @@ async function saveSubj(){
   const year=yearVal?parseInt(yearVal):null;
   const rotation=document.getElementById('sm-rotation')?.value||null;
   if(!name){toast('Name required');return;}
-  if(track==='ju'&&!year){toast('Please select a year for JU subjects');return;}
-  if(track==='ju'&&!rotation){toast('Please select a rotation for JU subjects');return;}
+  if(track==='ju'&&!year){toast('Please select a year for UJ subjects');return;}
+  if(track==='ju'&&!rotation){toast('Please select a rotation for UJ subjects');return;}
   const payload={name,description,icon,track,year:track==='ju'?year:null,rotation:track==='ju'?rotation:null};
   if(editSubjId)await sb.from('subjects').update(payload).eq('id',editSubjId);
   else await sb.from('subjects').insert(payload);
