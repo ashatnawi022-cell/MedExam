@@ -4161,9 +4161,11 @@ async function eRenderQ(){
         </div>
       </div>
       <div class="uw-explain-wrap">
-        ${q.explanation?`<fieldset class="uw-explain-fieldset"><legend>Explanation</legend><div class="exp-body hlable" style="font-size:14px;line-height:1.7;">${mdFmt(q.explanation)}</div></fieldset>`:''}
-        ${oaHtml?`<div class="uw-oa-wrap"><div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
-        ${q.take_home_message?`<div class="uw-edu-card"><div class="uw-edu-title">Educational Objective</div><div class="uw-edu-body hlable">${mdFmt(q.take_home_message)}</div></div>`:''}
+        ${(q.explanation||oaHtml||q.take_home_message)?`<fieldset class="uw-explain-fieldset"><legend>Explanation</legend>
+          ${q.explanation?`<div class="exp-body hlable" style="font-size:14px;line-height:1.7;">${mdFmt(q.explanation)}</div>`:''}
+          ${oaHtml?`<div class="uw-oa-wrap"><div class="exp-sec-title" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;font-weight:700;margin-bottom:10px;">Option Analysis</div><div class="oa-list">${oaHtml}</div></div>`:''}
+          ${q.take_home_message?`<div class="uw-edu-card"><div class="uw-edu-title">Educational Objective</div><div class="uw-edu-body hlable">${mdFmt(q.take_home_message)}</div></div>`:''}
+        </fieldset>`:''}
       </div>
       ${navBtnHtml}`;
     }else{
