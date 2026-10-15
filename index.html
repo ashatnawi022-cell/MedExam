@@ -653,6 +653,12 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 #examPage[data-theme="uworld"],#examPage[data-theme="uworld"] *{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif!important;}
 
 /* -- END EXAM THEMES -- */
+.locked-note{margin:14px 0 4px;padding:10px 14px;border:1px solid var(--gray200);border-radius:8px;background:var(--gray50);color:var(--gray600);font-size:13px;}
+#sus-overlay{position:fixed;inset:0;z-index:5000;align-items:center;justify-content:center;background:rgba(15,23,42,0.35);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}
+.sus-box{background:white;border-radius:14px;padding:30px 34px;max-width:420px;width:calc(100% - 32px);text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);}
+.sus-box h2{font-size:22px;margin:6px 0 8px;color:var(--navy);}
+.sus-box p{font-size:14px;color:var(--gray600);line-height:1.5;margin-bottom:18px;}
+.sus-btns{display:flex;flex-direction:column;gap:8px;}
 /* -- END CSS -- */
 /* -- SUPPORT CHAT -- */
 /* -- LOADING OVERLAY -- */
@@ -1103,6 +1109,7 @@ mark{border-radius:2px;padding:0;cursor:pointer;}
 <!-- MODALS -->
 <div class="modal-bg" id="end-modal" style="display:none;"><div class="modal"><h2>End Exam?</h2><p>Unanswered questions will be marked incorrect.</p><div class="modal-btns"><button class="btn btn-secondary" onclick="hideEModal('end-modal')">Cancel</button><button class="btn btn-danger" onclick="eForceEnd()">End & See Results</button></div></div></div>
 <div class="modal-bg" id="sus-modal" style="display:none;"><div class="modal"><h2>Suspend Exam?</h2><p>Progress saved. Continue anytime from My Exams.</p><div class="modal-btns"><button class="btn btn-secondary" onclick="hideEModal('sus-modal')">Cancel</button><button class="btn btn-amber" onclick="eSuspend()">Suspend & Go Home</button></div></div></div>
+<div id="sus-overlay" style="display:none;"><div class="sus-box"><div style="font-size:42px;">⏸</div><h2>Exam suspended</h2><p>Your progress is saved and the timer is paused. Your answers and results stay hidden until you finish the exam.</p><div class="sus-btns"><button class="btn btn-primary" onclick="eResumeSuspended()">▶ Resume exam</button><button class="btn btn-secondary" onclick="eSuspendHome()">🏠 Back to My Exams</button></div></div></div>
 
 <!-- Admin modals -->
 <div class="modal-bg" id="flag-delete-modal" style="display:none;">
@@ -3467,14 +3474,15 @@ async function goMyExams(){
             const ans=att.answers||[];const done=ans.filter(a=>a!==null).length;
             const cor=ans.filter(a=>a===true).length;
             const pct=done>0?Math.round(cor/done*100):0;
+            const timedHid=/·\s*Timed$/.test(att.filter_type||'')&&att.status!=='done';
             const badge=att.status==='done'?`<span class="att-badge badge-done">✓ ${pct}%</span>`:
-                        att.status==='suspended'?`<span class="att-badge badge-sus">⏸ Suspended · ${pct}%</span>`:
+                        att.status==='suspended'?`<span class="att-badge badge-sus">⏸ Suspended${timedHid?'':' · '+pct+'%'}</span>`:
                         `<span class="att-badge badge-prog">In Progress</span>`;
             const qIds=att.question_ids||[];
             return `<div class="att-row">
               <div style="flex:1;cursor:pointer;" onclick="resumeSession('${att.id}')">
                 <div class="att-title">${att.filter_type||'Session'}   ${done}/${qIds.length} answered</div>
-                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${att.status==='done'?pct+'% score':att.status==='suspended'?(done>0?pct+'% so far':'no answers yet'):'continue where you left off'}</div>
+                <div class="att-meta">${new Date(att.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${att.status==='done'?pct+'% score':att.status==='suspended'?(timedHid?'timed exam — results shown when it ends':done>0?pct+'% so far':'no answers yet'):'continue where you left off'}</div>
               </div>
               ${badge}
               <button onclick="deleteAtt('${att.id}')" style="background:var(--red-light);color:var(--red);border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-left:8px;">  Delete</button>
@@ -3603,7 +3611,7 @@ async function launchSessionReview(questions,att){
     questions,cur:0,
     score:att.score||answers.filter(function(a){return a===true;}).length,
     results:answers,
-    mySelections:Array(questions.length).fill(null),
+    mySelections:loadSelections(att.id,questions.length)||Array(questions.length).fill(null),
     qTimes:att.question_times||Array(questions.length).fill(0),
     excluded:Array(questions.length).fill(null).map(function(){return new Set();}),
     examSec:att.exam_seconds||0,
@@ -3614,6 +3622,7 @@ async function launchSessionReview(questions,att){
   var storedFlags=loadFlaggedIds();
   ES.questions.forEach(function(q,i){if(storedFlags[q.id])ES.flagged[i]=true;});
   eSec=ES.examSec;qSec=0;
+  await prefetchStats(questions.map(q=>q.id));
   document.getElementById('tb-title').textContent=(att.filter_type||'Session')+' — Review';
   document.getElementById('exam-t').textContent=efmt(eSec);
   document.getElementById('q-t').textContent='--:--';
@@ -3720,6 +3729,10 @@ async function launchSession(questions,title,existingAtt=null){
   eCheckMode=false;eHLMode=false;eHLC=HLCOLS[0];eSBOpen=false;
   const qIds=questions.map(q=>q.id);
   let att=existingAtt;
+  // The timed flag is remembered in the attempt title ("... · Timed") so it survives suspend/resume.
+  const TIMED_RE=/\s*·\s*Timed$/;
+  const isTimed=(att&&att.status!=='done')?TIMED_RE.test(att.filter_type||''):(timedMode||TIMED_RE.test(title||''));
+  title=(title||'').replace(TIMED_RE,'');
   if(!att||att.status==='done'){
     const{data:newAtt}=await sb.from('attempts').insert({
       user_id:CU.id,status:'in_progress',score:0,
@@ -3727,7 +3740,7 @@ async function launchSession(questions,title,existingAtt=null){
       question_times:Array(questions.length).fill(0),
       exam_seconds:0,current_question:0,
       question_ids:qIds,
-      filter_type:title,
+      filter_type:title+(isTimed?' · Timed':''),
       track:appTrack||'usmle',
       year:juYear||null,
       rotation:juRotation||null
@@ -3737,11 +3750,12 @@ async function launchSession(questions,title,existingAtt=null){
   eAttId=att.id;
   ES={questions,cur:att.current_question||0,score:att.score||0,
     results:(att.answers||[]).map(a=>a===null?null:a===true?true:false),
-    mySelections:Array(questions.length).fill(null),
+    mySelections:loadSelections(att.id,questions.length)||Array(questions.length).fill(null),
     qTimes:att.question_times||Array(questions.length).fill(0),
     excluded:Array(questions.length).fill(null).map(()=>new Set()),
-    examSec:att.exam_seconds||0,title,timed:timedMode,flagged:{},examLimit:examTimeLimit*60};
+    examSec:att.exam_seconds||0,title,timed:isTimed,flagged:{},examLimit:examTimeLimit*60};
   eSec=ES.examSec;qSec=ES.qTimes[ES.cur]||0;
+  await prefetchStats(qIds);
   document.getElementById('tb-title').textContent=title;
   document.getElementById('exam-t').textContent=efmt(eSec);
   document.getElementById('q-t').textContent=efmt(qSec);
@@ -3797,17 +3811,19 @@ function eBuildSB(){
   const uw=examTheme==='uworld';
   Q.forEach((q,i)=>{
     const r=ES.results[i];
+    const hid=ES.timed&&!eCheckMode&&r!==null; // timed: answered, but result stays hidden
     const flagged=ES.flagged&&ES.flagged[i]===true;
     const ac=i===ES.cur?' active':'';
     if(uw){
       let icon;
-      if(r===true)icon='<span class="uw-sb-icon" style="color:var(--uw-correct);">✓</span>';
+      if(hid)icon='<span class="uw-sb-icon" style="color:var(--uw-header-bg);">●</span>';
+      else if(r===true)icon='<span class="uw-sb-icon" style="color:var(--uw-correct);">✓</span>';
       else if(r===false)icon='<span class="uw-sb-icon" style="color:var(--uw-incorrect);">✕</span>';
       else if(flagged)icon='<span class="uw-sb-icon"><span class="uw-sb-flag"><i></i><b></b></span></span>';
       else icon='<span class="uw-sb-icon"><span class="uw-sb-dot"></span></span>';
       html+=`<div class="uw-sb-item${ac}" onclick="eNav(${i})">${icon}<span>${i+1}</span></div>`;
     }else{
-      const st=r===null?'<span style="color:var(--gray300);font-size:14px;">○</span>':r?'<span style="color:#16a34a;font-size:13px;">✓</span>':'<span style="color:#dc2626;font-size:13px;">✕</span>';
+      const st=hid?'<span style="color:#2563eb;font-size:13px;" title="Answered">●</span>':r===null?'<span style="color:var(--gray300);font-size:14px;">○</span>':r?'<span style="color:#16a34a;font-size:13px;">✓</span>':'<span style="color:#dc2626;font-size:13px;">✕</span>';
       const flagIcon=flagged?'<span style="font-size:10px;margin-left:2px;">🚩</span>':'';
       html+=`<div class="esb-item${ac}" onclick="eNav(${i})" style="justify-content:space-between;"><span class="esb-num">Q${i+1}</span><span style="display:flex;align-items:center;gap:3px;">${flagIcon}${st}</span></div>`;
     }
@@ -3822,7 +3838,7 @@ function eSecBadge(q){
 
 async function eNav(i){
   if(!ES)return;const Q=ES.questions;if(i<0||i>=Q.length)return;
-  ES.qTimes[ES.cur]=qSec;await eSave();ES.cur=i;
+  ES.qTimes[ES.cur]=qSec;eSave();ES.cur=i;
   const isAns=ES.results[i]!==null;
   qSec=ES.qTimes[i]||0;document.getElementById('q-t').textContent=efmt(qSec);
   if(isAns){qRun=false;document.getElementById('q-t').className='t-val paused';if(!eCheckMode){eRun=true;document.getElementById('exam-t').className='t-val';}}
@@ -4006,36 +4022,74 @@ function ePickOpt(i,ev){
 }
 
 async function eSubmit(autoSubmit=false){
-  const cur=ES.cur;const i=ES.mySelections[cur];if(i===null||i===undefined)return;
+  const cur=ES.cur;if(ES.results[cur]!==null)return;
+  let i=ES.mySelections[cur];
+  if(i===null||i===undefined){
+    // Timed countdown ran out with nothing chosen: lock it in as unanswered/wrong.
+    if(!autoSubmit)return;
+    i=-1;ES.mySelections[cur]=-1;
+  }
   const Q=ES.questions;const ok=i===Q[cur].correct_answer;
   ES.results[cur]=ok;if(ok)ES.score++;
   ES.qTimes[cur]=qSec;qRun=false;eRun=false;
+  clearTimedTick();
   document.getElementById('q-t').className='t-val paused';
   document.getElementById('exam-t').className='t-val paused';
   const ans=ES.results.filter(r=>r!==null).length;
-  document.getElementById('score-chip').textContent='Score: '+ES.score+' / '+ans;
+  // Timed mode hides results, so no running score either.
+  document.getElementById('score-chip').textContent=ES.timed?'':'Score: '+ES.score+' / '+ans;
   document.getElementById('eprog').style.width=Math.round(ans/Q.length*100)+'%';
-  // record this answer in stats table
+  saveSelections();
   const qid=Q[cur].id;
-  await sb.from('attempts').update({status:'in_progress'}).eq('id',eAttId);
-  await eSave();
-  // upsert answer stats
-  const{data:existing}=await sb.from('question_stats').select('*').eq('question_id',qid).maybeSingle();
-  if(existing){
-    const counts=[...existing.option_counts];
-    counts[i]=(counts[i]||0)+1;
-    await sb.from('question_stats').update({option_counts:counts,total_answers:(existing.total_answers||0)+1}).eq('question_id',qid);
-  } else {
-    const counts=Array(Q[cur].options?.length||4).fill(0);counts[i]=1;
-    await sb.from('question_stats').insert({question_id:qid,option_counts:counts,total_answers:1});
+  // Update the local stats cache so the % tags/correct-rate include this answer immediately.
+  if(i>=0){
+    const c=STATS_CACHE[qid];
+    if(c){const counts=[...(c.option_counts||[])];counts[i]=(counts[i]||0)+1;STATS_CACHE[qid]={...c,option_counts:counts,total_answers:(c.total_answers||0)+1};}
   }
+  // Show the result right away; persist in the background.
   eBuildSB();eRenderQ();
+  persistAnswer(qid,i);
+}
+async function persistAnswer(qid,i){
+  try{
+    await sb.from('attempts').update({status:'in_progress'}).eq('id',eAttId);
+    await eSave();
+    if(i<0)return;
+    const{data:existing}=await sb.from('question_stats').select('*').eq('question_id',qid).maybeSingle();
+    if(existing){
+      const counts=[...existing.option_counts];
+      counts[i]=(counts[i]||0)+1;
+      await sb.from('question_stats').update({option_counts:counts,total_answers:(existing.total_answers||0)+1}).eq('question_id',qid);
+    } else {
+      const q=ES&&ES.questions.find(x=>x.id===qid);
+      const counts=Array((q&&q.options?.length)||4).fill(0);counts[i]=1;
+      await sb.from('question_stats').insert({question_id:qid,option_counts:counts,total_answers:1});
+    }
+  }catch(e){console.warn('persistAnswer failed',e);}
+}
+// Picks are only kept in memory + attempts.answers (results), so remember them locally to
+// survive suspend/resume (needed to show which choice was locked in).
+function saveSelections(){try{if(eAttId&&ES)localStorage.setItem('sel_'+eAttId,JSON.stringify(ES.mySelections));}catch(e){}}
+function loadSelections(attId,n){try{const a=JSON.parse(localStorage.getItem('sel_'+attId)||'null');if(Array.isArray(a)&&a.length===n)return a;}catch(e){}return null;}
+const STATS_CACHE={};
+async function prefetchStats(ids){
+  try{
+    const todo=ids.filter(id=>STATS_CACHE[id]===undefined);if(!todo.length)return;
+    const{data}=await Promise.race([sb.from('question_stats').select('*').in('question_id',todo),new Promise(r=>setTimeout(()=>r({data:null}),3000))]);
+    if(!data)return;
+    todo.forEach(id=>{STATS_CACHE[id]=null;});
+    data.forEach(r=>{STATS_CACHE[r.question_id]=r;});
+  }catch(e){}
 }
 
 async function eRenderQ(){
   if(!ES)return;
   const Q=ES.questions;const cur=ES.cur;const q=Q[cur];
-  const isAns=ES.results[cur]!==null;const myI=ES.mySelections[cur];const excl=ES.excluded[cur];
+  const sub=ES.results[cur]!==null;const myI=ES.mySelections[cur];const excl=ES.excluded[cur];
+  // Timed mode: a submitted answer is locked but NOT revealed until the exam is ended/finished
+  // (review mode = eCheckMode reveals everything).
+  const locked=sub&&ES.timed&&!eCheckMode;
+  const isAns=sub&&!locked;
   const uw=examTheme==='uworld';
   const qid=q.custom_id&&String(q.custom_id).trim()?q.custom_id:('Q'+(cur+1));
   document.getElementById('prev-btn').disabled=cur===0;
@@ -4061,7 +4115,10 @@ async function eRenderQ(){
   // default theme's "How others answered" bars already read from. Fetched once, before building the
   // choice rows, so the UWorld theme can show a real per-choice % tag (never fabricated/randomized).
   let stats=null;
-  if(isAns){const{data}=await sb.from('question_stats').select('*').eq('question_id',q.id).maybeSingle();stats=data;}
+  if(isAns){
+    if(STATS_CACHE[q.id]!==undefined)stats=STATS_CACHE[q.id];
+    else{const{data}=await sb.from('question_stats').select('*').eq('question_id',q.id).maybeSingle();stats=data||null;STATS_CACHE[q.id]=stats;}
+  }
   const statCounts=stats?.option_counts||[];
   const statTotal=stats?.total_answers||0;
   const pctOf=i=>statTotal>0?Math.round((statCounts[i]||0)/statTotal*100):null;
@@ -4096,21 +4153,26 @@ async function eRenderQ(){
       }else if(myI===i){
         dotHtml='<span class="uw-radio-dot" style="background:var(--uw-radio-fill);"></span>';
       }
-      const radioClick=!isAns?` onclick="event.stopPropagation();ePickOpt(${i},event)"`:'';
-      const textClick=!isAns?` onclick="event.stopPropagation();eTogExcl(${i},event)"`:'';
+      const radioClick=(!isAns&&!locked)?` onclick="event.stopPropagation();ePickOpt(${i},event)"`:'';
+      const textClick=(!isAns&&!locked)?` onclick="event.stopPropagation();eTogExcl(${i},event)"`:'';
       const struck=!isAns&&excl.has(i);
-      return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
+      return `<button class="${cls}" id="eopt${i}" ${(isAns||locked)?'disabled':''} style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
         ${uwMark}<span class="uw-radio"${radioClick}>${dotHtml}</span><span class="uw-choice-text"${textClick}><span class="L">${LTRS[i]}</span><span class="opt-txt hlable" style="text-decoration:${struck?'line-through':'none'};">${mdFmtInline(o)}</span>${struck?'<span class="uw-strike-badge">✕</span>':''}</span>${uwPct}
         ${mediaHtml}
       </button>`;
     }
-    return `<button class="${cls}" id="eopt${i}" ${isAns?'disabled':''} onclick="ePickOpt(${i},event)" ontouchend="if(!this.disabled)ePickOpt(${i},event)" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
+    return `<button class="${cls}" id="eopt${i}" ${(isAns||locked)?'disabled':''} onclick="ePickOpt(${i},event)" ontouchend="if(!this.disabled)ePickOpt(${i},event)" style="${hasMedia?'flex-direction:column;align-items:flex-start;height:auto;':''}">
       <span class="L">${LTRS[i]}</span><span class="opt-txt hlable">${mdFmtInline(o)}</span>
-      ${!isAns?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
+      ${(!isAns&&!locked)?`<span class="excl-btn" onclick="eTogExcl(${i},event)">${excl.has(i)?'↩':'✕'}</span>`:''}
       ${mediaHtml}
     </button>`;
   }).join('');
   let expHtml='';
+  if(locked){
+    const last=cur===Q.length-1;
+    expHtml=`<div class="locked-note">🔒 Answer submitted. Results and explanations are shown when the exam ends.</div>
+    ${!last?`<button class="next-btn" onclick="eGoNext()">Next Question →</button>`:`<button class="next-btn" onclick="eFinish()">Finish Exam</button>`}`;
+  }
   if(isAns){
     const ok=ES.results[cur];
     const oaHtml=analysis.map((txt,i)=>txt?`<div class="oa-item ${i===q.correct_answer?'oa-right':'oa-bad'}"><div class="oa-tag">${LTRS[i]}</div><div class="hlable">${mdFmt(txt)}</div></div>`:'').join('');
@@ -4179,7 +4241,7 @@ async function eRenderQ(){
     ${navBtnHtml}`;
     }
   }
-  const qTV=isAns?efmt(ES.qTimes[cur]):efmt(qSec);
+  const qTV=sub?efmt(ES.qTimes[cur]):efmt(qSec);
   const catLabel=q.category||'General'; // never fall back to the raw category_id UUID
   document.getElementById('exam-content').innerHTML=`
     <div class="toolbar">
@@ -4195,13 +4257,13 @@ async function eRenderQ(){
       <div class="qnum">Q${cur+1} of ${Q.length}</div>
       <div class="q-t-chip">
         <span id="qtinline">${qTV}</span>
-        ${(!uw&&ES.timed&&!isAns)?`<span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span>`:''}
+        ${(!uw&&ES.timed&&!sub)?`<span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span>`:''}
       </div>
-      ${(uw&&ES.timed&&!isAns)?`<div class="uw-timed-countdown-wrap"><span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span></div>`:''}
+      ${(uw&&ES.timed&&!sub)?`<div class="uw-timed-countdown-wrap"><span class="q-timer-countdown" id="timed-countdown">\u23f1 ${timedPerQ}s</span></div>`:''}
       <div class="qtext hlable" id="qtext-content"></div>
       <div class="opts">${optsHtml}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-        ${!isAns?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>${uw?'Submit':'Submit Answer'}</button>`:'<div></div>'}
+        ${(!isAns&&!locked)?`<button class="sub-btn" id="esubBtn" onclick="eSubmit()" ${myI===null||myI===undefined?'disabled':''}>${uw?'Submit':'Submit Answer'}</button>`:'<div></div>'}
         <div style="display:flex;gap:6px;align-items:center;">
           <button class="flag-btn" id="flag-btn-q" onclick="flagQ(${cur})" title="Bookmark for later">🚩 Flag</button>
           ${isAns?`<button class="flag-btn" onclick="reportQ(${cur})" title="Report an issue with this question" style="font-size:11px;">⚑ Report</button>`:''}
@@ -4356,17 +4418,40 @@ function showEModal(id){document.getElementById(id).style.display='flex';}
 function hideEModal(id){document.getElementById(id).style.display='none';}
 async function eForceEnd(){
   hideEModal('end-modal');
-  ES.questions.forEach((_,i)=>{if(ES.results[i]===null){ES.results[i]=false;ES.mySelections[i]=-1;}});
+  ES.questions.forEach((q,i)=>{
+    if(ES.results[i]!==null)return;
+    const pick=ES.mySelections[i];
+    if(ES.timed&&pick!==null&&pick!==undefined&&pick>=0){const ok=pick===q.correct_answer;ES.results[i]=ok;if(ok)ES.score++;}
+    else{ES.results[i]=false;ES.mySelections[i]=-1;}
+  });
+  saveSelections();
   clearInterval(eTick);clearInterval(qTick);eRun=false;qRun=false;
   await sb.from('attempts').update({status:'done',updated_at:new Date().toISOString()}).eq('id',eAttId);
   await eSave();document.getElementById('exam-bb').style.display='none';eRenderResults();
 }
 async function eSuspend(){
-  hideEModal('sus-modal');await sb.from('attempts').update({status:'suspended',updated_at:new Date().toISOString()}).eq('id',eAttId);
+  hideEModal('sus-modal');
+  if(ES&&ES.timed&&!eCheckMode){
+    // Timed exam: keep the exam screen (nothing revealed), blur it and show a pause box.
+    clearInterval(eTick);clearInterval(qTick);clearTimedTick();eRun=false;qRun=false;
+    saveSelections();
+    document.getElementById('sus-overlay').style.display='flex';
+    await sb.from('attempts').update({status:'suspended',updated_at:new Date().toISOString()}).eq('id',eAttId);
+    await eSave();
+    return;
+  }
+  await sb.from('attempts').update({status:'suspended',updated_at:new Date().toISOString()}).eq('id',eAttId);
   await eSave();clearInterval(eTick);clearInterval(qTick);
   ES=null;eAttId=null;eCheckMode=false;showPage('homePage');renderDashboard();
   initSupportFab();
 }
+async function eResumeSuspended(){
+  const id=eAttId;
+  document.getElementById('sus-overlay').style.display='none';
+  await sb.from('attempts').update({status:'in_progress',updated_at:new Date().toISOString()}).eq('id',id);
+  await resumeSession(id);
+}
+function eSuspendHome(){document.getElementById('sus-overlay').style.display='none';eGoHome();}
 function eRenderResults(){
   // Restore support fab now that exam is over
   initSupportFab();
@@ -4420,7 +4505,7 @@ function setExamTimeLimit(mins){examTimeLimit=mins;showCreateExam();}
 function clearTimedTick(){if(timedTick){clearInterval(timedTick);timedTick=null;}}
 function startTimedCountdown(){
   clearTimedTick();
-  if(!timedMode||ES.results[ES.cur]!==null)return;
+  if(!ES.timed||ES.results[ES.cur]!==null)return;
   timedCountdownQIdx=ES.cur;
   timedSecsLeft=timedPerQ;
   updateTimedDisplay();
@@ -4440,7 +4525,7 @@ function startTimedCountdown(){
 // genuinely new/different question; a same-question re-render just refreshes the display
 // text (the DOM node was just replaced) without touching timedSecsLeft or the interval.
 function resumeOrStartTimedCountdown(){
-  if(!timedMode||ES.results[ES.cur]!==null)return;
+  if(!ES.timed||ES.results[ES.cur]!==null)return;
   if(timedTick&&timedCountdownQIdx===ES.cur){updateTimedDisplay();return;}
   startTimedCountdown();
 }
